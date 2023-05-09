@@ -65,21 +65,21 @@ static const char *termcmd[]  = { "st", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
-	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
-	{ MODKEY,                       XK_b,      togglebar,      {0} },
-	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
-	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
-	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
-	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
-	{ MODKEY,                       XK_Return, zoom,           {0} },
-	{ MODKEY,                       XK_Tab,    view,           {0} },
-	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
-	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
-	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
+	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },	// 打开 dmenucmd
+	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },	// 打开 st 终端
+	{ MODKEY,                       XK_b,      togglebar,      {0} },				// 隐藏 bar 
+	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },		// 焦点切换到下一个窗口
+	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },		// 焦点切换到上一个窗口
+	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },		// 窗口横排序
+	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },		// 窗口竖排序
+	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },		// 主窗口减少 5%
+	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },		// 主窗口增加 5%
+	{ MODKEY,                       XK_Return, zoom,           {0} },				// 把窗口提为主窗口
+	{ MODKEY,                       XK_Tab,    view,           {0} },				// 切换最近的上一个tag
+	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },				// 关闭窗口
+	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },	// 平铺
+	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },	// 浮动
+	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },	// 单片镜
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
@@ -97,7 +97,7 @@ static const Key keys[] = {
 	TAGKEYS(                        XK_7,                      6)
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
-	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
+	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },				// 关闭 dwm
 };
 
 /* button definitions */
