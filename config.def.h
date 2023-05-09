@@ -76,7 +76,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },		// 主窗口增加 5%
 	{ MODKEY,                       XK_Return, zoom,           {0} },				// 把窗口提为主窗口
 	{ MODKEY,                       XK_Tab,    view,           {0} },				// 切换最近的上一个tag
-	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },				// 关闭窗口
+	{ MODKEY,             			XK_c,      killclient,     {0} },				// 关闭窗口
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },	// 平铺
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },	// 浮动
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },	// 单片镜
