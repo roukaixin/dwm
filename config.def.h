@@ -29,9 +29,10 @@ static const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
-	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+	/* class      instance    title       		tags mask     isfloating   monitor */
+	{ "",         NULL,       "图片查看器",		0,            1,           -1 }, 	// qq图片查看器        浮动
+	{ "Gimp",     NULL,       NULL,       		0,            1,           -1 },
+	{ "Firefox",  NULL,       NULL,       		1 << 8,       0,           -1 },
 };
 
 /* layout(s) */
