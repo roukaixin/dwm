@@ -33,9 +33,7 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
 	 */
 	/* class      instance    title       		tags mask     isfloating   monitor */
-	{ "",         NULL,       "图片查看器",		0,            1,           -1 }, 	// qq图片查看器        浮动 
-	{ "",         NULL,       "Steam - 新闻",	0,            1,           -1 }, 	// steam 新闻        浮动
-	{ "",         NULL,       "好友列表",	    0,            1,           -1 }, 	// steam 好友列表        浮动
+	{ "QQ",       "qq",       "图片查看器",		0,            1,           -1 }, 	// qq图片查看器        浮动
 	{ "Gimp",     NULL,       NULL,       		0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       		1 << 8,       0,           -1 },
 };
