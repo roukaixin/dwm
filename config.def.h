@@ -33,14 +33,15 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
 	 */
 	/* class      instance    title       		tags mask     isfloating   monitor */
-	{ "QQ",       "qq",       "图片查看器",		0,            1,           -1 }, 	// qq图片查看器        浮动
+	{ "QQ",       "qq",       "图片查看器",		0,            1,           -1 }, 	// qq图片查看器         浮动
+	{ "QQ",       "qq",       "群公告",		    0,            1,           -1 }, 	// qq群公告            浮动
 	{ "Gimp",     NULL,       NULL,       		0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       		1 << 8,       0,           -1 },
 };
 
 /* layout(s) */
 static const double mfact     = 0.55; /* 主窗口的大小占比 [0.05..0.95] */
-static const int nmaster     = 1;    /* number of clients in master area */
+static const int nmaster     = 1;    /* master 区域的客户数量 */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 
