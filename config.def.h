@@ -21,6 +21,9 @@ static const char *colors[][3]      = {
 	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
 };
 
+// 自启动脚本位置
+static const char *autostartshell = "/home/tnt/wm/config/dwm/autostart.sh";
+
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
