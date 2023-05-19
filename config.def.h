@@ -1,5 +1,8 @@
 /* See LICENSE file for copyright and license details. */
 
+#include "layouts.c"
+
+
 /* appearance */
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
@@ -63,9 +66,10 @@ static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen win
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-        { "﬿",        tile },         /* 主次栈 */
+    { "﬿",        tile },         /* 主次栈 */
 	{ "><>",      NULL },    /* no layout function means floating behavior */
 	{ "[M]",      monocle },
+    { "HHH",      grid },
 };
 
 /* key definitions */
@@ -99,8 +103,9 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_Tab,    view,           {0} },				// 切换最近的上一个tag
 	{ MODKEY,             			XK_c,      killclient,     {0} },				// 关闭窗口
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },	// 平铺
-	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },	// 浮动
+	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },	// 没有布局
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },	// 单片镜
+    { MODKEY,                       XK_g,      setlayout,      {.v = &layouts[3]} },    // 网格布局
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
