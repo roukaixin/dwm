@@ -1153,6 +1153,36 @@ grid(Monitor *m) {
         return;
     }
 
+    if (n == 1) {
+        c = nexttiled(m->clients);
+        cw = m->ww * 0.7;
+        ch = m->wh * 0.65;
+        resize(c,
+               m->mx + (m->mw - cw) / 2 ,
+               m->my + (m->mh - ch) / 2 ,
+               cw - 2 * c->bw,
+               ch - 2 * c->bw,
+               0);
+        return;
+    }
+    if (n == 2) {
+        c = nexttiled(m->clients);
+        cw = m->ww / 2;
+        ch = m->wh * 0.65;
+        resize(c,
+               m->mx ,
+               m->my + (m->mh - ch) / 2 ,
+               cw - 2 * c->bw,
+               ch - 2 * c->bw,
+               0);
+        resize(nexttiled(c->next),
+               m->mx + cw ,
+               m->my + (m->mh - ch) / 2 ,
+               cw - 2 * c->bw,
+               ch - 2 * c->bw,
+               0);
+        return;
+    }
 
     /* 网格的大小 */
     for (cols = 0; cols <= n / 2; cols++)
