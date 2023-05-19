@@ -10,7 +10,8 @@ static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display 
 static const int showsystray        = 1;        /* 是否显示系统托盘。0否，1是 */
 static const int showbar            = 1;        /* 是否显示 bar 。0否，1是 */
 static const int topbar             = 1;        /* bar 是否在顶部。0底部，1顶部 */
-static const char *fonts[]          = { 
+static const char *fonts[]          = {
+                                        "JetBrainsMono Nerd Font:style=medium:size=13:antialias=true:autohint=true"
 										"WenQuanYi Zen Hei Mono:size=14:type=Regular:antialias=true:autohint=true",
 										"monospace:size=15" 
 									};
@@ -62,7 +63,7 @@ static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen win
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "[]=",      tile },    /* first entry is default */
+        { "﬿",        tile },         /* 主次栈 */
 	{ "><>",      NULL },    /* no layout function means floating behavior */
 	{ "[M]",      monocle },
 };
