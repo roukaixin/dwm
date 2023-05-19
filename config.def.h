@@ -11,6 +11,7 @@ static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display 
 static const int showsystray        = 1;        /* 是否显示系统托盘。0否，1是 */
 static const int showbar            = 1;        /* 是否显示 bar 。0否，1是 */
 static const int topbar             = 1;        /* bar 是否在顶部。0底部，1顶部 */
+static const int newClientInTop     = 0;        /* 新打开的窗口是否在顶部。1顶部，0底部 */
 static const char *fonts[]          = {
                                         "JetBrainsMono Nerd Font:style=medium:size=13:antialias=true:autohint=true"
 										"WenQuanYi Zen Hei Mono:size=14:type=Regular:antialias=true:autohint=true",

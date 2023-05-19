@@ -183,6 +183,7 @@ static void applyrules(Client *c);
 static int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact);
 static void arrange(Monitor *m);
 static void arrangemon(Monitor *m);
+/* 打开新窗口都会调用这个方法。参数：client 打开的当前窗口 */
 static void attach(Client *c);
 static void attachstack(Client *c);
 static void buttonpress(XEvent *e);
@@ -470,8 +471,15 @@ arrangemon(Monitor *m)
 void
 attach(Client *c)
 {
-	c->next = c->mon->clients;
-	c->mon->clients = c;
+    if (!newClientInTop){
+        Client **tc;
+        for (tc = &c->mon->clients; *tc; tc = &(*tc)->next);
+        *tc = c;
+        c->next = NULL;
+    } else {
+        c->next = c->mon->clients;
+        c->mon->clients = c;
+    }
 }
 
 void
@@ -1162,7 +1170,7 @@ grid(Monitor *m) {
                m->my + (m->mh - ch) / 2 ,
                cw - 2 * c->bw,
                ch - 2 * c->bw,
-               0);
+               False);
         return;
     }
     if (n == 2) {
@@ -1174,13 +1182,13 @@ grid(Monitor *m) {
                m->my + (m->mh - ch) / 2 ,
                cw - 2 * c->bw,
                ch - 2 * c->bw,
-               0);
+               False);
         resize(nexttiled(c->next),
                m->mx + cw ,
                m->my + (m->mh - ch) / 2 ,
                cw - 2 * c->bw,
                ch - 2 * c->bw,
-               0);
+               False);
         return;
     }
 
