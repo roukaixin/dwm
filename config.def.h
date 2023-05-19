@@ -20,12 +20,13 @@ static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
 static const char col_gray4[]       = "#eeeeee";
 static const char col_cyan[]        = "#005577";
-static const unsigned int baralpha = 0xd0;
-static const unsigned int borderalpha = OPAQUE;
+static const unsigned int baralpha = 0xc0;
+static const unsigned int borderalpha = 0xdd;
 static const char *colors[][3]      = {
 	/*               fg(字体颜色)         bg(背景颜色)         border(边框颜色)   */
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },     /* tar 中间打开窗口显示的部分 */
+	[SchemeNorm] = { "#bbbbbb", "#333333", "#444444" },      /* 未激活（未选中） */
+	[SchemeSel]  = { "#ffffff", "#37474F", "#42A5F5"  },     /* 激活的选项 */
+    [SchemeSystray] = { NULL, "#7799AA", NULL },             /* 系统托盘 */
 };
 
 static const unsigned int alphas[][3]      = {

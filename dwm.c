@@ -73,8 +73,12 @@
 #define XEMBED_EMBEDDED_VERSION (VERSION_MAJOR << 16) | VERSION_MINOR
 
 /* enums */
-enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel }; /* color schemes */
+enum {
+    CurNormal, CurResize, CurMove, CurLast
+}; /* cursor */
+enum {
+    SchemeNorm, SchemeSel
+}; /* color schemes */
 enum {
     NetSupported, NetWMName, NetWMState, NetWMCheck,
     NetSystemTray, NetSystemTrayOP, NetSystemTrayOrientation, NetSystemTrayOrientationHorz,
@@ -84,9 +88,13 @@ enum {
 enum {
     Manager, Xembed, XembedInfo, XLast
 }; /* Xembed atoms */
-enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
-enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
-       ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
+enum {
+    WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast
+}; /* default atoms */
+enum {
+    ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
+    ClkClientWin, ClkRootWin, ClkLast
+}; /* clicks */
 
 typedef union {
 	int i;
@@ -199,6 +207,7 @@ static void focusstack(const Arg *arg);
 static Atom getatomprop(Client *c, Atom prop);
 static int getrootptr(int *x, int *y);
 static long getstate(Window w);
+/* 获取系统托盘的宽度 */
 static unsigned int getsystraywidth(void);
 static int gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, int focused);
@@ -217,16 +226,20 @@ static void pop(Client *c);
 static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
 static Monitor *recttomon(int x, int y, int w, int h);
+/* 移除系统托盘图标 */
 static void removesystrayicon(Client *i);
 static void resize(Client *c, int x, int y, int w, int h, int interact);
+/* 调整 bar 大小 */
 static void resizebarwin(Monitor *m);
 static void resizeclient(Client *c, int x, int y, int w, int h);
 static void resizemouse(const Arg *arg);
+/* 调整系统托盘大小 */
 static void resizerequest(XEvent *e);
 static void restack(Monitor *m);
 static void run(void);
 static void runAutostart(void);
 static void scan(void);
+/* 发送事件 */
 static int sendevent(Window w, Atom proto, int m, long d0, long d1, long d2, long d3, long d4);
 static void sendmon(Client *c, Monitor *m);
 static void setclientstate(Client *c, long state);
@@ -256,8 +269,11 @@ static int updategeom(void);
 static void updatenumlockmask(void);
 static void updatesizehints(Client *c);
 static void updatestatus(void);
+/* 更新系统托盘 */
 static void updatesystray(void);
+/* 点击更新系统图标 */
 static void updatesystrayicongeom(Client *i, int w, int h);
+/* 更新系统图标状态 */
 static void updatesystrayiconstate(Client *i, XPropertyEvent *ev);
 static void updatetitle(Client *c);
 static void updatewindowtype(Client *c);
@@ -265,6 +281,7 @@ static void updatewmhints(Client *c);
 static void view(const Arg *arg);
 static Client *wintoclient(Window w);
 static Monitor *wintomon(Window w);
+/* 打开客户端加入图标到系统托盘 */
 static Client *wintosystrayicon(Window w);
 static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
@@ -754,9 +771,9 @@ destroynotify(XEvent *e)
 	Client *c;
 	XDestroyWindowEvent *ev = &e->xdestroywindow;
 
-	if ((c = wintoclient(ev->window)))
-		unmanage(c, 1);
-    else if ((c = wintosystrayicon(ev->window))) {
+	if ((c = wintoclient(ev->window))){
+        unmanage(c, 1);
+    } else if ((c = wintosystrayicon(ev->window))) {
         removesystrayicon(c);
         resizebarwin(selmon);
         updatesystray();
@@ -1800,10 +1817,9 @@ setup(void)
 	cursor[CurMove] = drw_cur_create(drw, XC_fleur);
 	/* init appearance */
 	scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
-    unsigned int alphas[] = {borderalpha, baralpha, OPAQUE};
 	for (i = 0; i < LENGTH(colors); i++)
-        scheme[i] = drw_scm_create(drw, colors[i], alphas, 3);
-    /* init system tray */
+        scheme[i] = drw_scm_create(drw, colors[i], alphas[i], 3);
+    /* 初始化系统托盘 */
     updatesystray();
 	/* init bars */
 	updatebars();
@@ -2045,7 +2061,8 @@ unmapnotify(XEvent *e)
         /* KLUDGE! sometimes icons occasionally unmap their windows, but do
          * _not_ destroy them. We map those windows back
          */
-        XMapRaised(dpy, c->win);updatesystray();
+        XMapRaised(dpy, c->win);
+        updatesystray();
     }
 }
 
