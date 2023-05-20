@@ -63,7 +63,7 @@ static const Rule rules[] = {
 
 /* layout(s) */
 static const double mfact     = 0.55; /* 主窗口的大小占比 [0.05..0.95] */
-static const int nmaster     = 1;    /* master 区域的客户数量 */
+    /* master 区域的客户数量 */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 

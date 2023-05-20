@@ -1176,16 +1176,16 @@ grid(Monitor *m) {
     }
     if (n == 2) {
         c = nexttiled(m->clients);
-        cw = m->ww / 2;
+        cw = (m->ww - 2 * gappov - gappiv) / 2;
         ch = m->wh * 0.65;
         resize(c,
-               m->mx ,
+               m->mx + gappov,
                m->my + (m->mh - ch) / 2 ,
                cw - 2 * c->bw,
                ch - 2 * c->bw,
                False);
         resize(nexttiled(c->next),
-               m->mx + cw ,
+               m->mx + cw + gappov + gappiv,
                m->my + (m->mh - ch) / 2 ,
                cw - 2 * c->bw,
                ch - 2 * c->bw,
@@ -1199,26 +1199,29 @@ grid(Monitor *m) {
             break;
     rows = (cols && (cols - 1) * cols >= n) ? cols - 1 : cols;
 
-    /* window geoms (cell height/width) */
-    ch = m->wh / (rows ? rows : 1);
-    cw = m->ww / (cols ? cols : 1);
+    /* 每个窗口的高度 */
+    ch = (m->wh - 2 * gappoh - (rows - 1) * gappih) / rows;
+    /* 每个窗口的宽度 */
+    cw = (m->ww - 2 * gappov - (cols - 1) * gappiv ) / cols;
 
     // 计算最后一行多少个 client
     lastRows = n % cols;
     if (lastRows){
-        lastX = (m->ww - lastRows * cw) / 2;
+        lastX = (m->ww - lastRows * cw - (lastRows - 1) * gappiv - 2 * gappov) / 2;
     }
 
     for (i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next)) {
-        cx = m->wx + (i % cols) * cw;
-        cy = m->wy + (i / cols) * ch;
-        /* adjust height/width of last row/column's windows */
-        ah = ((i + 1) % rows == 0) ? m->wh - ch * rows : 0;
-        aw = (i >= rows * (cols - 1)) ? m->ww - cw * cols : 0;
+        cx = m->wx + (i % cols) * (cw +  gappiv) + gappov;
+        cy = m->wy + (i / cols) * (ch + gappih) + gappoh;
         if ( lastRows && i >= n - lastRows){
             cx += lastX;
         }
-        resize(c, cx, cy, cw - 2 * c->bw + aw, ch - 2 * c->bw + ah, False);
+        resize(c,
+               cx,
+               cy,
+               cw - 2 * c->bw ,
+               ch - 2 * c->bw ,
+               False);
         i++;
     }
 }
@@ -2017,7 +2020,7 @@ void
 tile(Monitor *m)
 {
     // n：窗口数量
-	unsigned int i, n, h;
+	unsigned int i, n;
     // mw : 主区域的宽度，my：主窗口的 y 轴，mh ： 单个主窗口的高度, ty： stack 的 y 轴, th ： 单个stack的高度
     unsigned int  mw, my, mh, ty, th;
 	Client *c;
