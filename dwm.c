@@ -259,6 +259,7 @@ static void spawn(const Arg *arg);
 static Monitor *systraytomon(Monitor *m);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
+/* 平铺布局 */
 static void tile(Monitor *m);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
@@ -2015,28 +2016,49 @@ tagmon(const Arg *arg)
 void
 tile(Monitor *m)
 {
-	unsigned int i, n, h, mw, my, ty;
+    // n：窗口数量
+	unsigned int i, n, h;
+    // mw : 主区域的宽度，my：主窗口的 y 轴，mh ： 单个主窗口的高度, ty： stack 的 y 轴, th ： 单个stack的高度
+    unsigned int  mw, my, mh, ty, th;
 	Client *c;
 
 	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
 	if (n == 0)
 		return;
 
-	if (n > m->nmaster)
-		mw = m->nmaster ? m->ww * m->mfact : 0;
-	else
-		mw = m->ww;
-	for (i = my = ty = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+    // 判断窗口数量有没有大于主窗口数量
+	if (n > m->nmaster){
+        // 有 stack 时，主区域的宽度，ww：win 宽度，mfack：主区域的比例
+        mw = m->nmaster ? (m->ww * m->mfact) - gappov - 0.5 * gappiv : 0;
+    } else
+        // 没有 stack 时，主区域的宽度
+		mw = m->ww - 2 * gappov;
+
+    mh = (m->wh - 2 * gappoh - (MIN(n, m->nmaster) -1) * gappih) / MIN(n, m->nmaster);
+    th = n == m->nmaster ? 0 : (m->wh - 2 * gappoh - gappih * (n - m->nmaster - 1)) / (n - m->nmaster);
+    // 遍历窗口
+	for (i =  0, my = ty = gappoh, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+
 		if (i < m->nmaster) {
-			h = (m->wh - my) / (MIN(n, m->nmaster) - i);
-			resize(c, m->wx, m->wy + my, mw - (2*c->bw), h - (2*c->bw), 0);
-			if (my + HEIGHT(c) < m->wh)
-				my += HEIGHT(c);
+            // 主区域的主窗口
+			resize(c,
+                    m->wx + gappov,
+                    m->wy + my,
+                    mw - (2*c->bw),
+                    mh - (2*c->bw),
+                    False);
+			if (my + HEIGHT(c) + gappih < m->wh)
+				my += HEIGHT(c) + gappih;
 		} else {
-			h = (m->wh - ty) / (n - i);
-			resize(c, m->wx + mw, m->wy + ty, m->ww - mw - (2*c->bw), h - (2*c->bw), 0);
-			if (ty + HEIGHT(c) < m->wh)
-				ty += HEIGHT(c);
+			resize(c,
+                   m->wx + mw + gappov + gappiv,
+                   m->wy + ty,
+                   m->ww - mw - (2*c->bw) - 2 * gappov - gappiv,
+                   th - (2*c->bw),
+                   False);
+			if (ty + HEIGHT(c) + gappih < m->wh){
+                ty += HEIGHT(c) + gappih;
+            }
 		}
 }
 
