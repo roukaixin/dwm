@@ -8,19 +8,20 @@ static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows sel
 static const unsigned int systrayonleft = 0;    /* 0: systray in the right corner, >0: systray on left of status text */
 static const unsigned int systrayspacing = 2;   /* 系统托盘间隙 systray spacing */
 static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
-static const int showsystray        = 1;        /* 是否显示系统托盘。0否，1是 */
-static const int showbar            = 1;        /* 是否显示 bar 。0否，1是 */
-static const int topbar             = 1;        /* bar 是否在顶部。0底部，1顶部 */
-static const int newClientInTop     = 0;        /* 新打开的窗口是否在顶部。1顶部，0底部 */
-static const unsigned int gappih    = 10;       /* 水平窗口和窗口的间隙 */
-static const unsigned int gappiv    = 10;       /* 垂直窗口和窗口的间隙 */
-static const unsigned int gappoh    = 10;       /* 水平方向：窗口和屏幕边缘之间的间隙 */
-static const unsigned int gappov    = 10;       /* 垂直方向：窗口和屏幕边缘之间的间隙 */
-static const char *fonts[]          = {
-                                        "JetBrainsMono Nerd Font:style=medium:size=13:antialias=true:autohint=true"
-										"WenQuanYi Zen Hei Mono:size=14:type=Regular:antialias=true:autohint=true",
-										"monospace:size=15" 
-									};
+static const int showsystray            = 1;        /* 是否显示系统托盘。0否，1是 */
+static const int showbar                = 1;        /* 是否显示 bar 。0否，1是 */
+static const int topbar                 = 1;        /* bar 是否在顶部。0底部，1顶部 */
+static const int new_client_in_top      = 0;        /* 新打开的窗口是否在顶部。1顶部，0底部 */
+static const unsigned int gappih        = 10;       /* 水平窗口和窗口的间隙 */
+static const unsigned int gappiv        = 10;       /* 垂直窗口和窗口的间隙 */
+static const unsigned int gappoh        = 10;       /* 水平方向：窗口和屏幕边缘之间的间隙 */
+static const unsigned int gappov        = 10;       /* 垂直方向：窗口和屏幕边缘之间的间隙 */
+static const unsigned int user_bh       = 2;        /* bar 的高度，默认值为 2 */
+static const char *fonts[]              = {
+                                            "JetBrainsMono Nerd Font:style=medium:size=13:antialias=true:autohint=true",
+										    "WenQuanYi Zen Hei Mono:size=14:type=Regular:antialias=true:autohint=true",
+										    "monospace:size=15"
+									    };
 static const char dmenufont[]       = "WenQuanYi Zen Hei Mono:size=14";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
@@ -62,10 +63,10 @@ static const Rule rules[] = {
 };
 
 /* layout(s) */
-static const double mfact     = 0.55; /* 主窗口的大小占比 [0.05..0.95] */
-    /* master 区域的客户数量 */
-static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
-static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
+static const double mfact       = 0.55;     /* 主窗口的大小占比 [0.05..0.95] */
+static const int nmaster        = 1;        /* master 区域的客户数量 */
+static const int resizehints    = 1;        /* 1 means respect size hints in tiled resizals */
+static const int lockfullscreen = 1;        /* 1 will force focus on the fullscreen window */
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */

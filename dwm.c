@@ -483,7 +483,7 @@ arrangemon(Monitor *m)
 void
 attach(Client *c)
 {
-    if (!newClientInTop){
+    if (!new_client_in_top){
         Client **tc;
         for (tc = &c->mon->clients; *tc; tc = &(*tc)->next);
         *tc = c;
@@ -1918,7 +1918,7 @@ setup(void)
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
 	lrpad = drw->fonts->h;
-	bh = drw->fonts->h + 2;
+    bh = user_bh ? drw->fonts->h + user_bh : drw->fonts->h + 2;
 	updategeom();
 	/* init atoms */
 	utf8string = XInternAtom(dpy, "UTF8_STRING", False);
