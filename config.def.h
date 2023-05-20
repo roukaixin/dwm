@@ -56,7 +56,7 @@ static const Rule rules[] = {
 	/* class      instance    title       		tags mask     isfloating   monitor */
 	{ "QQ",       "qq",       "图片查看器",		0,            1,           -1 }, 	// qq图片查看器         浮动
 	{ "QQ",       "qq",       "群公告",		    0,            1,           -1 }, 	// qq群公告            浮动
-	{ "QQ",       "qq",       "视频播放器",		0,            1,           -1 }, 	// qq视频播放器            浮动
+	{ "QQ",       "qq",       "视频播放器",		0,            1,           -1 }, 	// qq视频播放器         浮动
 	{ "Gimp",     NULL,       NULL,       		0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       		1 << 8,       0,           -1 },
 };
