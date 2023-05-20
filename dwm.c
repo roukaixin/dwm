@@ -1143,7 +1143,7 @@ grabkeys(void)
 
 void
 grid(Monitor *m) {
-    int i, n, aw, ah;
+    int i, n;
     // client 的 x y轴，cw：宽，ch：高
     int cx, cy, cw, ch;
     // 行，列，最后一行多少个
@@ -1165,7 +1165,7 @@ grid(Monitor *m) {
     if (n == 1) {
         c = nexttiled(m->clients);
         cw = m->ww * 0.7;
-        ch = m->wh * 0.65;
+        ch = m->wh * 0.75;
         resize(c,
                m->mx + (m->mw - cw) / 2 ,
                m->my + (m->mh - ch) / 2 ,
