@@ -70,10 +70,10 @@ static const int lockfullscreen = 1;        /* 1 will force focus on the fullscr
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-    { "﬿",        tile },         /* 平铺布局 */
+    { "󰙀",        tile },         /* 平铺布局 */
 	{ "><>",      NULL },         /* 没有布局功能，意味着浮动行为 */
 	{ "[M]",      monocle },      /* 单片镜布局 */
-    { "﩯",        grid },         /* 网格布局 */
+    { "󰕰",        grid },         /* 网格布局 */
 };
 
 /* key definitions */
