@@ -116,7 +116,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },	// 没有布局
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },	// 单片镜
     { MODKEY,                       XK_g,      setlayout,      {.v = &layouts[3]} },    // 网格布局
-	{ MODKEY,                       XK_space,  setlayout,      {0} },
+	{ MODKEY,                       XK_space,  setlayout,      {0} },                   // 恢复到第一布局
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
@@ -126,7 +126,7 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
     { MODKEY,                       XK_s,      show,           {0} },
     { MODKEY|ShiftMask,             XK_s,      showall,        {0} },
-    { MODKEY,                       XK_h,      hide,           {0} },
+    { MODKEY|ShiftMask,             XK_h,      hide,           {0} },                   // 隐藏窗口
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
