@@ -96,11 +96,14 @@ static const Layout layouts[] = {
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *termcmd[]  = { "st", NULL };
+static const char scratchpadname[] = "scratchpad";
+static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "80x16", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },	// 打开 dmenucmd
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },	// 打开 st 终端
+    { MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } },     // 打开临时窗口
 	{ MODKEY,                       XK_b,      togglebar,      {0} },				// 隐藏 bar 
 	// { MODKEY,                       XK_j,      focusstack,     {.i = +1 } },		// 焦点切换到下一个窗口
 	// { MODKEY,                       XK_k,      focusstack,     {.i = -1 } },		// 焦点切换到上一个窗口
