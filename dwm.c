@@ -503,9 +503,9 @@ attach(Client *c)
 {
     if (!new_client_in_top){
         Client **tc;
+        c->next = NULL;
         for (tc = &c->mon->clients; *tc; tc = &(*tc)->next);
         *tc = c;
-        c->next = NULL;
     } else {
         c->next = c->mon->clients;
         c->mon->clients = c;
