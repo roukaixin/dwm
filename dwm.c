@@ -228,6 +228,7 @@ static void grabbuttons(Client *c, int focused);
 static void grabkeys(void);
 /* 网格布局 */
 static void grid(Monitor *m);
+/* 隐藏窗口 */
 static void hide(const Arg *arg);
 static void hidewin(Client *c);
 static void incnmaster(const Arg *arg);

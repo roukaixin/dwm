@@ -101,10 +101,10 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_b,      togglebar,      {0} },				// 隐藏 bar 
 	// { MODKEY,                       XK_j,      focusstack,     {.i = +1 } },		// 焦点切换到下一个窗口
 	// { MODKEY,                       XK_k,      focusstack,     {.i = -1 } },		// 焦点切换到上一个窗口
-    { MODKEY,                       XK_j,      focusstackvis,  {.i = +1 } },
-    { MODKEY,                       XK_k,      focusstackvis,  {.i = -1 } },
-    { MODKEY|ShiftMask,             XK_j,      focusstackhid,  {.i = +1 } },
-    { MODKEY|ShiftMask,             XK_k,      focusstackhid,  {.i = -1 } },
+    { MODKEY,                       XK_j,      focusstackvis,  {.i = +1 } },        // 焦点切换到下一个窗口（不包括隐藏窗口）
+    { MODKEY,                       XK_k,      focusstackvis,  {.i = -1 } },        // 焦点切换到上一个窗口（不包括隐藏窗口）
+    { MODKEY|ShiftMask,             XK_j,      focusstackhid,  {.i = +1 } },        // 焦点切换到下一个窗口（全部窗口）
+    { MODKEY|ShiftMask,             XK_k,      focusstackhid,  {.i = -1 } },        // 焦点切换到上一个窗口（全部窗口）
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },		// 窗口横排序
 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },		// 窗口竖排序
 	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },		// 主窗口减少 5%
