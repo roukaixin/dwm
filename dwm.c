@@ -2901,6 +2901,7 @@ updatesystray(void)
 			return;
 		}
 	}
+    // 系统托盘图标
 	for (w = 0, i = systray->icons; i; i = i->next) {
 		/* make sure the background color stays the same */
         wa.background_pixel  = scheme[SchemeSystray][ColBg].pixel;
@@ -2908,8 +2909,10 @@ updatesystray(void)
 		XMapRaised(dpy, i->win);
 		w += systrayspacing;
 		i->x = w;
-		XMoveResizeWindow(dpy, i->win, i->x, 0, i->w, i->h);
-		w += i->w;
+        // 图标的宽和高
+		XMoveResizeWindow(dpy, i->win, i->x, 0, MAX(i->w,bh), MAX(i->h,bh));
+        // 填充到 bh 一样的宽度
+		w += MAX(i->w, bh);
 		if (i->mon != m)
 			i->mon = m;
 	}
