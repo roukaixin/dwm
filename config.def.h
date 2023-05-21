@@ -130,6 +130,11 @@ static const Key keys[] = {
     { MODKEY,                       XK_s,      show,           {0} },
     { MODKEY|ShiftMask,             XK_s,      showall,        {0} },
     { MODKEY|ShiftMask,             XK_h,      hide,           {0} },                   // 隐藏窗口
+    { MODKEY|ShiftMask,             XK_Up,     movethrow,      {.ui = DIR_N  }},
+    { MODKEY|ShiftMask,             XK_Down,   movethrow,      {.ui = DIR_S  }},
+    { MODKEY|ShiftMask,             XK_Left,   movethrow,      {.ui = DIR_W  }},
+    { MODKEY|ShiftMask,             XK_Right,  movethrow,      {.ui = DIR_E  }},
+    { MODKEY|ShiftMask,             XK_m,      movethrow,      {.ui = DIR_C  }},
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
