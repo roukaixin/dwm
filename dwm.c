@@ -83,6 +83,7 @@ enum {
     SchemeSystray,      // 托盘
     SchemeHov,
     SchemeHid,
+    SchemeBarEmpty,     // 空白状态栏
 }; /* color schemes */
 enum {
     NetSupported, NetWMName, NetWMState, NetWMCheck,
@@ -208,6 +209,7 @@ static void destroynotify(XEvent *e);
 static void detach(Client *c);
 static void detachstack(Client *c);
 static Monitor *dirtomon(int dir);
+/* 绘制 bar 状态栏 */
 static void drawbar(Monitor *m);
 static void drawbars(void);
 static void enternotify(XEvent *e);
@@ -526,6 +528,7 @@ buttonpress(XEvent *e)
 	Monitor *m;
 	XButtonPressedEvent *ev = &e->xbutton;
 
+    // 判断鼠标点击的位置
 	click = ClkRootWin;
 	/* focus monitor if necessary */
 	if ((m = wintomon(ev->window)) && m != selmon) {
@@ -893,8 +896,9 @@ dirtomon(int dir)
 void
 drawbar(Monitor *m)
 {
-    int x, w, tw = 0, n = 0, scm;
-    unsigned int stw = 0;
+    int x, w, tag_w = 0, n = 0, scm;
+    // 系统托盘宽度，
+    unsigned int systray_w = 0, bar_empty_w = 0, clint_all_w = 0, beyond_clint_w = 0;
 	int boxs = drw->fonts->h / 9;
 	int boxw = drw->fonts->h / 6 + 2;
 	unsigned int i, occ = 0, urg = 0;
@@ -903,15 +907,16 @@ drawbar(Monitor *m)
 	if (!m->showbar)
 		return;
 
+    // 获取系统托盘的宽度
     if(showsystray && m == systraytomon(m) && !systrayonleft){
-        stw = getsystraywidth();
+        systray_w = getsystraywidth();
     }
 
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
 		drw_setscheme(drw, scheme[SchemeNorm]);
-        tw = TEXTW(stext) - lrpad / 2 + 2; /* 2px extra right padding */
-        drw_text(drw, m->ww - tw - stw, 0, tw, bh, lrpad / 2 - 2, stext, 0);
+        tag_w = TEXTW(stext) - lrpad / 2 + 2; /* 2px extra right padding */
+        drw_text(drw, m->ww - tag_w - systray_w, 0, tag_w, bh, lrpad / 2 - 2, stext, 0);
 	}
 
     resizebarwin(m);
@@ -940,11 +945,12 @@ drawbar(Monitor *m)
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
-    if ((w = m->ww - tw - stw - x) > bh) {
+    if ((w = m->ww - tag_w - systray_w - x) > bh) {
         if (n > 0) {
             int remainder = w % n;
-            int tabw = (1.0 / (double)n) * w + 1;
+            // int tabw = (1.0 / (double)n) * w + 1;
             for (c = m->clients; c; c = c->next) {
+                int tabw = MIN(TEXTW(c->name),150);
                 if (!ISVISIBLE(c))
                     continue;
                 if (m->hov == c)
@@ -963,8 +969,21 @@ drawbar(Monitor *m)
                     }
                     remainder--;
                 }
-                drw_text(drw, x, 0, tabw, bh, lrpad / 2, c->name, 0);
+                clint_all_w += tabw;
+                if (clint_all_w > w - TEXTW("...")){
+                    beyond_clint_w += tabw;
+                    drw_text(drw, x, 0, w - (clint_all_w - beyond_clint_w) , bh, lrpad / 2, "...", 0);
+                    x -= tabw;
+                    bar_empty_w = 0;
+                } else{
+                    bar_empty_w = w - (clint_all_w - beyond_clint_w);
+                    drw_text(drw, x, 0, tabw, bh, lrpad / 2, c->name, 0);
+                }
                 x += tabw;
+            }
+            if(w > clint_all_w){
+                drw_setscheme(drw, scheme[SchemeNorm]);
+                drw_rect(drw, x, 0, bar_empty_w, bh, 1, 1);
             }
 		} else {
 			drw_setscheme(drw, scheme[SchemeNorm]);
@@ -973,7 +992,7 @@ drawbar(Monitor *m)
 	}
     m->bt = n;
     m->btw = w;
-    drw_map(drw, m->barwin, 0, 0, m->ww - stw, bh);
+    drw_map(drw, m->barwin, 0, 0, m->ww - systray_w, bh);
 }
 
 void

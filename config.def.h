@@ -37,12 +37,14 @@ static const char *colors[][3]      = {
     [SchemeSystray] = { NULL, "#7799AA", NULL },             /* 系统托盘 */
     [SchemeHov]  = { col_gray4, col_cyan,  col_cyan  },
     [SchemeHid]  = { col_cyan,  col_gray1, col_cyan  },
+    [SchemeBarEmpty] = { NULL, "#111111", NULL },
 };
 
 static const unsigned int alphas[][3]      = {
         /*               fg      bg        border*/
         [SchemeNorm] = { OPAQUE, baralpha, borderalpha },
         [SchemeSel]  = { OPAQUE, baralpha, borderalpha },
+        [SchemeBarEmpty] = { OPAQUE, 0x11, borderalpha },
 };
 
 // 自启动脚本位置
