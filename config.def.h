@@ -121,6 +121,7 @@ static const Key keys[] = {
     { MODKEY,                       XK_g,      setlayout,      {.v = &layouts[3]} },    // 网格布局
 	{ MODKEY,                       XK_space,  setlayout,      {0} },                   // 恢复到第一布局
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
+    { MODKEY|ShiftMask,             XK_f,      togglefullscr,  {0} },                   // 窗口最大化（全屏）
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
 	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
