@@ -101,30 +101,30 @@ static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "80x16"
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },	// 打开 dmenucmd
-	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },	// 打开 st 终端
+	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },	        // 打开 dmenucmd
+	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },	        // 打开 st 终端
     { MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } },     // 打开临时窗口
-	{ MODKEY,                       XK_b,      togglebar,      {0} },				// 隐藏 bar 
-	// { MODKEY,                       XK_j,      focusstack,     {.i = +1 } },		// 焦点切换到下一个窗口
-	// { MODKEY,                       XK_k,      focusstack,     {.i = -1 } },		// 焦点切换到上一个窗口
-    { MODKEY,                       XK_j,      focusstackvis,  {.i = +1 } },        // 焦点切换到下一个窗口（不包括隐藏窗口）
-    { MODKEY,                       XK_k,      focusstackvis,  {.i = -1 } },        // 焦点切换到上一个窗口（不包括隐藏窗口）
-    { MODKEY|ShiftMask,             XK_j,      focusstackhid,  {.i = +1 } },        // 焦点切换到下一个窗口（全部窗口）
-    { MODKEY|ShiftMask,             XK_k,      focusstackhid,  {.i = -1 } },        // 焦点切换到上一个窗口（全部窗口）
-	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },		// 窗口横排序
-	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },		// 窗口竖排序
-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },		// 主窗口减少 5%
-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },		// 主窗口增加 5%
-	{ MODKEY,                       XK_Return, zoom,           {0} },				// 把窗口提为主窗口
-	{ MODKEY,                       XK_Tab,    view,           {0} },				// 切换最近的上一个tag
-	{ MODKEY,             			XK_c,      killclient,     {0} },				// 关闭窗口
-	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },	// 平铺
-	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },	// 没有布局
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },	// 单片镜
-    { MODKEY,                       XK_g,      setlayout,      {.v = &layouts[3]} },    // 网格布局
-	{ MODKEY,                       XK_space,  setlayout,      {0} },                   // 恢复到第一布局
+	{ MODKEY,                       XK_b,      togglebar,      {0} },				        // 隐藏 bar
+	// { MODKEY,                       XK_j,      focusstack,     {.i = +1 } },		        // 焦点切换到下一个窗口
+	// { MODKEY,                       XK_k,      focusstack,     {.i = -1 } },		        // 焦点切换到上一个窗口
+    { MODKEY,                       XK_j,      focusstackvis,  {.i = +1 } },                // 焦点切换到下一个窗口（不包括隐藏窗口）
+    { MODKEY,                       XK_k,      focusstackvis,  {.i = -1 } },                // 焦点切换到上一个窗口（不包括隐藏窗口）
+    { MODKEY|ShiftMask,             XK_j,      focusstackhid,  {.i = +1 } },                // 焦点切换到下一个窗口（全部窗口）
+    { MODKEY|ShiftMask,             XK_k,      focusstackhid,  {.i = -1 } },                // 焦点切换到上一个窗口（全部窗口）
+	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },		        // 窗口横排序
+	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },		        // 窗口竖排序
+	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },		        // 主窗口减少 5%
+	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },		        // 主窗口增加 5%
+	{ MODKEY,                       XK_Return, zoom,           {0} },				        // 把窗口提为主窗口
+	{ MODKEY,                       XK_Tab,    view,           {0} },				        // 切换最近的上一个tag
+	{ MODKEY,             			XK_c,      killclient,     {0} },				        // 关闭窗口
+	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },	    // 平铺
+	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },	    // 没有布局
+	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },	    // 单片镜
+    { MODKEY,                       XK_g,      setlayout,      {.v = &layouts[3]} },        // 网格布局
+	{ MODKEY,                       XK_space,  setlayout,      {0} },                       // 恢复到第一布局
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
-    { MODKEY|ShiftMask,             XK_f,      togglefullscr,  {0} },                   // 窗口最大化（全屏）
+    { MODKEY|ShiftMask,             XK_f,      togglefullscr,  {0} },                       // 窗口最大化（全屏）
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
 	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
@@ -133,7 +133,7 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
     { MODKEY,                       XK_s,      show,           {0} },
     { MODKEY|ShiftMask,             XK_s,      showall,        {0} },
-    { MODKEY|ShiftMask,             XK_h,      hide,           {0} },                   // 隐藏窗口
+    { MODKEY|ShiftMask,             XK_h,      hide,           {0} },                       // 隐藏窗口
     { MODKEY|ShiftMask,             XK_Up,     movethrow,      {.ui = DIR_N  }},
     { MODKEY|ShiftMask,             XK_Down,   movethrow,      {.ui = DIR_S  }},
     { MODKEY|ShiftMask,             XK_Left,   movethrow,      {.ui = DIR_W  }},
@@ -159,12 +159,12 @@ static const Button buttons[] = {
 //	{ ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },
     { ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
     { ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
-    { ClkWinTitle,          0,              Button1,        togglewin,      {0} },
+    { ClkWinTitle,          0,              Button1,        togglewin,      {0} },                  // 切换窗口显示状态
 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
 	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
-	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
+	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },                  // 拖动窗口
 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
-	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
+	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },                  // 改变窗口大小
 	{ ClkTagBar,            0,              Button1,        view,           {0} },
 	{ ClkTagBar,            0,              Button3,        toggleview,     {0} },
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },

@@ -129,6 +129,7 @@ struct Client {
 	int oldx, oldy, oldw, oldh;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh, hintsvalid;
 	int bw, oldbw;
+    int taskw;          // 任务标题的宽度
 	unsigned int tags;
 	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen;
 	Client *next;
@@ -573,7 +574,8 @@ buttonpress(XEvent *e)
                     if (!ISVISIBLE(c))
                         continue;
                     else
-                        x +=(1.0 / (double)m->bt) * m->btw;
+                        // 任务标题的点击范围
+                        x += c->taskw;
                 } while (ev->x > x && (c = c->next));
 
                 click = ClkWinTitle;
@@ -985,9 +987,13 @@ drawbar(Monitor *m)
                     drw_text(drw, x, 0, w - (clint_all_w - beyond_clint_w) , bh, lrpad / 2, "...", 0);
                     x -= tabw;
                     bar_empty_w = 0;
+                    // 设置任务标题的宽度
+                    c->taskw = tabw;
                 } else{
                     bar_empty_w = w - (clint_all_w - beyond_clint_w);
                     drw_text(drw, x, 0, tabw, bh, lrpad / 2, c->name, 0);
+                    // 设置任务标题的宽度
+                    c->taskw = tabw;
                 }
                 x += tabw;
             }
