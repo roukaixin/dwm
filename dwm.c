@@ -2286,9 +2286,11 @@ run(void)
 
 void
 runAutostart(void) {
-    char cmd [100];
-    sprintf(cmd, "%s &", autostartscript);
-    system(cmd);
+    char shell[100] = "sh ";
+    char ht[] = " &";
+    strcat(shell, autostartshell);
+    strcat(shell, ht);
+    system(shell);
 }
 
 void
