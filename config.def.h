@@ -98,6 +98,8 @@ static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont,
 static const char *termcmd[]  = { "st", NULL };
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "80x16", NULL };
+// 截图
+static const char *flameshot[] = { "flameshot", "gui" , NULL};
 
 
 /**
@@ -110,7 +112,7 @@ static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },	        // 打开 dmenucmd
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },	        // 打开 st 终端
-    { Mod1Mask,                     XK_a,      spawn,          SHCMD("flameshot gui") },	// 截图
+    { Mod1Mask,                     XK_a,      spawn,          {.v = flameshot } },	        // 截图
     { MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } },     // 打开临时窗口
 	{ MODKEY,                       XK_b,      togglebar,      {0} },				        // 隐藏 bar
     { MODKEY,                       XK_j,      focusstackvis,  {.i = +1 } },                // 焦点切换到下一个窗口（不包括隐藏窗口）
