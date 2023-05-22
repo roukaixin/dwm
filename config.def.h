@@ -96,17 +96,25 @@ static const Layout layouts[] = {
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *termcmd[]  = { "st", NULL };
+// 截图
+static const char *flameshot[]  = { "flameshot gui", NULL };
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "80x16", NULL };
 
+
+/**
+ * Mod4Mask : win
+ * ControlMask : ctrl
+ * ShiftMask : shift
+ * Mod1Mask : alt
+ */
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },	        // 打开 dmenucmd
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },	        // 打开 st 终端
+    { Mod1Mask,                     XK_a,      spawn,          SHCMD("flameshot gui") },	// 截图
     { MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } },     // 打开临时窗口
 	{ MODKEY,                       XK_b,      togglebar,      {0} },				        // 隐藏 bar
-	// { MODKEY,                       XK_j,      focusstack,     {.i = +1 } },		        // 焦点切换到下一个窗口
-	// { MODKEY,                       XK_k,      focusstack,     {.i = -1 } },		        // 焦点切换到上一个窗口
     { MODKEY,                       XK_j,      focusstackvis,  {.i = +1 } },                // 焦点切换到下一个窗口（不包括隐藏窗口）
     { MODKEY,                       XK_k,      focusstackvis,  {.i = -1 } },                // 焦点切换到上一个窗口（不包括隐藏窗口）
     { MODKEY|ShiftMask,             XK_j,      focusstackhid,  {.i = +1 } },                // 焦点切换到下一个窗口（全部窗口）
@@ -123,7 +131,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },	    // 单片镜
     { MODKEY,                       XK_g,      setlayout,      {.v = &layouts[3]} },        // 网格布局
 	{ MODKEY,                       XK_space,  setlayout,      {0} },                       // 恢复到第一布局
-	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
+	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },                       // 切换窗口状态（浮动，不浮动）
     { MODKEY|ShiftMask,             XK_f,      togglefullscr,  {0} },                       // 窗口最大化（全屏）
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
@@ -131,14 +139,14 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-    { MODKEY,                       XK_s,      show,           {0} },
-    { MODKEY|ShiftMask,             XK_s,      showall,        {0} },
+    { MODKEY,                       XK_s,      show,           {0} },                       // 显示当前隐藏窗口
+    { MODKEY|ShiftMask,             XK_s,      showall,        {0} },                       // 显示全部窗口（包括隐藏窗口）
     { MODKEY|ShiftMask,             XK_h,      hide,           {0} },                       // 隐藏窗口
-    { MODKEY|ShiftMask,             XK_Up,     movethrow,      {.ui = DIR_N  }},
-    { MODKEY|ShiftMask,             XK_Down,   movethrow,      {.ui = DIR_S  }},
-    { MODKEY|ShiftMask,             XK_Left,   movethrow,      {.ui = DIR_W  }},
-    { MODKEY|ShiftMask,             XK_Right,  movethrow,      {.ui = DIR_E  }},
-    { MODKEY|ShiftMask,             XK_m,      movethrow,      {.ui = DIR_C  }},
+    { MODKEY|ShiftMask,             XK_Up,     movethrow,      {.ui = DIR_N  }},            // 向上移动窗口
+    { MODKEY|ShiftMask,             XK_Down,   movethrow,      {.ui = DIR_S  }},            // 向下移动
+    { MODKEY|ShiftMask,             XK_Left,   movethrow,      {.ui = DIR_W  }},            // 向左移动
+    { MODKEY|ShiftMask,             XK_Right,  movethrow,      {.ui = DIR_E  }},            // 向右移动
+    { MODKEY|ShiftMask,             XK_m,      movethrow,      {.ui = DIR_C  }},            // 移动居中
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
@@ -153,6 +161,11 @@ static const Key keys[] = {
 
 /* button definitions */
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
+/**
+ * Button1 ： 左键
+ * Button2 ： 滚轮
+ * Button3 ： 右键
+ */
 static const Button buttons[] = {
 	/* click                event mask      button          function        argument */
 //	{ ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
