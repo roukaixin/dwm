@@ -115,7 +115,7 @@ static const Rule rules[] = {
 };
 
 static const char *overviewtag = "OVERVIEW";
-static const Layout overviewlayout = { "舘",  overview };
+static const Layout overviewlayout = { "󰕮",  overview };
 
 /* 自定义布局 */
 static const Layout layouts[] = {
