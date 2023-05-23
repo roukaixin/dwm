@@ -3699,7 +3699,7 @@ Client *direction_select(const Arg *arg) {
     int sel_x=tc->x;
     int sel_y=tc->y;
     long long int distance=LLONG_MAX;
-    int temp_focus=0;
+    // int temp_focus=0;
     Client *tempFocusClients=NULL;
 
     switch (arg->i) {
