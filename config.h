@@ -28,15 +28,16 @@ static const char *fonts[]               = {
 };
 static const char dmenufont[]       = "WenQuanYi Zen Hei Mono:size=14";
 static const char *colors[][3]           = {          /* 颜色设置 ColFg, ColBg, ColBorder */
-    [SchemeNorm] = { "#bbbbbb", "#333333", "#444444" },
-    [SchemeSel] = { "#ffffff", "#37474F", "#42A5F5" },
-    [SchemeSelGlobal] = { "#ffffff", "#37474F", "#FFC0CB" },
-    [SchemeHid] = { "#dddddd", NULL, NULL },
-    [SchemeSystray] = { NULL, "#7799AA", NULL },
-    [SchemeUnderline] = { "#7799AA", NULL, NULL }, 
-    [SchemeNormTag] = { "#bbbbbb", "#333333", NULL },
-    [SchemeSelTag] = { "#eeeeee", "#333333", NULL },
-    [SchemeBarEmpty] = { NULL, "#111111", NULL },
+        /* 颜色设置               ColFg：字体颜色      ColBg：背景颜色       ColBorder：边框颜色 */
+        [SchemeNorm]        = { "#bbbbbb",          "#333333",          "#444444" },
+        [SchemeSel]         = { "#ffffff",          "#37474F",          "#42A5F5" },
+        [SchemeSelGlobal]   = { "#ffffff",          "#37474F",          "#FFC0CB" },
+        [SchemeHid]         = { "#dddddd",          NULL,               NULL },
+        [SchemeSystray]     = { NULL,               "#7799AA",          NULL },
+        [SchemeUnderline]   = { "#7799AA",          NULL,               NULL },
+        [SchemeNormTag]     = { "#bbbbbb",          "#333333",          NULL },
+        [SchemeSelTag]      = { "#eeeeee",          "#333333",          NULL },
+        [SchemeBarEmpty]    = { NULL,               "#111111",          NULL },
 };
 static const unsigned int alphas[][3]    = {          /* 透明度设置 ColFg, ColBg, ColBorder */ 
     [SchemeNorm] = { OPAQUE, baralpha, borderalpha }, 
