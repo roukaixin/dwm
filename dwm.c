@@ -2110,6 +2110,7 @@ propertynotify(XEvent *e)
 void
 quit(const Arg *arg)
 {
+    system("killall statusbar.sh");
     running = 0;
 }
 
