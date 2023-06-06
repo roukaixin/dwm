@@ -51,8 +51,8 @@ static const unsigned int alphas[][3]    = {
 };
 
 // 自启动脚本位置
-static const char *autostartshell = "/home/tnt/wm/config/dwm/autostart.sh";
-static const char *statusbarscript = "/home/tnt/wm/config/dwm/statusbar/statusbar.sh";
+static const char *autostartshell = "$HOME/wm/config/dwm/autostart.sh";
+static const char *statusbarscript = "$HOME/wm/config/dwm/statusbar/statusbar.sh";
 
 /* 自定义 scratchpad instance */
 static const char scratchpadname[] = "scratchpad";
