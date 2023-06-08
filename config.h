@@ -60,6 +60,7 @@ static const char scratchpadname[] = "scratchpad";
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", "#222222", "-nf", "#bbbbbb", "-sb", "#005577", "-sf", "#eeeeee", NULL };
+static const char *roficmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", "#222222", "-nf", "#bbbbbb", "-sb", "#005577", "-sf", "#eeeeee", NULL };
 
 /* 自定义tag名称 */
 /* 自定义特定实例的显示状态 */
@@ -204,7 +205,7 @@ static Key keys[] = {
     { MODKEY,              XK_F1,     spawn, SHCMD("killall pcmanfm || pcmanfm") },                             /* super F1         | 打开/关闭pcmanfm       */
     { MODKEY,              XK_d,      spawn, SHCMD("rofi -show run") },                                         /* super d          | rofi: 执行run          */
 //    { MODKEY,              XK_p,      spawn, SHCMD("$DWM/DEF/rofi.sh") },                                       /* super p          | rofi: 执行自定义脚本   */
-    { MODKEY,              XK_n,      spawn, SHCMD("$DWM/DEF/blurlock.sh") },                                   /* super n          | 锁定屏幕               */
+    { MODKEY,              XK_n,      spawn, SHCMD("sh $HOME/wm/config/lock/blurlock.sh") },                       /* super n          | 锁定屏幕               */
     { MODKEY|ShiftMask,    XK_Up,     spawn, SHCMD("$DWM/DEF/set_vol.sh up") },                                 /* super shift up   | 音量加                 */
     { MODKEY|ShiftMask,    XK_Down,   spawn, SHCMD("$DWM/DEF/set_vol.sh down") },                               /* super shift down | 音量减                 */
     { MODKEY|ShiftMask,    XK_a,      spawn, SHCMD("flameshot gui -c -p ~/Pictures/screenshots") },             /* super shift a    | 截图                   */
