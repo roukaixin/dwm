@@ -60,7 +60,6 @@ static const char scratchpadname[] = "scratchpad";
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", "#222222", "-nf", "#bbbbbb", "-sb", "#005577", "-sf", "#eeeeee", NULL };
-static const char *roficmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", "#222222", "-nf", "#bbbbbb", "-sb", "#005577", "-sf", "#eeeeee", NULL };
 
 /* 自定义tag名称 */
 /* 自定义特定实例的显示状态 */
@@ -89,26 +88,26 @@ static const Rule rules[] = {
         { "QQ",                 "qq",                   "视频播放器",         0,          1,          0,          0,          -1,        0 },            // qq视频播放器        浮动
         /* 普通优先级 */
         { "obs",                NULL,                   NULL,               1 << 3,     0,          0,          0,          -1,         0 },            // obs        tag -> 󰕧
-        {"chrome",              NULL,                   NULL,               1 << 4,     0,          0,          0,          -1,         0 },            // chrome     tag -> 
-        {"Chromium",            NULL,                   NULL,               1 << 4,     0,          0,          0,          -1,         0 },            // Chromium   tag -> 
-        {"music",               NULL,                   NULL,               1 << 5,     1,          0,          1,          -1,         0 },            // music      tag ->  浮动、无边框
+        { "chrome",             NULL,                   NULL,               1 << 4,     0,          0,          0,          -1,         0 },            // chrome     tag -> 
+        { "Chromium",           NULL,                   NULL,               1 << 4,     0,          0,          0,          -1,         0 },            // Chromium   tag -> 
+        { "music",              NULL,                   NULL,               1 << 5,     1,          0,          1,          -1,         0 },            // music      tag ->  浮动、无边框
         { NULL,                 "qq",                   NULL,               1 << 6,     0,          0,          1,          -1,         0 },            // qq         tag -> ﬄ 无边框
         { NULL,                 "wechat.exe",           NULL,               1 << 7,     0,          0,          1,          -1,         0 },            // wechat     tag -> ﬐ 无边框
         { NULL,                 "wxwork.exe",           NULL,               1 << 8,     0,          0,          1,          -1,         0 },            // workwechat tag ->  无边框
-        {"Vncviewer",           NULL,                   NULL,               0,          1,          0,          1,          -1,         2 },            // Vncviewer           浮动、无边框 屏幕顶部
-        {"flameshot",           NULL,                   NULL,               0,          1,          0,          0,          -1,         0 },            // 火焰截图            浮动
-        {"scratchpad",          "scratchpad",           "scratchpad",       TAGMASK,    1,          1,          1,          -1,         2 },            // scratchpad          浮动、全局、无边框 屏幕顶部
-        {"Pcmanfm",             NULL,                   NULL,               0,          1,          0,          1,          -1,         3 },            // pcmanfm             浮动、无边框 右上角
-        {"wemeetapp",           NULL,                   NULL,               TAGMASK,    1,          1,          0,          -1,         0 },            // !!!腾讯会议在切换tag时有诡异bug导致退出 变成global来规避该问题
+        { "Vncviewer",          NULL,                   NULL,               0,          1,          0,          1,          -1,         2 },            // Vncviewer           浮动、无边框 屏幕顶部
+        { "flameshot",          NULL,                   NULL,               0,          1,          0,          0,          -1,         0 },            // 火焰截图            浮动
+        { "scratchpad",         "scratchpad",           "scratchpad",       TAGMASK,    1,          1,          1,          -1,         2 },            // scratchpad          浮动、全局、无边框 屏幕顶部
+        { "Pcmanfm",            NULL,                   NULL,               0,          1,          0,          1,          -1,         3 },            // pcmanfm             浮动、无边框 右上角
+        { "wemeetapp",          NULL,                   NULL,               TAGMASK,    1,          1,          0,          -1,         0 },            // !!!腾讯会议在切换tag时有诡异bug导致退出 变成global来规避该问题
 
         /** 部分特殊class的规则 */
-        {"float",               NULL,                   NULL,               0,          1,          0,          0,          -1,         0 },            // class = float       浮动
-        {"global",              NULL,                   NULL,               TAGMASK,    0,          1,          0,          -1,         0 },            // class = gloabl      全局
-        {"noborder",            NULL,                   NULL,               0,          0,          0,          1,          -1,         0 },            // class = noborder    无边框
-        {"FGN",                 NULL,                   NULL,               TAGMASK,    1,          1,          1,          -1,         0 },            // class = FGN         浮动、全局、无边框
-        {"FG",                  NULL,                   NULL,               TAGMASK,    1,          1,          0,          -1,         0 },            // class = FG          浮动、全局
-        {"FN",                  NULL,                   NULL,               0,          1,          0,          1,          -1,         0 },            // class = FN          浮动、无边框
-        {"GN",                  NULL,                   NULL,               TAGMASK,    0,          1,          1,          -1,         0 },            // CLASS = GN          全局、无边框
+        { "float",              NULL,                   NULL,               0,          1,          0,          0,          -1,         0 },            // class = float       浮动
+        { "global",             NULL,                   NULL,               TAGMASK,    0,          1,          0,          -1,         0 },            // class = gloabl      全局
+        { "noborder",           NULL,                   NULL,               0,          0,          0,          1,          -1,         0 },            // class = noborder    无边框
+        { "FGN",                NULL,                   NULL,               TAGMASK,    1,          1,          1,          -1,         0 },            // class = FGN         浮动、全局、无边框
+        { "FG",                 NULL,                   NULL,               TAGMASK,    1,          1,          0,          -1,         0 },            // class = FG          浮动、全局
+        { "FN",                 NULL,                   NULL,               0,          1,          0,          1,          -1,         0 },            // class = FN          浮动、无边框
+        { "GN",                 NULL,                   NULL,               TAGMASK,    0,          1,          1,          -1,         0 },            // CLASS = GN          全局、无边框
 
         /** 优先度低 越在上面优先度越低 */
         { NULL,                 NULL,                   "crx_",             0,          1,          0,          0,          -1,         0 },            // 错误载入时 会有crx_ 浮动
@@ -203,9 +202,9 @@ static Key keys[] = {
     { MODKEY,              XK_minus,  spawn, SHCMD("st -c FG") },                                               /* super +          | 打开全局st终端         */
     { MODKEY,              XK_space,  spawn, SHCMD("st -c float") },                                            /* super space      | 打开浮动st终端         */
     { MODKEY,              XK_F1,     spawn, SHCMD("killall pcmanfm || pcmanfm") },                             /* super F1         | 打开/关闭pcmanfm       */
-    { MODKEY,              XK_d,      spawn, SHCMD("rofi -show run") },                                         /* super d          | rofi: 执行run          */
-//    { MODKEY,              XK_p,      spawn, SHCMD("$DWM/DEF/rofi.sh") },                                       /* super p          | rofi: 执行自定义脚本   */
-    { MODKEY,              XK_n,      spawn, SHCMD("sh $HOME/wm/config/lock/blurlock.sh") },                       /* super n          | 锁定屏幕               */
+    { MODKEY|ShiftMask,    XK_r,      spawn, SHCMD("rofi -show run") },                                         /* super shift r    | rofi: 执行run          */
+    { MODKEY,              XK_r,      spawn, SHCMD("sh $HOME/wm/config/rofi/rofi.sh") },                        /* super r          | rofi: 执行自定义脚本   */
+    { MODKEY,              XK_n,      spawn, SHCMD("sh $HOME/wm/config/lock/blurlock.sh") },                    /* super n          | 锁定屏幕               */
     { MODKEY|ShiftMask,    XK_Up,     spawn, SHCMD("$DWM/DEF/set_vol.sh up") },                                 /* super shift up   | 音量加                 */
     { MODKEY|ShiftMask,    XK_Down,   spawn, SHCMD("$DWM/DEF/set_vol.sh down") },                               /* super shift down | 音量减                 */
     { MODKEY|ShiftMask,    XK_a,      spawn, SHCMD("flameshot gui -c -p ~/Pictures/screenshots") },             /* super shift a    | 截图                   */
