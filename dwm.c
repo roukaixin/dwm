@@ -1026,7 +1026,7 @@ drawbar(Monitor *m)
     // 绘制TAGS
     x = 0;
 
-    // 代表为overview tag状态
+    // 代表为 overview tag状态
     if (m->isoverview) {
         w = TEXTW(overviewtag);
         drw_setscheme(drw, scheme[SchemeSelTag]);
@@ -1056,7 +1056,7 @@ drawbar(Monitor *m)
     drw_setscheme(drw, scheme[SchemeNorm]);
     x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
-    // 绘制TASKS
+    // 绘制 TASKS（任务栏）
     for (c = m->clients; c; c = c->next) {
         // 判断是否需要绘制 && 判断颜色设置
         if (!ISVISIBLE(c))
@@ -1069,10 +1069,11 @@ drawbar(Monitor *m)
             scm = SchemeNorm;
         drw_setscheme(drw, scheme[scm]);
 
-        // 绘制TASK
+        // 绘制 TASK。任务栏的最大宽度
         w = MIN(TEXTW(c->name), TEXTW("          "));
-        empty_w = m->ww - x - status_w - system_w;
-        if (w > empty_w) { // 如果当前TASK绘制后长度超过最大宽度
+        // 空白的 bar
+        empty_w = m->ww - x - status_w - system_w - 2 * sp - (system_w ? systrayspadding : 0);
+        if (w > empty_w - TEXTW("...")) { // 如果当前TASK绘制后长度超过最大宽度
             w = empty_w;
             x = drw_text(drw, x, 0, w, bh, lrpad / 2, "...", 0);
             c->taskw = w;
@@ -1084,7 +1085,12 @@ drawbar(Monitor *m)
             tasks_w += w;
         }
     }
-    /** 空白部分的宽度 = 总宽度 - 状态栏的宽度 - 托盘的宽度 - sp (托盘存在时 额外多-一个 systrayspadding) */
+
+
+    /**
+     * 绘制空白bar
+     * 空白部分的宽度 = 总宽度 - 状态栏的宽度 - 托盘的宽度 - sp (托盘存在时 额外多-一个 systrayspadding)
+     */
     empty_w = m->ww - x - status_w - system_w - 2 * sp - (system_w ? systrayspadding : 0);
     if (empty_w > 0) {
         drw_setscheme(drw, scheme[SchemeBarEmpty]);
