@@ -58,8 +58,7 @@ static const char *statusbarscript = "$HOME/wm/config/dwm/statusbar/statusbar.sh
 static const char scratchpadname[] = "scratchpad";
 
 /* commands */
-static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", "#222222", "-nf", "#bbbbbb", "-sb", "#005577", "-sf", "#eeeeee", NULL };
+static const char *rofi_cmd[] = { "rofi", "-show", "run" };
 
 /* 自定义tag名称 */
 /* 自定义特定实例的显示状态 */
@@ -132,7 +131,6 @@ static const Layout layouts[] = {
 
 static Key keys[] = {
     /* modifier            key              function          argument */
-    { MODKEY,              XK_p,            spawn,            {.v = dmenucmd } },	     /* super p            |  打开 dmenucmd */
     { MODKEY,              XK_equal,        togglesystray,    {0} },                     /* super +            |  切换 托盘栏显示状态 */
 
     { MODKEY,              XK_Tab,          focusstack,       {.i = +1} },               /* super tab          |  本tag内切换聚焦窗口 */
@@ -202,7 +200,7 @@ static Key keys[] = {
     { MODKEY,              XK_minus,  spawn, SHCMD("st -c FG") },                                               /* super +          | 打开全局st终端         */
     { MODKEY,              XK_space,  spawn, SHCMD("st -c float") },                                            /* super space      | 打开浮动st终端         */
     { MODKEY,              XK_F1,     spawn, SHCMD("killall pcmanfm || pcmanfm") },                             /* super F1         | 打开/关闭pcmanfm       */
-    { MODKEY|ShiftMask,    XK_r,      spawn, SHCMD("rofi -show run") },                                         /* super shift r    | rofi: 执行run          */
+    { MODKEY,              XK_p,      spawn, {.v = rofi_cmd } },	                                            /* super p          |  打开 rofi run */
     { MODKEY,              XK_r,      spawn, SHCMD("sh $HOME/wm/config/rofi/rofi.sh") },                        /* super r          | rofi: 执行自定义脚本   */
     { MODKEY,              XK_n,      spawn, SHCMD("sh $HOME/wm/config/lock/blurlock.sh") },                    /* super n          | 锁定屏幕               */
     { MODKEY|ShiftMask,    XK_Up,     spawn, SHCMD("$DWM/DEF/set_vol.sh up") },                                 /* super shift up   | 音量加                 */
