@@ -210,8 +210,6 @@ static Key keys[] = {
     { MODKEY,              XK_Return,                   spawn,          SHCMD("st") },                                                     /* super enter      | 打开st终端             */
     { MODKEY,              XK_minus,                    spawn,          SHCMD("st -c FG") },                                               /* super +          | 打开全局st终端         */
     { MODKEY,              XK_space,                    spawn,          SHCMD("st -c float") },                                            /* super space      | 打开浮动st终端         */
-    { MODKEY,              XK_F1,                       spawn,          SHCMD("killall pcmanfm || pcmanfm") },                             /* super F1         | 打开/关闭pcmanfm       */
-    { MODKEY,              XK_r,                        spawn,          SHCMD("sh $HOME/wm/config/rofi/rofi.sh") },                        /* super r          | rofi: 执行自定义脚本   */
     { MODKEY,              XK_n,                        spawn,          SHCMD("sh $HOME/wm/config/lock/blurlock.sh") },                    /* super n          | 锁定屏幕               */
     { MODKEY|ShiftMask,    XK_a,                        spawn,          SHCMD("flameshot gui -c -p ~/Pictures/screenshots") },             /* super shift a    | 截图                   */
     { MODKEY|ShiftMask,    XK_q,                        spawn,          SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") }, /* super shift q    | 选中某个窗口并强制kill */
