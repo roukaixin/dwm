@@ -572,8 +572,10 @@ arrangemon(Monitor *m)
         strncpy(m->ltsymbol, overviewlayout.symbol, sizeof m->ltsymbol);
         overviewlayout.arrange(m);
     } else {
-        strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->ltsymbol);
+        strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->ltsymbol - 1);
         m->lt[m->sellt]->arrange(m);
+        // strncpy不拷贝最后一个字节，手动给它赋值'\0'
+        m->ltsymbol[sizeof m->ltsymbol - 1] = '\0';
     }
 }
 
@@ -713,6 +715,7 @@ cleanup(void)
         drw_cur_free(drw, cursor[i]);
     for (i = 0; i < LENGTH(colors) + 1; i++)
         free(scheme[i]);
+    free(scheme);
     XDestroyWindow(dpy, wmcheckwin);
     drw_free(drw);
     XSync(dpy, False);
