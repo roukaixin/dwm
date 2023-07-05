@@ -354,7 +354,7 @@ static const char broken[] = "broken";
 static char stext[1024];
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
-static int bh, blw = 0;      /* bar geometry */
+static int bh;      /* bar height */
 static int lrpad;            /* sum of left and right padding for text */
 static int vp;               /* vertical padding for bar */
 static int sp;               /* side padding for bar */
@@ -641,7 +641,7 @@ buttonpress(XEvent *e)
         if (i < LENGTH(tags)) {
             click = ClkTagBar;
             arg.ui = 1 << i;
-        } else if (ev->x < x + blw)
+        } else if (ev->x < x + TEXTW(selmon->ltsymbol))
             click = ClkLtSymbol;
         else if (ev->x > selmon->ww - status_w - 2 * sp - (selmon == systraytomon(selmon) ? (system_w ? system_w + systraypinning + 2 : 0) : 0)) {
             click = ClkStatusText;
