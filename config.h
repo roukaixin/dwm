@@ -140,7 +140,7 @@ static const Layout layouts[] = {
     { MODKEY|ShiftMask,    KEY, tag,        {.ui = 1 << TAG} }, \
     { MODKEY|ControlMask,  KEY, toggleview, {.ui = 1 << TAG} }, \
 
-static Key keys[] = {
+static const Key keys[] = {
     /* modifier            key              function          argument */
     { MODKEY,              XK_equal,        togglesystray,    {0} },                     /* super +            |  切换 托盘栏显示状态 */
 
@@ -239,7 +239,7 @@ static Key keys[] = {
  * Button2 ： 滚轮
  * Button3 ： 右键
  */
-static Button buttons[] = {
+static const Button buttons[] = {
     /* click               event mask       button            function       argument  */
     /* 点击窗口标题栏操作 */
     { ClkWinTitle,         0,               Button1,          hideotherwins, {0} },                                   // 左键        |  点击标题     |  隐藏其他窗口仅保留该窗口
