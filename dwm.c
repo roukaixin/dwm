@@ -264,7 +264,7 @@ static void movemouse(const Arg *arg);
 static void movewin(const Arg *arg);
 static void resizewin(const Arg *arg);
 static Client *nexttiled(Client *c);
-static void pop(Client *);
+static void pop(Client *c);
 static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
 static void setup(void);
