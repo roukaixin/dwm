@@ -623,7 +623,7 @@ buttonpress(XEvent *e)
     int system_w = getsystraywidth();
     if (ev->window == selmon->barwin || (!c && selmon->showbar && (topbar ? ev->y <= selmon->wy : ev->y >= selmon->wy + selmon->wh))) { // 点击在bar上
         i = x = 0;
-        blw = TEXTW(selmon->ltsymbol);
+        // blw = TEXTW(selmon->ltsymbol);
         
         if (selmon->isoverview) {
             x += TEXTW(overviewtag);
@@ -652,7 +652,7 @@ buttonpress(XEvent *e)
         } else {
             click = ClkBarEmpty;
 
-            x += blw;
+            x += TEXTW(selmon->ltsymbol);
             c = m->clients;
 
             if (m->bt != 0)
@@ -3666,10 +3666,12 @@ zoom(const Arg *arg)
 {
     Client *c = selmon->sel;
 
-    if (c && (c->isfloating || c->isfullscreen))
+    if (c && (c->isfloating || c->isfullscreen)) {
         return;
-	if (c == nexttiled(selmon->clients) && !(c = nexttiled(c->next)))
-		return;
+    }
+	if (c == nexttiled(selmon->clients) && !(c = nexttiled(c->next))) {
+	    return;
+	}
     pop(c);
 }
 

@@ -273,8 +273,9 @@ drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lp
 	}
 
 	usedfont = drw->fonts;
-    if (!ellipsis_width && render)
+    if (!ellipsis_width && render) {
         ellipsis_width = drw_fontset_getwidth(drw, "...");
+    }
 	while (1) {
 		ew = ellipsis_len = utf8strlen = 0;
 		utf8str = text;
@@ -320,9 +321,9 @@ drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lp
 
 		if (utf8strlen) {
             if (render) {
-                ty = y + (h - usedfont->h) / 2 + usedfont->xfont->ascent;
-                XftDrawStringUtf8(d, &drw->scheme[invert ? ColBg : ColFg],
-                                  usedfont->xfont, x, ty, (XftChar8 *)buf, len);
+				ty = y + (h - usedfont->h) / 2 + usedfont->xfont->ascent;
+				XftDrawStringUtf8(d, &drw->scheme[invert ? ColBg : ColFg],
+				                  usedfont->xfont, x, ty, (XftChar8 *)utf8str, utf8strlen);
             }
             x += ew;
             w -= ew;
