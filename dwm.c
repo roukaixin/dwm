@@ -2659,9 +2659,7 @@ spawn(const Arg *arg)
         sigaction(SIGCHLD, &sa, NULL);
 
         execvp(((char **)arg->v)[0], (char **)arg->v);
-        fprintf(stderr, "dwm: execvp %s", ((char **)arg->v)[0]);
-        perror(" failed");
-        exit(EXIT_SUCCESS);
+        die("dwm: execvp '%s' failed:", ((char **)arg->v)[0]);
     }
 }
 
