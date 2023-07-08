@@ -23,9 +23,8 @@ static const unsigned int baralpha       = 0xc0;      /* 状态栏透明度 */
 static const unsigned int borderalpha    = 0xdd;      /* 边框透明度 */
 static const unsigned int null_alpha     = 0x00;
 static const char *fonts[]               = {
-        "JetBrainsMono Nerd Font:style=medium:size=13:antialias=true:autohint=true",
-        "WenQuanYi Zen Hei Mono:size=14:type=Regular:antialias=true:autohint=true",
-        "monospace:size=15"
+        "JetBrainsMono Nerd Font:style=ExtraLight Italic,Italic:size=14:antialias=true:autohint=true",
+        "WenQuanYi Zen Hei Mono:size=14:type=Regular:antialias=true:autohint=true"
 };
 static const char dmenufont[]            = "WenQuanYi Zen Hei Mono:size=14";
 static const char *colors[][3]           = {
@@ -103,7 +102,7 @@ static const Rule rules[] = {
         { "chrome",             NULL,                   NULL,               1 << 4,     0,          0,          0,          -1,         0 },            // chrome     tag -> 
         { "Chromium",           NULL,                   NULL,               1 << 4,     0,          0,          0,          -1,         0 },            // Chromium   tag -> 
         { "music",              NULL,                   NULL,               1 << 5,     1,          0,          1,          -1,         0 },            // music      tag ->  浮动、无边框
-        { NULL,                 "qq",                   NULL,               1 << 6,     0,          0,          1,          -1,         0 },            // qq         tag -> ﬄ 无边框
+        { "QQ",                 NULL,                   NULL,               1 << 6,     0,          0,          1,          -1,         0 },            // qq         tag -> ﬄ 无边框
         { NULL,                 "wechat.exe",           NULL,               1 << 7,     0,          0,          1,          -1,         0 },            // wechat     tag -> ﬐ 无边框
         { "Vncviewer",          NULL,                   NULL,               0,          1,          0,          1,          -1,         2 },            // Vncviewer           浮动、无边框 屏幕顶部
         { "flameshot",          NULL,                   NULL,               0,          1,          0,          0,          -1,         0 },            // 火焰截图            浮动
