@@ -3666,9 +3666,8 @@ zoom(const Arg *arg)
 {
     Client *c = selmon->sel;
 
-    if (c && (c->isfloating || c->isfullscreen)) {
-        return;
-    }
+    if (!selmon->lt[selmon->sellt]->arrange || !c || c->isfloating || c->isfullscreen)
+    		return;
 	if (c == nexttiled(selmon->clients) && !(c = nexttiled(c->next))) {
 	    return;
 	}
