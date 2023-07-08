@@ -59,15 +59,15 @@ static const char *statusbarscript = "$HOME/wm/config/dwm/statusbar/statusbar.sh
 static const char scratchpadname[] = "scratchpad";
 
 /* commands */
-static const char *rofi_cmd[] = { "rofi", "-show", "run" };
+static const char *rofi_cmd[] = { "rofi", "-show", "run", NULL };
 /* 增加亮度 */
 static const char *brighter[] = { "brightnessctl", "set", "1%+", NULL };
 /* 减少亮度 */
 static const char *dimmer[]   = { "brightnessctl", "set", "1%-", NULL };
 /* 增加音量 */
-static const char *up_vol[]   = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "+5%",   NULL };
+static const char *up_vol[]   = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "+5%", NULL };
 /* 减少音量 */
-static const char *down_vol[] = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "-5%",   NULL };
+static const char *down_vol[] = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "-5%", NULL };
 /* 切换是否为静音 */
 static const char *mute_vol[] = { "pactl", "set-sink-mute",   "@DEFAULT_SINK@", "toggle", NULL };
 
@@ -140,6 +140,14 @@ static const Layout layouts[] = {
     { MODKEY|ShiftMask,    KEY, tag,        {.ui = 1 << TAG} }, \
     { MODKEY|ControlMask,  KEY, toggleview, {.ui = 1 << TAG} }, \
 
+
+/*
+Mod4Mask : win
+ShiftMask : shift
+ControlMask : ctrl
+Mod1Mask : alt
+space : 空格
+*/
 static const Key keys[] = {
     /* modifier            key              function          argument */
     { MODKEY,              XK_equal,        togglesystray,    {0} },                     /* super +            |  切换 托盘栏显示状态 */
@@ -210,10 +218,10 @@ static const Key keys[] = {
     { MODKEY,              XK_Return,                   spawn,          SHCMD("st") },                                                     /* super enter      | 打开st终端             */
     { MODKEY,              XK_minus,                    spawn,          SHCMD("st -c FG") },                                               /* super +          | 打开全局st终端         */
     { MODKEY,              XK_space,                    spawn,          SHCMD("st -c float") },                                            /* super space      | 打开浮动st终端         */
-    { MODKEY,              XK_n,                        spawn,          SHCMD("sh $HOME/wm/config/lock/blurlock.sh") },                    /* super n          | 锁定屏幕               */
-    { MODKEY|ShiftMask,    XK_a,                        spawn,          SHCMD("flameshot gui -c -p ~/Pictures/screenshots") },             /* super shift a    | 截图                   */
-    { MODKEY|ShiftMask,    XK_q,                        spawn,          SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") }, /* super shift q    | 选中某个窗口并强制kill */
-    { MODKEY,              XK_p,                        spawn,          {.v = rofi_cmd } },	                                                /* super p          |  打开 rofi run */
+    { MODKEY,              XK_n,                        spawn,          SHCMD("sh $HOME/wm/config/lock/blurlock.sh") }, // 锁定屏幕(super n)
+    { 0|Mod1Mask,          XK_a,                        spawn,          SHCMD("flameshot gui") },   // 截图(super shift a)
+    { MODKEY|ShiftMask,    XK_c,                        spawn,          SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") }, /* super shift c    | 选中某个窗口并强制kill */
+    { MODKEY,              XK_p,                        spawn,          {.v = rofi_cmd} },	                                                /* super p          |  打开 rofi run */
     { 0,                   XF86XK_MonBrightnessDown,    spawn,          {.v = dimmer } },                                                   // 降低亮度（window下的调节快捷键）
     { 0,                   XF86XK_MonBrightnessUp,      spawn,          {.v = brighter } },                                                 // 升高亮度（window下的调节快捷键）
     { 0,                   XF86XK_AudioMute,            spawn,          {.v = mute_vol } },                                                 // 切换是否为静音（window下的调节快捷键）
