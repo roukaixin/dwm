@@ -1768,11 +1768,16 @@ manage(Window w, XWindowAttributes *wa)
     c->y = MAX(c->y, c->mon->wy);
 
     if (c->isfloating) {
+        // if new client is floating, then manage it as floating
         if (c->x==0 && c->y==0) {
             c->x = selmon->wx + (selmon->ww - c->w) / 2;
             c->y = selmon->wy + (selmon->wh - c->h) / 2;
         }
         managefloating(c);
+    } else {
+        // if new client is tile, old sel is fullscreen, then close fullscreen
+        if (c->mon->sel && c->mon->sel->isfullscreen)
+            fullscreen(NULL);
     }
 
     XConfigureWindow(dpy, w, CWBorderWidth, &wc);
@@ -2458,13 +2463,19 @@ setfullscreen(Client *c, int fullscreen)
 void
 fullscreen(const Arg *arg)
 {
-    if (selmon->sel) {
-        if (selmon->showbar)
-            setfullscreen(selmon->sel, 1);
-        else
-            setfullscreen(selmon->sel, 0);
+    if (!selmon->sel) {
+        togglebar(arg);
+        return;
     }
-    togglebar(arg);
+    if (selmon->sel->isfullscreen) {
+        setfullscreen(selmon->sel, 0);
+        if (!selmon->showbar)
+            togglebar(arg);
+    } else {
+        setfullscreen(selmon->sel, 1);
+        if (selmon->showbar)
+            togglebar(arg);
+    }
 }
 
 void
