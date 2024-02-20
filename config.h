@@ -228,18 +228,31 @@ static const Key keys[] = {
     { MODKEY|ShiftMask,    XK_l,            exchange_client,  {.i = RIGHT } },           /* super shift l      | 二维交换窗口 (仅平铺) */
 
     /* spawn + SHCMD 执行对应命令(已下部分建议完全自己重新定义) */
-    { MODKEY,              XK_s,                        togglescratch,  SHCMD("kitty --title scratchpad --class float") },                      /* super s          | 打开scratch终端        */
-    { MODKEY,              XK_minus,                    spawn,          SHCMD("kitty --class FG") },                                            /* super +          | 打开全局st终端         */
-    { MODKEY,              XK_space,                    spawn,          SHCMD("kitty --class float") },                                            /* super space      | 打开浮动st终端         */
-    { MODKEY,              XK_n,                        spawn,          SHCMD("sh $HOME/wm/config/lock/blurlock.sh") }, // 锁定屏幕(super n)
-    { 0|Mod1Mask,          XK_a,                        spawn,          SHCMD("flameshot gui") },   // 截图(super shift a)
-    { MODKEY|ShiftMask,    XK_c,                        spawn,          SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") }, /* super shift c    | 选中某个窗口并强制kill */
-    { MODKEY,              XK_p,                        spawn,          {.v = rofi_cmd} },	                                                /* super p          |  打开 rofi run */
-    { 0,                   XF86XK_MonBrightnessDown,    spawn,          {.v = dimmer } },                                                   // 降低亮度（window下的调节快捷键）
-    { 0,                   XF86XK_MonBrightnessUp,      spawn,          {.v = brighter } },                                                 // 升高亮度（window下的调节快捷键）
-    { 0,                   XF86XK_AudioMute,            spawn,          {.v = mute_vol } },                                                 // 切换是否为静音（window下的调节快捷键）
-    { 0,                   XF86XK_AudioLowerVolume,     spawn,          {.v = down_vol } },                                                 // 降低音量（window下的调节快捷键）
-    { 0,                   XF86XK_AudioRaiseVolume,     spawn,          {.v = up_vol } },                                                   // 升高音量（window下的调节快捷键）
+
+    /* super s          |    打开scratch终端 */
+    { MODKEY,              XK_s,                        togglescratch,  SHCMD("kitty --title scratchpad --class float -o initial_window_width=70c -o initial_window_height=17c") },
+    /* super -          |    打开全局终端 */
+    { MODKEY,              XK_minus,                    spawn,          SHCMD("kitty --class FG -o initial_window_width=70c -o initial_window_height=17c") },
+    /* super space      |    打开浮动st终端 */
+    { MODKEY,              XK_space,                    spawn,          SHCMD("kitty --class float -o initial_window_width=70c -o initial_window_height=17c") },
+    /* super n          |    锁定屏幕 */
+    { MODKEY,              XK_n,                        spawn,          SHCMD("sh $HOME/wm/config/lock/blurlock.sh") },
+    /* alt a            |    截图 */
+    { 0|Mod1Mask,            XK_a,                        spawn,          SHCMD("flameshot gui") },
+    /* super shift c    |    选中某个窗口并强制kill */
+    { MODKEY|ShiftMask,      XK_c,                        spawn,          SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") },
+    /* super p          |    打开 rofi run */
+    { MODKEY,              XK_p,                        spawn,          {.v = rofi_cmd} },
+    // 降低亮度（window下的调节快捷键）
+    { 0,                   XF86XK_MonBrightnessDown,    spawn,          {.v = dimmer } },
+    // 升高亮度（window下的调节快捷键）
+    { 0,                   XF86XK_MonBrightnessUp,      spawn,          {.v = brighter } },
+    // 切换是否为静音（window下的调节快捷键）
+    { 0,                   XF86XK_AudioMute,            spawn,          {.v = mute_vol } },
+    // 降低音量（window下的调节快捷键）
+    { 0,                   XF86XK_AudioLowerVolume,     spawn,          {.v = down_vol } },
+    // 升高音量（window下的调节快捷键）
+    { 0,                   XF86XK_AudioRaiseVolume,     spawn,          {.v = up_vol } },
 
     /* super key : 跳转到对应tag (可附加一条命令 若目标目录无窗口，则执行该命令) */
     /* super shift key : 将聚焦窗口移动到对应tag */
