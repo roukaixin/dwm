@@ -238,11 +238,11 @@ static const Key keys[] = {
     /* super n          |    锁定屏幕 */
     { MODKEY,              XK_n,                        spawn,          SHCMD("sh $HOME/wm/config/lock/blurlock.sh") },
     /* alt a            |    截图 */
-    { 0|Mod1Mask,            XK_a,                        spawn,          SHCMD("flameshot gui") },
+    { 0|Mod1Mask,          XK_a,                        spawn,          SHCMD("flameshot gui") },
     /* super shift c    |    选中某个窗口并强制kill */
-    { MODKEY|ShiftMask,      XK_c,                        spawn,          SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") },
+    { MODKEY|ShiftMask,    XK_c,                        spawn,          SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") },
     /* super p          |    打开 rofi run */
-    { MODKEY,              XK_p,                        spawn,          {.v = rofi_cmd} },
+    { 0|ControlMask,       XK_space,                    spawn,          {.v = rofi_cmd} },
     // 降低亮度（window下的调节快捷键）
     { 0,                   XF86XK_MonBrightnessDown,    spawn,          {.v = dimmer } },
     // 升高亮度（window下的调节快捷键）
