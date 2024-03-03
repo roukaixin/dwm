@@ -72,7 +72,7 @@ static const char *mute_vol[] = { "pactl", "set-sink-mute",   "@DEFAULT_SINK@", 
 
 /* 自定义tag名称 */
 /* 自定义特定实例的显示状态 */
-static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+static const char *tags[] = { "󰎤", "󰎧", "󰎪", "󰎭", "󰎱", "󰎳", "󰎶", "󰎹", "󰎼" };
 
 
 /* 自定义窗口显示规则 */
