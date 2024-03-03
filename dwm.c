@@ -1344,8 +1344,8 @@ clickstatusbar(const Arg *arg)
     }
 
     memset(text, '\0', sizeof(text));
-    sprintf(text, "%s %s %s &", statusbarscript, signal, button);
-    system(text);
+    // sprintf(text, "%s %s %s &", statusbarscript, signal, button);
+    // system(text);
 }
 
 // 禁用焦点跟随鼠标
@@ -2340,7 +2340,7 @@ run(void)
 void
 runAutostart(void) {
     char cmd [100];
-    sprintf(cmd, "%s &", autostartshell);
+    sprintf(cmd, "%s %s &", "sh", autostartshell);
     system(cmd);
 }
 
