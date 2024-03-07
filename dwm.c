@@ -442,7 +442,7 @@ applyrules(Client *c)
 
     for (i = 0; i < LENGTH(rules); i++) {
         r = &rules[i];
-        // 当rule中定义了一个或多个属性时，只要有一个属性匹配，就认为匹配成功
+        // 当 rule 中定义了一个或多个属性时，只要有一个属性匹配，就认为匹配成功
         if ((r->title && strstr(c->name, r->title))
                 || (r->class && strstr(class, r->class))
                 || (r->instance && strstr(instance, r->instance)))
@@ -455,7 +455,7 @@ applyrules(Client *c)
             for (m = mons; m && m->num != r->monitor; m = m->next);
             if (m)
                 c->mon = m;
-            // 如果设定了floatposition 且未指定xy，设定窗口位置
+            // 如果设定了 floatposition 且未指定xy，设定窗口位置
             if (r->isfloating && c->x == 0 && c->y == 0) {
                 switch (r->floatposition) {
                     case 1:

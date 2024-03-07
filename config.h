@@ -70,19 +70,21 @@ static const char *down_vol[] = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", 
 static const char *mute_vol[] = { "pactl", "set-sink-mute",   "@DEFAULT_SINK@", "toggle", NULL };
 
 
-/* 自定义tag名称 */
-/* 自定义特定实例的显示状态 */
+/* 显示 tags */
 static const char *tags[] = { "󰎤", "󰎧", "󰎪", "󰎭", "󰎱", "󰎳", "󰎶", "󰎹", "󰎼" };
 
 
-/* 自定义窗口显示规则 */
-/* class instance title 主要用于定位窗口适合哪个规则 */
-/* tags mask 定义符合该规则的窗口的tag 0 表示当前tag */
-/* isfloating 定义符合该规则的窗口是否浮动 */
-/* isglobal 定义符合该规则的窗口是否全局浮动 */
-/* isnoborder 定义符合该规则的窗口是否无边框 */
-/* monitor 定义符合该规则的窗口显示在哪个显示器上 -1 为当前屏幕 */
-/* floatposition 定义符合该规则的窗口显示的位置 0 中间，1到9分别为9宫格位置，例如1左上，9右下，3右上 */
+/**
+ * 自定义窗口显示规则
+ *
+ * class instance title 主要用于定位窗口适合哪个规则
+ * tags mask 定义符合该规则的窗口的tag 0 表示当前tag
+ * isfloating 定义符合该规则的窗口是否浮动。1浮动，0不浮动
+ * isglobal 定义符合该规则的窗口是否全局。1全局，0不全局(当前 tag)
+ * isnoborder 定义符合该规则的窗口是否无边框。1无边框，0有边宽
+ * monitor 定义符合该规则的窗口显示在哪个显示器上 -1 为当前屏幕
+ * floatposition 定义符合该规则的窗口显示的位置 0 中间，1到9分别为9宫格位置，例如1左上，9右下，3右上
+ */
 static const Rule rules[] = {
         /**
          * xprop(1):
@@ -91,11 +93,11 @@ static const Rule rules[] = {
          *
          * 优先级高 越在上面优先度越高
          */
-        /* class                instance                title               togs mosk   isfloating  isglobal    isnoborder  monitor    floatposition */
+        /* class                       instance                       title                   tags mosk       isfloating          isglobal           isnoborder          monitor           floatposition */
         { NULL,                 NULL,                   "图片查看器",         0,          1,          0,          0,          -1,        0 },            // qq图片查看器     浮动
-        { NULL,                 NULL,                   "群公告",            0,          1,          0,          0,           -1,       0 },            // qq群公告        浮动
+        { NULL,                 NULL,                   "群公告",            0,          1,          0,          0,          -1,        0 },            // qq群公告        浮动
         { NULL,                 NULL,                   "视频播放器",         0,          1,          0,          0,          -1,        0 },            // qq视频播放器        浮动
-        { NULL,                 NULL,                   "图片查看",          0,           1,          0,          0,          -1,        0 },           // 微信图片查看器      浮动
+        { NULL,                 NULL,                   "Preview",          0,           1,          0,          0,         -1,        0 },           // 微信图片查看器      浮动
         /* 普通优先级 */
         { "obs",                NULL,                   NULL,               1 << 3,     0,          0,          0,          -1,         0 },            // obs        tag -> 󰕧
         { "chrome",             NULL,                   NULL,               1 << 4,     0,          0,          0,          -1,         0 },            // chrome     tag -> 
