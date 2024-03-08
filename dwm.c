@@ -447,14 +447,16 @@ applyrules(Client *c)
         r-> class ? strstr(class, r->class) ? match_count ++ : 0 : null_count ++;
         r->instance ? strstr(instance, r->instance) ? match_count ++ : 0 : null_count ++;
         r->title ? strstr(c->name, r->title) ? match_count ++ : 0 : null_count ++;
-        // 当 rule 中定义了一个或多个属性时，只要有一个属性匹配，就认为匹配成功
+        // 当 rule 中定义了一个或多个属性时，只要有全部属性匹配，就认为匹配成功
         if (3 - null_count == match_count) {
             c->isfloating = r->isfloating;
             c->isglobal = r->isglobal;
             c->isnoborder = r->isnoborder;
             c->tags |= r->tags;
             c->bw = c->isnoborder ? 0 : borderpx;
-            for (m = mons; m && m->num != r->monitor; m = m->next);
+            for (m = mons; m && m->num != r->monitor; ) {
+                m = m->next;
+            }
             if (m)
                 c->mon = m;
             // 如果设定了 floatposition 且未指定xy，设定窗口位置
@@ -503,7 +505,8 @@ applyrules(Client *c)
                         break;
                 }
             }
-            break; // 有且只会匹配一个第一个符合的rule
+            // 有且只会匹配一个第一个符合的rule
+            break;
         }
     }
     if (!strcmp(c->name, scratchpadname) || !strcmp(class, scratchpadname) || !strcmp(instance, scratchpadname)) {
