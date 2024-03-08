@@ -622,7 +622,9 @@ attach(Client *c)
 {
     if (!newclientathead) {
         Client **tc;
-        for (tc = &c->mon->clients; *tc; tc = &(*tc)->next);
+        for (tc = &c->mon->clients; *tc; ) {
+            tc = &(*tc)->next;
+        }
         *tc = c;
         c->next = NULL;
     } else {
@@ -769,7 +771,9 @@ cleanupmon(Monitor *mon)
     if (mon == mons)
         mons = mons->next;
     else {
-        for (m = mons; m && m->next != mon; m = m->next);
+        for (m = mons; m && m->next != mon; ) {
+            m = m->next;
+        }
         m->next = mon->next;
     }
     XUnmapWindow(dpy, mon->barwin);
@@ -1002,7 +1006,9 @@ detach(Client *c)
 {
     Client **tc;
 
-    for (tc = &c->mon->clients; *tc && *tc != c; tc = &(*tc)->next);
+    for (tc = &c->mon->clients; *tc && *tc != c; ) {
+        tc = &(*tc)->next;
+    }
     *tc = c->next;
 }
 
@@ -1011,11 +1017,15 @@ detachstack(Client *c)
 {
     Client **tc, *t;
 
-    for (tc = &c->mon->stack; *tc && *tc != c; tc = &(*tc)->snext);
+    for (tc = &c->mon->stack; *tc && *tc != c; ) {
+        tc = &(*tc)->snext;
+    }
     *tc = c->snext;
 
     if (c == c->mon->sel) {
-        for (t = c->mon->stack; t && !ISVISIBLE(t); t = t->snext);
+        for (t = c->mon->stack; t && !ISVISIBLE(t); ) {
+            t = t->snext;
+        }
         c->mon->sel = t;
     }
 }
@@ -1029,9 +1039,13 @@ dirtomon(int dir)
         if (!(m = selmon->next))
             m = mons;
     } else if (selmon == mons)
-        for (m = mons; m->next; m = m->next);
+        for (m = mons; m->next; ) {
+            m = m->next;
+        }
     else
-        for (m = mons; m->next != selmon; m = m->next);
+        for (m = mons; m->next != selmon; ) {
+            m = m->next;
+        }
     return m;
 }
 
@@ -1390,7 +1404,9 @@ void
 focus(Client *c)
 {
     if (!c || !ISVISIBLE(c) || HIDDEN(c))
-        for (c = selmon->stack; c && (!ISVISIBLE(c) || HIDDEN(c)); c = c->snext);
+        for (c = selmon->stack; c && (!ISVISIBLE(c) || HIDDEN(c)); ) {
+            c = c->snext;
+        }
     if (selmon->sel && selmon->sel != c)
         unfocus(selmon->sel, 0);
     if (c) {
@@ -1543,7 +1559,10 @@ getsystraywidth()
     unsigned int w = 0;
     Client *i;
     if(showsystray)
-        for(i = systray->icons; i; w += MAX(i->w, bh) + systrayspacing, i = i->next) ;
+        for(i = systray->icons; i; ) {
+            w += MAX(i->w, bh) + systrayspacing;
+            i = i->next;
+        }
     return w ? w + systrayspacing : 0;
 }
 
@@ -2103,7 +2122,9 @@ resizewin(const Arg *arg)
 Client *
 nexttiled(Client *c)
 {
-    for (; c && (c->isfloating || !ISVISIBLE(c) || HIDDEN(c)); c = c->next);
+    for (; c && (c->isfloating || !ISVISIBLE(c) || HIDDEN(c)); ) {
+        c = c->next;
+    }
     return c;
 }
 
@@ -2192,7 +2213,9 @@ removesystrayicon(Client *i)
 
     if (!showsystray || !i)
         return;
-    for (ii = &systray->icons; *ii && *ii != i; ii = &(*ii)->next);
+    for (ii = &systray->icons; *ii && *ii != i; ) {
+        ii = &(*ii)->next;
+    }
     if (ii)
         *ii = i->next;
     free(i);
@@ -3465,7 +3488,8 @@ viewtoright(const Arg *arg) {
 void
 tile(Monitor *m)
 {
-    unsigned int i, n, mw, mh, sh, my, sy; // mw: master的宽度, mh: master的高度, sh: stack的高度, my: master的y坐标, sy: stack的y坐标
+    // mw: master的宽度, mh: master的高度, sh: stack的高度, my: master的y坐标, sy: stack的y坐标
+    unsigned int i, n, mw, mh, sh, my, sy;
     Client *c;
 
     for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
