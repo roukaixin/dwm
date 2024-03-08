@@ -425,7 +425,7 @@ void
 applyrules(Client *c)
 {
     const char *class, *instance;
-    unsigned int i;
+    unsigned int i, null_count, match_count;
     const Rule *r;
     Monitor *m;
     XClassHint ch = { NULL, NULL };
@@ -441,12 +441,14 @@ applyrules(Client *c)
     instance = ch.res_name  ? ch.res_name  : broken;
 
     for (i = 0; i < LENGTH(rules); i++) {
+        null_count = 0;
+        match_count = 0;
         r = &rules[i];
+        r-> class ? strstr(class, r->class) ? match_count ++ : 0 : null_count ++;
+        r->instance ? strstr(instance, r->instance) ? match_count ++ : 0 : null_count ++;
+        r->title ? strstr(c->name, r->title) ? match_count ++ : 0 : null_count ++;
         // 当 rule 中定义了一个或多个属性时，只要有一个属性匹配，就认为匹配成功
-        if ((r->title && strstr(c->name, r->title))
-                || (r->class && strstr(class, r->class))
-                || (r->instance && strstr(instance, r->instance)))
-        {
+        if (3 - null_count == match_count) {
             c->isfloating = r->isfloating;
             c->isglobal = r->isglobal;
             c->isnoborder = r->isnoborder;
