@@ -91,20 +91,24 @@ static const Rule rules[] = {
          * WM_CLASS(STRING) = instance, class
          * WM_NAME(STRING) = title
          *
+         *  class、instance、title、tags mosk、isfloating、isglobal、isnoborder、monitor、floatposition
          * 优先级高 越在上面优先度越高
          */
-        /* class                       instance                       title                   tags mosk       isfloating          isglobal           isnoborder          monitor           floatposition */
-        { "QQ",                 "qq",                   "图片查看器",         0,          1,          0,          0,          -1,        0 },            // qq图片查看器     浮动
-        { "QQ",                 "qq",                   "群公告",            0,          1,          0,          0,          -1,        0 },            // qq群公告        浮动
-        { "QQ",                 "qq",                   "视频播放器",         0,          1,          0,          0,          -1,        0 },            // qq视频播放器        浮动
-        { NULL,                 NULL,                   "Preview",          0,           1,          0,          0,         -1,        0 },           // 微信图片查看器      浮动
-        /* 普通优先级 */
-        { "obs",                NULL,                   NULL,               1 << 3,     0,          0,          0,          -1,         0 },            // obs        tag -> 󰕧
-        { "chrome",             NULL,                   NULL,               1 << 4,     0,          0,          0,          -1,         0 },            // chrome     tag -> 
-        { "Chromium",           NULL,                   NULL,               1 << 4,     0,          0,          0,          -1,         0 },            // Chromium   tag -> 
-        { "music",              NULL,                   NULL,               1 << 5,     1,          0,          1,          -1,         0 },            // music      tag ->  浮动、无边框
-        { "QQ",                 NULL,                   NULL,               1 << 6,     0,          0,          1,          -1,         0 },            // qq         tag -> ﬄ 无边框
-        { NULL,                 "wechat.exe",           NULL,               1 << 7,     0,          0,          1,          -1,         0 },            // wechat     tag -> ﬐ 无边框
+        // QQ 规则
+        { "QQ",                 "qq",                   "图片查看器",         0,          1,          0,          0,          -1,        0 },
+        { "QQ",                 "qq",                   "群公告",            0,          1,          0,          0,          -1,        0 },
+        { "QQ",                 "qq",                   "视频播放器",         0,          1,          0,          0,          -1,        0 },
+        { "QQ",                 "qq",                   "文件管理器",         0,          1,          0,          0,          -1,        0 },
+        { "QQ",                 "qq",                   "收藏",              0,          1,          0,          0,          -1,        0 },
+        { "QQ",                 "qq",                   "QQ",               1 << 6,     0,          0,          1,          -1,         0 },
+        // 微信规则
+        { "wechat",             "wechat",               "Preview",          0,           1,          0,          0,         -1,        0 },
+        { "wechat",             "wechat",               "微信",              1 << 7,     0,          0,          1,          -1,         0 },
+        { "obs",                NULL,                   NULL,               1 << 3,     0,          0,          0,          -1,         0 },
+        { "Google-chrome",      "google-chrome",        NULL,               1 << 4,     0,          0,          0,          -1,         0 },
+        { "Chromium",           NULL,                   NULL,               1 << 4,     0,          0,          0,          -1,         0 },
+        // 音乐
+        { "qqmusic",            "qqmusic",              "qqmusic",          1 << 5,     0,          0,          1,          -1,         0 },
         { "Vncviewer",          NULL,                   NULL,               0,          1,          0,          1,          -1,         2 },            // Vncviewer           浮动、无边框 屏幕顶部
         { "flameshot",          NULL,                   NULL,               0,          1,          0,          0,          -1,         0 },            // 火焰截图            浮动
         { "scratchpad",         "scratchpad",           "scratchpad",       TAGMASK,    1,          1,          1,          -1,         2 },            // scratchpad          浮动、全局、无边框 屏幕顶部
