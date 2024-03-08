@@ -94,9 +94,9 @@ static const Rule rules[] = {
          * 优先级高 越在上面优先度越高
          */
         /* class                       instance                       title                   tags mosk       isfloating          isglobal           isnoborder          monitor           floatposition */
-        { NULL,                 NULL,                   "图片查看器",         0,          1,          0,          0,          -1,        0 },            // qq图片查看器     浮动
-        { NULL,                 NULL,                   "群公告",            0,          1,          0,          0,          -1,        0 },            // qq群公告        浮动
-        { NULL,                 NULL,                   "视频播放器",         0,          1,          0,          0,          -1,        0 },            // qq视频播放器        浮动
+        { "QQ",                 "qq",                   "图片查看器",         0,          1,          0,          0,          -1,        0 },            // qq图片查看器     浮动
+        { "QQ",                 "qq",                   "群公告",            0,          1,          0,          0,          -1,        0 },            // qq群公告        浮动
+        { "QQ",                 "qq",                   "视频播放器",         0,          1,          0,          0,          -1,        0 },            // qq视频播放器        浮动
         { NULL,                 NULL,                   "Preview",          0,           1,          0,          0,         -1,        0 },           // 微信图片查看器      浮动
         /* 普通优先级 */
         { "obs",                NULL,                   NULL,               1 << 3,     0,          0,          0,          -1,         0 },            // obs        tag -> 󰕧
