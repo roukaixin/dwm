@@ -2252,8 +2252,7 @@ resizeclient(Client *c, int x, int y, int w, int h)
     c->oldh = c->h; c->h = wc.height = h;
     wc.border_width = c->bw;
 
-    if (((nexttiled(c->mon->clients) == c && !nexttiled(c->next)))
-            && !c->isfullscreen && !c->isfloating) {
+    if (nexttiled(c->mon->clients) == c && !nexttiled(c->next) && !c->isfullscreen && !c->isfloating && !c->isglobal) {
         c->w = wc.width += c->bw * 2;
         c->h = wc.height += c->bw * 2;
         wc.border_width = 0;
@@ -2584,7 +2583,9 @@ setup(void)
 	sigaction(SIGCHLD, &sa, NULL);
 
 	/* clean up any zombies (inherited from .xinitrc etc) immediately */
-	while (waitpid(-1, NULL, WNOHANG) > 0);
+	while (waitpid(-1, NULL, WNOHANG) > 0) {
+
+	}
 
     /* init screen */
     screen = DefaultScreen(dpy);
@@ -2935,9 +2936,11 @@ toggleview(const Arg *arg)
 void
 toggleglobal(const Arg *arg)
 {
+    // 判断当前是否选中
     if (!selmon->sel)
         return;
-    if (selmon->sel->isscratchpad) // is scratchpad always global
+    // is scratchpad always global
+    if (selmon->sel->isscratchpad)
         return;
     selmon->sel->isglobal ^= 1;
     selmon->sel->tags = selmon->sel->isglobal ? TAGMASK : selmon->tagset[selmon->seltags];
@@ -2951,6 +2954,7 @@ toggleglobal(const Arg *arg)
 void
 toggleborder(const Arg *arg)
 {
+    // 判断当前是否选中客户端
     if (!selmon->sel)
         return;
     selmon->sel->isnoborder ^= 1;
