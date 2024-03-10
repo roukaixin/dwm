@@ -163,6 +163,7 @@ struct Monitor {
 	int showbar;
 	int topbar;
 	Client *clients;
+    // 选中的窗口
 	Client *sel;
 	Client *stack;
 	Monitor *next;
@@ -1965,6 +1966,8 @@ movemouse(const Arg *arg)
                 if (c->isfloating)
                     resize(c, nx, ny, c->w, c->h, 1);
                 break;
+            default:
+                break;
         }
     } while (ev.type != ButtonRelease);
     XUngrabPointer(dpy, CurrentTime);
@@ -2053,6 +2056,8 @@ movewin(const Arg *arg)
             nx = tar == 99999 ? nx : tar;
             nx = MIN(nx, c->mon->wx + c->mon->ww - gappo - WIDTH(c));
             break;
+        default:
+            break;
     }
     resize(c, nx, ny, c->w, c->h, 1);
     pointerfocuswin(c);
@@ -2114,6 +2119,8 @@ resizewin(const Arg *arg)
         case V_REDUCE: // 上
             nh -= selmon->wh / 8;
             nh = MAX(nh, selmon->wh / 10);
+            break;
+        default:
             break;
     }
     resize(c, c->x, c->y, nw, nh, 1);
@@ -2954,9 +2961,20 @@ toggleglobal(const Arg *arg)
 void
 toggleborder(const Arg *arg)
 {
+    int client_count = 0;
+    Client *c = NULL;
     // 判断当前是否选中客户端
     if (!selmon->sel)
         return;
+    // 判断是否只有一个窗口
+    for (c = selmon->clients; c; c = c->next) {
+        if (ISVISIBLE(c) && !HIDDEN(c)) {
+            client_count ++;
+        }
+    }
+    if (client_count == 1) {
+        return;
+    }
     selmon->sel->isnoborder ^= 1;
     selmon->sel->bw = selmon->sel->isnoborder ? 0 : borderpx;
     int diff = (selmon->sel->isnoborder ? -1 : 1) * borderpx;
