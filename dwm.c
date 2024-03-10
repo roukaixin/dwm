@@ -661,7 +661,7 @@ buttonpress(XEvent *e)
     }
     int status_w = drawstatusbar(selmon, bh, stext);
     int system_w = getsystraywidth();
-    if (ev->window == selmon->barwin || (!c && selmon->showbar && (topbar ? ev->y <= selmon->wy : ev->y >= selmon->wy + selmon->wh))) { // 点击在bar上
+    if (ev->window == selmon->barwin || (c == NULL && selmon->showbar && (topbar ? ev->y <= selmon->wy : ev->y >= selmon->wy + selmon->wh))) { // 点击在bar上
         i = x = 0;
         // blw = TEXTW(selmon->ltsymbol);
         
@@ -834,7 +834,7 @@ clientmessage(XEvent *e)
         }
         return;
     }
-    if (!c)
+    if (c == NULL)
         return;
     if (cme->message_type == netatom[NetWMState]) {
         if (cme->data.l[1] == netatom[NetWMFullscreen]
@@ -1406,7 +1406,7 @@ expose(XEvent *e)
 void
 focus(Client *c)
 {
-    if (!c || !ISVISIBLE(c) || HIDDEN(c))
+    if (c == NULL || !ISVISIBLE(c) || HIDDEN(c))
         for (c = selmon->stack; c && (!ISVISIBLE(c) || HIDDEN(c)); ) {
             c = c->snext;
         }
@@ -1445,7 +1445,7 @@ focusmon(const Arg *arg)
 {
     Monitor *m;
 
-    if (!mons->next)
+    if (mons->next == NULL)
         return;
     if ((m = dirtomon(arg->i)) == selmon)
         return;
@@ -1462,9 +1462,9 @@ focusstack(const Arg *arg)
     Client *c = NULL, *tc = selmon->sel;
     int last = -1, cur = 0, issingle = issinglewin(NULL);
 
-    if (!tc)
+    if (tc == NULL)
         tc = selmon->clients;
-    if (!tc)
+    if (tc == NULL)
         return;
 
     for (c = selmon->clients; c; c = c->next) {
@@ -1643,7 +1643,7 @@ grabkeys(void)
 
 void
 hide(Client *c) {
-    if (!c || HIDDEN(c))
+    if (c == NULL || HIDDEN(c))
         return;
 
     Window w = c->win;
@@ -1680,7 +1680,7 @@ hideotherwins(const Arg *arg) {
 void
 showonlyorall(const Arg *arg) {
     Client *c;
-    if (issinglewin(NULL) || !selmon->sel) {
+    if (issinglewin(NULL) || selmon->sel == NULL) {
         for (c = selmon->clients; c; c = c->next)
             if (ISVISIBLE(c))
                 show(c);
@@ -1735,7 +1735,7 @@ killclient(const Arg *arg)
     Client *c;
     int n = 0;
 
-    if (!selmon->sel)
+    if (selmon->sel == NULL)
         return;
     if (!sendevent(selmon->sel->win, wmatom[WMDelete], NoEventMask, wmatom[WMDelete], CurrentTime, 0 , 0, 0)) {
         XGrabServer(dpy);
@@ -1756,7 +1756,7 @@ killclient(const Arg *arg)
 void
 forcekillclient(const Arg *arg)
 {
-    if (!selmon->sel)
+    if (selmon->sel == NULL)
         return;
     killclient(arg);
     unmanage(selmon->sel, 1);
@@ -1890,7 +1890,7 @@ maprequest(XEvent *e)
 
     if (!XGetWindowAttributes(dpy, ev->window, &wa) || wa.override_redirect)
         return;
-    if (!wintoclient(ev->window))
+    if (wintoclient(ev->window) == NULL)
         manage(ev->window, &wa);
 }
 
@@ -1985,7 +1985,7 @@ movewin(const Arg *arg)
     int nx, ny;
     int buttom, top, left, right, tar;
     c = selmon->sel;
-    if (!c || c->isfullscreen)
+    if (c == NULL || c->isfullscreen)
         return;
     if (!c->isfloating)
         togglefloating(NULL);
@@ -2071,7 +2071,7 @@ resizewin(const Arg *arg)
     int nh, nw;
     int buttom, top, left, right, tar;
     c = selmon->sel;
-    if (!c || c->isfullscreen)
+    if (c == NULL || c->isfullscreen)
         return;
     if (!c->isfloating)
         togglefloating(NULL);
@@ -2220,7 +2220,7 @@ removesystrayicon(Client *i)
 {
     Client **ii;
 
-    if (!showsystray || !i)
+    if (!showsystray || i == NULL)
         return;
     for (ii = &systray->icons; *ii && *ii != i; ) {
         ii = &(*ii)->next;
@@ -2259,7 +2259,8 @@ resizeclient(Client *c, int x, int y, int w, int h)
     c->oldh = c->h; c->h = wc.height = h;
     wc.border_width = c->bw;
 
-    if (nexttiled(c->mon->clients) == c && !nexttiled(c->next) && !c->isfullscreen && !c->isfloating && !c->isglobal) {
+    if (nexttiled(c->mon->clients) == c && nexttiled(c->next) == NULL
+        && !c->isfullscreen && !c->isfloating && !c->isglobal) {
         c->w = wc.width += c->bw * 2;
         c->h = wc.height += c->bw * 2;
         wc.border_width = 0;
@@ -2347,7 +2348,7 @@ restack(Monitor *m)
     XWindowChanges wc;
 
     drawbar(m);
-    if (!m->sel)
+    if (m->sel == NULL)
         return;
     if (m->sel->isfloating)
         XRaiseWindow(dpy, m->sel->win);
@@ -2528,7 +2529,7 @@ setfullscreen(Client *c, int fullscreen)
 void
 fullscreen(const Arg *arg)
 {
-    if (!selmon->sel) {
+    if (selmon->sel == NULL) {
         togglebar(arg);
         return;
     }
@@ -2684,7 +2685,7 @@ seturgent(Client *c, int urg)
 void
 show(Client *c)
 {
-    if (!c || !HIDDEN(c))
+    if (c == NULL || !HIDDEN(c))
         return;
 
     XMapWindow(dpy, c->win);
@@ -2697,7 +2698,7 @@ show(Client *c)
 void
 showtag(Client *c)
 {
-    if (!c)
+    if (c == NULL)
         return;
     if (ISVISIBLE(c)) {
         /** 将可见的client从屏幕边缘移动到屏幕内 */
@@ -2751,7 +2752,7 @@ tag(const Arg *arg)
 void
 tagmon(const Arg *arg)
 {
-    if (!selmon->sel || !mons->next)
+    if (selmon->sel == NULL || mons->next == NULL)
         return;
     sendmon(selmon->sel, dirtomon(arg->i));
     focusmon(&(Arg) { .i = +1 });
@@ -2798,7 +2799,7 @@ togglebar(const Arg *arg)
 void
 togglefloating(const Arg *arg)
 {
-    if (!selmon->sel)
+    if (selmon->sel == NULL)
         return;
     if (selmon->sel->isfullscreen) {
         fullscreen(NULL);
@@ -2825,7 +2826,7 @@ toggleallfloating(const Arg *arg)
     Client *c = NULL;
     int somefloating = 0;
 
-    if (!selmon->sel || selmon->sel->isfullscreen)
+    if (selmon->sel == NULL || selmon->sel->isfullscreen)
         return;
 
     for (c = selmon->clients; c; c = c->next)
@@ -2894,9 +2895,9 @@ restorewin(const Arg *arg) {
 
 void
 hidewin(const Arg *arg) {
-    if (!selmon->sel)
+    if (selmon->sel == NULL)
         return;
-    Client *c = (Client *)selmon->sel;
+    Client *c = selmon->sel;
     hide(c);
 }
 
@@ -2944,7 +2945,7 @@ void
 toggleglobal(const Arg *arg)
 {
     // 判断当前是否选中
-    if (!selmon->sel)
+    if (selmon->sel == NULL)
         return;
     // is scratchpad always global
     if (selmon->sel->isscratchpad)
@@ -2964,7 +2965,7 @@ toggleborder(const Arg *arg)
     int tile_client_count = 0;
     Client *c = NULL;
     // 判断当前是否选中客户端
-    if (!selmon->sel)
+    if (selmon->sel == NULL)
         return;
     if (!selmon->sel->isfloating) {
         // 判断是否只有一个窗口
@@ -2998,7 +2999,7 @@ toggleborder(const Arg *arg)
 void
 unfocus(Client *c, int setfocus)
 {
-    if (!c)
+    if (c == NULL)
         return;
     grabbuttons(c, 0);
     XSetWindowBorder(dpy, c->win, scheme[SchemeNorm][ColBorder].pixel);
@@ -3289,7 +3290,7 @@ updatesystrayiconstate(Client *i, XPropertyEvent *ev)
     long flags;
     int code = 0;
 
-    if (!showsystray || !i || ev->atom != xatom[XembedInfo] ||
+    if (!showsystray || i == NULL || ev->atom != xatom[XembedInfo] ||
             !(flags = getatomprop(i, xatom[XembedInfo])))
         return;
 
@@ -3576,7 +3577,7 @@ grid(Monitor *m, uint gappo, uint gappi)
 {
     unsigned int i, n;
     unsigned int cx, cy, cw, ch;
-    unsigned int dx;
+    unsigned int dx = 0;
     unsigned int cols, rows, overcols;
     Client *c;
 
@@ -3773,7 +3774,7 @@ zoom(const Arg *arg)
 {
     Client *c = selmon->sel;
 
-    if (!selmon->lt[selmon->sellt]->arrange || !c || c->isfloating || c->isfullscreen)
+    if (!selmon->lt[selmon->sellt]->arrange || c == NULL || c->isfloating || c->isfullscreen)
     		return;
 	if (c == nexttiled(selmon->clients) && !(c = nexttiled(c->next))) {
 	    return;
@@ -3813,9 +3814,9 @@ Client *direction_select(const Arg *arg) {
 
     if (tc && tc->isfullscreen) /* no support for focusstack with fullscreen windows */
         return NULL;
-    if (!tc)
+    if (tc == NULL)
         tc = selmon->clients;
-    if (!tc)
+    if (tc == NULL)
         return NULL;
 
     for (c = selmon->clients; c; c = c->next) {
@@ -3846,7 +3847,7 @@ Client *direction_select(const Arg *arg) {
                     }
                 }
             }
-            if (!tempFocusClients) {
+            if (tempFocusClients == NULL) {
                 distance = LLONG_MAX;
                 for (int _i = 0; _i <= last; _i++) {
                     if (tempClients[_i]->y < sel_y) {
@@ -3879,7 +3880,7 @@ Client *direction_select(const Arg *arg) {
                     }
                 }
             }
-            if (!tempFocusClients) {
+            if (tempFocusClients == NULL) {
                 distance = LLONG_MAX;
                 for (int _i = 0; _i <= last; _i++) {
                     if (tempClients[_i]->y > sel_y) {
@@ -3912,7 +3913,7 @@ Client *direction_select(const Arg *arg) {
                     }
                 }
             }
-            if (!tempFocusClients) {
+            if (tempFocusClients == NULL) {
                 distance = LLONG_MAX;
                 for (int _i = 0; _i <= last; _i++) {
                     if (tempClients[_i]->x < sel_x) {
@@ -3947,7 +3948,7 @@ Client *direction_select(const Arg *arg) {
                 }
             }
             // 没筛选到,再去除同一层次的要求,重新筛选
-            if (!tempFocusClients) {
+            if (tempFocusClients == NULL) {
                 distance = LLONG_MAX;
                 for (int _i = 0; _i <= last; _i++) {
                     if (tempClients[_i]->x > sel_x) {
@@ -4067,7 +4068,7 @@ void exchange_two_client(Client *c1, Client *c2) {
 
 void exchange_client(const Arg *arg) {
   Client *c = selmon->sel;
-  if (!c || c->isfloating || c->isfullscreen)
+  if (c == NULL || c->isfloating || c->isfullscreen)
     return;
   exchange_two_client(c, direction_select(arg));
 }
