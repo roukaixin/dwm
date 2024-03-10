@@ -2530,7 +2530,7 @@ void
 fullscreen(const Arg *arg)
 {
     if (selmon->sel == NULL) {
-        togglebar(arg);
+        // togglebar(arg);
         return;
     }
     if (selmon->sel->isfullscreen) {
