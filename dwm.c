@@ -2961,20 +2961,26 @@ toggleglobal(const Arg *arg)
 void
 toggleborder(const Arg *arg)
 {
-    int client_count = 0;
+    int tile_client_count = 0;
     Client *c = NULL;
     // 判断当前是否选中客户端
     if (!selmon->sel)
         return;
-    // 判断是否只有一个窗口
-    for (c = selmon->clients; c; c = c->next) {
-        if (ISVISIBLE(c) && !HIDDEN(c)) {
-            client_count ++;
+    if (!selmon->sel->isfloating) {
+        // 判断是否只有一个窗口
+        for (c = selmon->clients; c; c = c->next) {
+            if (ISVISIBLE(c) && !HIDDEN(c) && !c->isfloating) {
+                tile_client_count ++;
+            }
+            if (tile_client_count == 2) {
+                break;
+            }
+        }
+        if (tile_client_count == 1) {
+            return;
         }
     }
-    if (client_count == 1) {
-        return;
-    }
+
     selmon->sel->isnoborder ^= 1;
     selmon->sel->bw = selmon->sel->isnoborder ? 0 : borderpx;
     int diff = (selmon->sel->isnoborder ? -1 : 1) * borderpx;
