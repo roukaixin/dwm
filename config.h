@@ -235,7 +235,7 @@ static const Key keys[] = {
     /* spawn + SHCMD 执行对应命令(已下部分建议完全自己重新定义) */
 
     /* super s          |    打开scratch终端 */
-    { MODKEY,              XK_s,                        togglescratch,  SHCMD("kitty --title scratchpad --class float -o initial_window_width=70c -o initial_window_height=17c") },
+    { MODKEY,              XK_s,                        togglescratch,  SHCMD("kitty --title scratchpad --class scratchpad -o initial_window_width=70c -o initial_window_height=17c") },
     /* super -          |    打开全局终端 */
     { MODKEY,              XK_minus,                    spawn,          SHCMD("kitty --class FG -o initial_window_width=70c -o initial_window_height=17c") },
     /* super space      |    打开浮动st终端 */

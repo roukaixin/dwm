@@ -1314,10 +1314,10 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 void
 expose(XEvent *e)
 {
+    Monitor *m;
     XExposeEvent *ev = &e->xexpose;
-    Monitor *m = wintomon(ev->window);
 
-    if (ev->count == 0 && m) {
+    if (ev->count == 0 && (m = wintomon(ev->window))) {
         drawbar(m);
         if (m == selmon)
             updatesystray();
@@ -2778,13 +2778,12 @@ togglescratch(const Arg *arg)
     Monitor *m;
     unsigned int found = 0;
 
+    // 判断是否存在 scratchpad 便签
     for (m = mons; m && !found; m = m->next) {
-        found = c->isscratchpad;
-        for (c = m->clients; c && !found; ) {
-            c = c->next;
-        }
+        for (c = m->clients; c && !(found = c->isscratchpad); c = c->next);
     }
     if (found) {
+        // 存在 scratchpad 便签
         if (c->mon == selmon) // 在同屏幕则toggle win状态
             togglewin(&(Arg){.v = c});
         else {                // 不在同屏幕则将win移到当前屏幕 并显示
@@ -2797,6 +2796,7 @@ togglescratch(const Arg *arg)
             pointerfocuswin(c);
         }
     } else
+        // 不存在 scratchpad 便签
         spawn(arg);
 }
 
@@ -3716,8 +3716,7 @@ zoom(const Arg *arg)
 
     if (selmon->lt[selmon->sellt]->arrange == NULL || c == NULL || c->isfloating || c->isfullscreen)
     		return;
-    c = nexttiled(c->next);
-	if (c == nexttiled(selmon->clients) && c == NULL) {
+    if (c == nexttiled(selmon->clients) && !(c = nexttiled(c->next))) {
 	    return;
 	}
     pop(c);
