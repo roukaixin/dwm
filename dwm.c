@@ -213,7 +213,6 @@ static void clientmessage(XEvent *e);
 static void configure(Client *c);
 static void configurenotify(XEvent *e);
 static void configurerequest(XEvent *e);
-static void clickstatusbar(const Arg *arg);
 static Monitor *createmon(void);
 static void destroynotify(XEvent *e);
 static void detach(Client *c);
@@ -1285,89 +1284,6 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
     free(p);
 
     return status_w - 2;
-}
-
-// 点击状态栏时执行的func
-// 传入参数为 i  => 鼠标点击的位置相对于左边界的距离
-// 传入参数为 ui => 鼠标按键, 1 => 左键, 2 => 中键, 3 => 右键, 4 => 滚轮向上, 5 => 滚轮向下
-long lastclickstatusbartime = 0; // 用于避免过于频繁的点击和滚轮行为
-void
-clickstatusbar(const Arg *arg)
-{
-    if (!arg->i && arg->i < 0)
-        return;
-
-    // 用于避免过于频繁的点击和滚轮行为
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    long now = tv.tv_sec * 1000 + tv.tv_usec / 1000;
-    if (now - lastclickstatusbartime < 100)
-        return;
-    lastclickstatusbartime = now;
-
-    int offset = -1;
-    int status_w = 0;
-    int iscode = 0, issignal = 0, signalindex = 0;
-    char signal [20];
-    char text [100];
-    char *button = "L";
-    int limit, max = sizeof(stext);
-
-    while (stext[++offset] != '\0') {
-        // 左侧^
-        if (stext[offset] == '^' && !iscode) {
-            iscode = 1;
-            offset++;
-            if (stext[offset] == 's') { // 查询到s->signal
-                issignal = 1;
-                signalindex = 0;
-                memset(signal, '\0', sizeof(signal));
-            } else {
-                issignal = 0;
-            }
-            continue;
-        }
-
-        // 右侧^
-        if (stext[offset] == '^' && iscode) {
-            iscode = 0;
-            issignal = 0;
-            continue;
-        }
-
-        if (issignal) { // 逐位读取signal
-            signal[signalindex++] = stext[offset];
-        }
-
-        // 是普通文本
-        if (!iscode) {
-            // 查找到下一个^ 或 游标到达最后
-            limit = 0;
-            while (stext[offset + ++limit] != '^' && offset + limit < max);
-            if (offset + limit == max)
-                break;
-
-            memset(text, '\0', sizeof(text));
-            strncpy(text, stext + offset, limit);
-            offset += --limit;
-            status_w += TEXTW(text) - lrpad;
-            if (status_w > arg->i)
-                break;
-        }
-    }
-
-    switch (arg->ui) {
-        case Button1: button = "L"; break;
-        case Button2: button = "M"; break;
-        case Button3: button = "R"; break;
-        case Button4: button = "U"; break;
-        case Button5: button = "D"; break;
-        default: break;
-    }
-
-    memset(text, '\0', sizeof(text));
-    // sprintf(text, "%s %s %s &", statusbarscript, signal, button);
-    // system(text);
 }
 
 // 禁用焦点跟随鼠标
