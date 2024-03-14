@@ -197,8 +197,10 @@ static const Key keys[] = {
     { MODKEY,              XK_u,            toggleborder,     {0} },                     /* super u            |  开启/关闭 边框 */
     { MODKEY,              XK_e,            incnmaster,       {.i = +1} },               /* super e            |  改变主工作区窗口数量 (1 2中切换) */
 
-    { MODKEY,              XK_b,            focusmon,         {.i = +1} },               /* super b            |  光标移动到另一个显示器 */
-    { MODKEY|ShiftMask,    XK_b,            tagmon,           {.i = +1} },               /* super shift b      |  将聚焦窗口移动到另一个显示器 */
+    /* super m            |  光标移动到另一个显示器 重复按键 */
+    { MODKEY,              XK_m,            focusmon,         {.i = +1} },
+    /* super shift       |  将聚焦窗口移动到另一个显示器 */
+    { MODKEY|ShiftMask,    XK_m,            tagmon,           {.i = +1} },
     /* super + c (关闭窗口)  */
     { MODKEY,              XK_c,            killclient,       {0} },
     /* super + ctrl + c (强制关闭窗口(处理某些情况下无法销毁的窗口)) */
