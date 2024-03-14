@@ -697,11 +697,11 @@ buttonpress(XEvent *e)
 
             if (m->bt != 0)
                 do {
-                    if (ISVISIBLE(c)) {
+                    if (!ISVISIBLE(c))
+                        continue;
+                    else
                         x += c->taskw;
-                    }
-                    c = c->next;
-                } while (ev->x > x && c);
+                } while (ev->x > x && (c = c->next));
 
             if (c) {
                 click = ClkWinTitle;
