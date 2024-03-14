@@ -653,7 +653,8 @@ buttonpress(XEvent *e)
     // 判断鼠标点击的位置
     click = ClkRootWin;
     /* focus monitor if necessary */
-    if ((m = wintomon(ev->window)) && m != selmon) {
+    m = wintomon(ev->window);
+    if (m && m != selmon) {
         unfocus(selmon->sel, 1);
         selmon = m;
         focus(NULL);
@@ -696,11 +697,11 @@ buttonpress(XEvent *e)
 
             if (m->bt != 0)
                 do {
-                    if (!ISVISIBLE(c))
-                        continue;
-                    else
+                    if (ISVISIBLE(c)) {
                         x += c->taskw;
-                } while (ev->x > x && (c = c->next));
+                    }
+                    c = c->next;
+                } while (ev->x > x && c);
 
             if (c) {
                 click = ClkWinTitle;
@@ -793,9 +794,11 @@ clientmessage(XEvent *e)
     if (showsystray && cme->window == systray->win && cme->message_type == netatom[NetSystemTrayOP]) {
         /* add systray icons */
         if (cme->data.l[1] == SYSTEM_TRAY_REQUEST_DOCK) {
-            if (!(c = (Client *)calloc(1, sizeof(Client))))
+            c = (Client *)calloc(1, sizeof(Client));
+            if (c == NULL)
                 die("fatal: could not malloc() %u bytes\n", sizeof(Client));
-            if (!(c->win = cme->data.l[2])) {
+            c->win = cme->data.l[2];
+            if (c == NULL) {
                 free(c);
                 return;
             }
@@ -1037,7 +1040,8 @@ dirtomon(int dir)
     Monitor *m = NULL;
 
     if (dir > 0) {
-        if (!(m = selmon->next))
+        m = selmon->next;
+        if (m == NULL)
             m = mons;
     } else if (selmon == mons)
         for (m = mons; m->next; ) {
@@ -1181,7 +1185,8 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
         system_w = getsystraywidth();
 
     len = strlen(stext) + 1 ;
-    if (!(text = (char*) malloc(sizeof(char)*len)))
+    text = (char*) malloc(sizeof(char)*len);
+    if (!text)
         die("malloc");
     p = text;
     memcpy(text, stext, len);
@@ -1312,7 +1317,8 @@ expose(XEvent *e)
     Monitor *m;
     XExposeEvent *ev = &e->xexpose;
 
-    if (ev->count == 0 && (m = wintomon(ev->window))) {
+    m = wintomon(ev->window);
+    if (ev->count == 0 && m) {
         drawbar(m);
         if (m == selmon)
             updatesystray();
@@ -1542,7 +1548,7 @@ grabkeys(void)
         XUngrabKey(dpy, AnyKey, AnyModifier, root);
         XDisplayKeycodes(dpy, &start, &end);
         syms = XGetKeyboardMapping(dpy, start, end - start + 1, &skip);
-        if (!syms)
+        if (syms == NULL)
             return;
         for (k = start; k <= end; k++)
             for (i = 0; i < LENGTH(keys); i++)
@@ -1724,7 +1730,8 @@ manage(Window w, XWindowAttributes *wa)
     c->bw = borderpx;
 
     updatetitle(c);
-    if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
+    t = wintoclient(trans);
+    if (XGetTransientForHint(dpy, w, &trans) && t) {
         c->mon = t->mon;
         c->tags = t->tags;
     } else {
@@ -1836,7 +1843,8 @@ movemouse(const Arg *arg)
     XEvent ev;
     Time lasttime = 0;
 
-    if (!(c = selmon->sel))
+    c = selmon->sel;
+    if (c == NULL)
         return;
     if (c->isfullscreen) /* no support moving fullscreen windows by mouse */
         return;
@@ -2089,17 +2097,17 @@ propertynotify(XEvent *e)
         switch(ev->atom) {
             default: break;
             case XA_WM_TRANSIENT_FOR:
-                     if (!c->isfloating && (XGetTransientForHint(dpy, c->win, &trans)) &&
-                             (c->isfloating = (wintoclient(trans)) != NULL))
-                         arrange(c->mon);
-                     break;
+                if (!c->isfloating && XGetTransientForHint(dpy, c->win, &trans) &&
+                     (c->isfloating = wintoclient(trans) != NULL))
+                 arrange(c->mon);
+                break;
             case XA_WM_NORMAL_HINTS:
-                     updatesizehints(c);
-                     break;
+                updatesizehints(c);
+                break;
             case XA_WM_HINTS:
-                     updatewmhints(c);
-                     drawbars();
-                     break;
+                updatewmhints(c);
+                drawbars();
+                break;
         }
         if (ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
             updatetitle(c);
@@ -2195,7 +2203,8 @@ resizemouse(const Arg *arg)
     XEvent ev;
     Time lasttime = 0;
 
-    if (!(c = selmon->sel))
+    c = selmon->sel;
+    if (c == NULL)
         return;
     if (c->isfullscreen) /* no support resizing fullscreen windows by mouse */
         return;
@@ -2231,11 +2240,15 @@ resizemouse(const Arg *arg)
                 if (c->isfloating)
                     resize(c, c->x, c->y, nw, nh, 1);
                 break;
+            default:
+                break;
         }
     } while (ev.type != ButtonRelease);
     XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
     XUngrabPointer(dpy, CurrentTime);
-    while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+    while (XCheckMaskEvent(dpy, EnterWindowMask, &ev)) {
+
+    }
     if ((m = recttomon(c->x, c->y, c->w, c->h)) != selmon) {
         sendmon(c, m);
         selmon = m;
@@ -2483,7 +2496,7 @@ setmfact(const Arg *arg)
 {
     float f;
 
-    if (!arg)
+    if (arg == NULL)
         return;
     f = arg->f < 1.0 ? arg->f + selmon->mfact : arg->f - 1.0;
     if (f < 0.05 || f > 0.95)
@@ -2518,7 +2531,7 @@ setup(void)
     root = RootWindow(dpy, screen);
     xinitvisual();
     drw = drw_create(dpy, screen, root, sw, sh, visual, depth, cmap);
-    if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
+    if (drw_fontset_create(drw, fonts, LENGTH(fonts)) == NULL)
         die("no fonts could be loaded.");
     lrpad = drw->fonts->h;
     bh = drw->fonts->h + 2;
@@ -2591,7 +2604,8 @@ seturgent(Client *c, int urg)
     XWMHints *wmh;
 
     c->isurgent = urg;
-    if (!(wmh = XGetWMHints(dpy, c->win)))
+    wmh = XGetWMHints(dpy, c->win);
+    if (wmh == NULL)
         return;
     wmh->flags = urg ? (wmh->flags | XUrgencyHint) : (wmh->flags & ~XUrgencyHint);
     XSetWMHints(dpy, c->win, wmh);
@@ -2769,12 +2783,16 @@ toggleallfloating(const Arg *arg)
 void
 togglescratch(const Arg *arg)
 {
-    Client *c;
+    Client *c = NULL;
     Monitor *m;
     unsigned int found = 0;
 
-    for (m = mons; m && !found; m = m->next)
-        for (c = m->clients; c && !(found = c->isscratchpad); c = c->next);
+    for (m = mons; m && !found; m = m->next) {
+        found = c->isscratchpad;
+        for (c = m->clients; c && !found; ) {
+            c = c->next;
+        }
+    }
     if (found) {
         if (c->mon == selmon) // 在同屏幕则toggle win状态
             togglewin(&(Arg){.v = c});
@@ -3041,7 +3059,9 @@ updategeom(void)
         XineramaScreenInfo *info = XineramaQueryScreens(dpy, &nn);
         XineramaScreenInfo *unique = NULL;
 
-        for (n = 0, m = mons; m; m = m->next, n++);
+        for (n = 0, m = mons; m; n++) {
+            m = m->next;
+        }
         /* only consider unique geometries as separate screens */
         unique = ecalloc(nn, sizeof(XineramaScreenInfo));
         for (i = 0, j = 0; i < nn; i++)
@@ -3052,7 +3072,9 @@ updategeom(void)
 
 		/* new monitors if nn > n */
 		for (i = n; i < nn; i++) {
-			for (m = mons; m && m->next; m = m->next);
+			for (m = mons; m && m->next; ){
+			    m = m->next;
+			}
 			if (m)
 				m->next = createmon();
 			else
@@ -3073,7 +3095,9 @@ updategeom(void)
 			}
 		/* removed monitors if n > nn */
 		for (i = nn; i < n; i++) {
-			for (m = mons; m && m->next; m = m->next);
+			for (m = mons; m && m->next; ) {
+			    m = m->next;
+			}
 			while ((c = m->clients)) {
 				dirty = 1;
 				m->clients = c->next;
@@ -3090,7 +3114,7 @@ updategeom(void)
     } else
 #endif /* XINERAMA */
     { /* default monitor setup */
-        if (!mons)
+        if (mons == NULL)
             mons = createmon();
         if (mons->mw != sw || mons->mh != sh) {
             dirty = 1;
@@ -3203,11 +3227,10 @@ updatesystrayicongeom(Client *i, int w, int h)
 void
 updatesystrayiconstate(Client *i, XPropertyEvent *ev)
 {
-    long flags;
+    long flags = getatomprop(i, xatom[XembedInfo]);
     int code = 0;
-
     if (!showsystray || i == NULL || ev->atom != xatom[XembedInfo] ||
-            !(flags = getatomprop(i, xatom[XembedInfo])))
+            !flags)
         return;
 
     if (flags & XEMBED_MAPPED && !i->tags) {
@@ -3240,9 +3263,10 @@ updatesystray(void)
 
     if (!showsystray)
         return;
-    if (!systray) {
+    if (systray == NULL) {
         /* init systray */
-        if (!(systray = (Systray *)calloc(1, sizeof(Systray))))
+        systray = (Systray *)calloc(1, sizeof(Systray));
+        if (systray == NULL)
             die("fatal: could not malloc() %u bytes\n", sizeof(Systray));
         systray->win = XCreateSimpleWindow(dpy, root, x - sp, m->by + vp, w, bh, 0, 0, scheme[SchemeSystray][ColBg].pixel);
         wa.event_mask        = ButtonPressMask | ExposureMask;
@@ -3445,7 +3469,9 @@ tile(Monitor *m)
     unsigned int i, n, mw, mh, sh, my, sy;
     Client *c;
 
-    for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+    for (n = 0, c = nexttiled(m->clients); c; n++) {
+        c = nexttiled(c->next);
+    }
     if (n == 0) return;
 
     if (n > m->nmaster)
@@ -3497,7 +3523,9 @@ grid(Monitor *m, uint gappo, uint gappi)
     unsigned int cols, rows, overcols;
     Client *c;
 
-    for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+    for (n = 0, c = nexttiled(m->clients); c; n++) {
+        c = nexttiled(c->next);
+    }
     if (n == 0) return;
     if (n == 1) {
         c = nexttiled(m->clients);
@@ -3637,12 +3665,16 @@ systraytomon(Monitor *m) {
     Monitor *t;
     int i, n;
     if(!systraypinning) {
-        if(!m)
+        if(m == NULL)
             return selmon;
         return m == selmon ? m : NULL;
     }
-    for(n = 1, t = mons; t && t->next; n++, t = t->next) ;
-    for(i = 1, t = mons; t && t->next && i < systraypinning; i++, t = t->next) ;
+    for(n = 1, t = mons; t && t->next; n++) {
+        t = t->next;
+    }
+    for(i = 1, t = mons; t && t->next && i < systraypinning; i++) {
+        t = t->next;
+    }
     if(n < systraypinning)
         return mons;
     return t;
@@ -3678,7 +3710,7 @@ xinitvisual()
 
     XFree(infos);
 
-    if (! visual) {
+    if (visual == NULL) {
         visual = DefaultVisual(dpy, screen);
         depth = DefaultDepth(dpy, screen);
         cmap = DefaultColormap(dpy, screen);
@@ -3690,9 +3722,10 @@ zoom(const Arg *arg)
 {
     Client *c = selmon->sel;
 
-    if (!selmon->lt[selmon->sellt]->arrange || c == NULL || c->isfloating || c->isfullscreen)
+    if (selmon->lt[selmon->sellt]->arrange == NULL || c == NULL || c->isfloating || c->isfullscreen)
     		return;
-	if (c == nexttiled(selmon->clients) && !(c = nexttiled(c->next))) {
+    c = nexttiled(c->next);
+	if (c == nexttiled(selmon->clients) && c == NULL) {
 	    return;
 	}
     pop(c);
@@ -3707,7 +3740,8 @@ main(int argc, char *argv[])
         die("usage: dwm [-v]");
     if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
         fputs("warning: no locale support\n", stderr);
-    if (!(dpy = XOpenDisplay(NULL)))
+    dpy = XOpenDisplay(NULL);
+    if (dpy == NULL)
         die("dwm: cannot open display");
     checkotherwm();
     setup();
