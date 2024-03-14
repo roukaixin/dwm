@@ -138,8 +138,7 @@ static const Layout layouts[] = {
 };
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
-#define MODKEY Mod1Mask
-#define MODKEY_1 Mod4Mask
+#define MODKEY Mod4Mask
 #define TAGKEYS(KEY, TAG, cmd) \
     { MODKEY,              KEY, view,       {.ui = 1 << TAG, .v = cmd} }, \
     { MODKEY|ShiftMask,    KEY, tag,        {.ui = 1 << TAG} }, \
@@ -183,7 +182,7 @@ static const Key keys[] = {
     /* super + shift + i (取消隐藏窗口) */
     { MODKEY|ShiftMask,    XK_i,            restorewin,       {0} },
     /* super + enter (打开终端) */
-    { MODKEY,              XK_Return,       spawn,            SHCMD("st") },
+    { MODKEY,              XK_Return,       spawn,            SHCMD("kitty") },
     /* super + shift + enter (将当前聚焦窗口置为主窗口) */
     { MODKEY|ShiftMask,    XK_Return,       zoom,             {0} },
     /* super + v (切换浮动模式(聚焦窗口)) */
@@ -201,7 +200,7 @@ static const Key keys[] = {
     { MODKEY,              XK_b,            focusmon,         {.i = +1} },               /* super b            |  光标移动到另一个显示器 */
     { MODKEY|ShiftMask,    XK_b,            tagmon,           {.i = +1} },               /* super shift b      |  将聚焦窗口移动到另一个显示器 */
     /* super + c (关闭窗口)  */
-    { MODKEY,              XK_x,            killclient,       {0} },
+    { MODKEY,              XK_c,            killclient,       {0} },
     /* super + ctrl + c (强制关闭窗口(处理某些情况下无法销毁的窗口)) */
     { MODKEY|ControlMask,  XK_c,            forcekillclient,  {0} },
     /* super + shift + q (退出) */
@@ -219,10 +218,10 @@ static const Key keys[] = {
     { MODKEY|ControlMask,  XK_Left,         movewin,          {.ui = LEFT} },            /* super ctrl left    |  移动窗口 */
     { MODKEY|ControlMask,  XK_Right,        movewin,          {.ui = RIGHT} },           /* super ctrl right   |  移动窗口 */
 
-    { MODKEY|MODKEY_1,     XK_Up,           resizewin,        {.ui = V_REDUCE} },        /* super alt up       |  调整窗口 */
-    { MODKEY|MODKEY_1,     XK_Down,         resizewin,        {.ui = V_EXPAND} },        /* super alt down     |  调整窗口 */
-    { MODKEY|MODKEY_1,     XK_Left,         resizewin,        {.ui = H_REDUCE} },        /* super alt left     |  调整窗口 */
-    { MODKEY|MODKEY_1,     XK_Right,        resizewin,        {.ui = H_EXPAND} },        /* super alt right    |  调整窗口 */
+    { MODKEY|Mod1Mask,     XK_Up,           resizewin,        {.ui = V_REDUCE} },        /* super alt up       |  调整窗口 */
+    { MODKEY|Mod1Mask,     XK_Down,         resizewin,        {.ui = V_EXPAND} },        /* super alt down     |  调整窗口 */
+    { MODKEY|Mod1Mask,     XK_Left,         resizewin,        {.ui = H_REDUCE} },        /* super alt left     |  调整窗口 */
+    { MODKEY|Mod1Mask,     XK_Right,        resizewin,        {.ui = H_EXPAND} },        /* super alt right    |  调整窗口 */
 
   	{ MODKEY,              XK_k,            focusdir,         {.i = UP } },              /* super k            | 二维聚焦窗口 */
   	{ MODKEY,              XK_j,            focusdir,         {.i = DOWN } },            /* super j            | 二维聚焦窗口 */
@@ -236,15 +235,15 @@ static const Key keys[] = {
     /* spawn + SHCMD 执行对应命令(已下部分建议完全自己重新定义) */
 
     /* super s          |    打开scratch终端 */
-    { MODKEY,              XK_s,                        togglescratch,  SHCMD("st -t scratchpad -c float") },
+    { MODKEY,              XK_s,                        togglescratch,  SHCMD("kitty --title scratchpad --class float -o initial_window_width=70c -o initial_window_height=17c") },
     /* super -          |    打开全局终端 */
-    { MODKEY,              XK_minus,                    spawn,          SHCMD("st -c FG") },
+    { MODKEY,              XK_minus,                    spawn,          SHCMD("kitty --class FG -o initial_window_width=70c -o initial_window_height=17c") },
     /* super space      |    打开浮动st终端 */
-    { MODKEY,              XK_space,                    spawn,          SHCMD("st -c float") },
+    { MODKEY,              XK_space,                    spawn,          SHCMD("kitty --class float -o initial_window_width=70c -o initial_window_height=17c") },
     /* super n          |    锁定屏幕 */
     { MODKEY,              XK_n,                        spawn,          SHCMD("sh $HOME/wm/config/lock/blurlock.sh") },
     /* alt a            |    截图 */
-    { 0|MODKEY_1,          XK_a,                        spawn,          SHCMD("flameshot gui") },
+    { 0|Mod1Mask,          XK_a,                        spawn,          SHCMD("flameshot gui") },
     /* super shift c    |    选中某个窗口并强制kill */
     { MODKEY|ShiftMask,    XK_c,                        spawn,          SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") },
     /* super p          |    打开 rofi run */
