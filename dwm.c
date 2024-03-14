@@ -1314,10 +1314,9 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 void
 expose(XEvent *e)
 {
-    Monitor *m;
     XExposeEvent *ev = &e->xexpose;
+    Monitor *m = wintomon(ev->window);
 
-    m = wintomon(ev->window);
     if (ev->count == 0 && m) {
         drawbar(m);
         if (m == selmon)
@@ -1548,7 +1547,7 @@ grabkeys(void)
         XUngrabKey(dpy, AnyKey, AnyModifier, root);
         XDisplayKeycodes(dpy, &start, &end);
         syms = XGetKeyboardMapping(dpy, start, end - start + 1, &skip);
-        if (syms == NULL)
+        if (!syms)
             return;
         for (k = start; k <= end; k++)
             for (i = 0; i < LENGTH(keys); i++)
@@ -1730,8 +1729,7 @@ manage(Window w, XWindowAttributes *wa)
     c->bw = borderpx;
 
     updatetitle(c);
-    t = wintoclient(trans);
-    if (XGetTransientForHint(dpy, w, &trans) && t) {
+    if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
         c->mon = t->mon;
         c->tags = t->tags;
     } else {
@@ -1843,8 +1841,7 @@ movemouse(const Arg *arg)
     XEvent ev;
     Time lasttime = 0;
 
-    c = selmon->sel;
-    if (c == NULL)
+    if (!(c = selmon->sel))
         return;
     if (c->isfullscreen) /* no support moving fullscreen windows by mouse */
         return;
@@ -2097,17 +2094,17 @@ propertynotify(XEvent *e)
         switch(ev->atom) {
             default: break;
             case XA_WM_TRANSIENT_FOR:
-                if (!c->isfloating && XGetTransientForHint(dpy, c->win, &trans) &&
-                     (c->isfloating = wintoclient(trans) != NULL))
-                 arrange(c->mon);
-                break;
+                     if (!c->isfloating && (XGetTransientForHint(dpy, c->win, &trans)) &&
+                             (c->isfloating = (wintoclient(trans)) != NULL))
+                         arrange(c->mon);
+                     break;
             case XA_WM_NORMAL_HINTS:
-                updatesizehints(c);
-                break;
+                     updatesizehints(c);
+                     break;
             case XA_WM_HINTS:
-                updatewmhints(c);
-                drawbars();
-                break;
+                     updatewmhints(c);
+                     drawbars();
+                     break;
         }
         if (ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
             updatetitle(c);
@@ -2203,8 +2200,7 @@ resizemouse(const Arg *arg)
     XEvent ev;
     Time lasttime = 0;
 
-    c = selmon->sel;
-    if (c == NULL)
+    if (!(c = selmon->sel))
         return;
     if (c->isfullscreen) /* no support resizing fullscreen windows by mouse */
         return;
@@ -2240,15 +2236,11 @@ resizemouse(const Arg *arg)
                 if (c->isfloating)
                     resize(c, c->x, c->y, nw, nh, 1);
                 break;
-            default:
-                break;
         }
     } while (ev.type != ButtonRelease);
     XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
     XUngrabPointer(dpy, CurrentTime);
-    while (XCheckMaskEvent(dpy, EnterWindowMask, &ev)) {
-
-    }
+    while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
     if ((m = recttomon(c->x, c->y, c->w, c->h)) != selmon) {
         sendmon(c, m);
         selmon = m;
@@ -2496,7 +2488,7 @@ setmfact(const Arg *arg)
 {
     float f;
 
-    if (arg == NULL)
+    if (!arg)
         return;
     f = arg->f < 1.0 ? arg->f + selmon->mfact : arg->f - 1.0;
     if (f < 0.05 || f > 0.95)
@@ -2531,7 +2523,7 @@ setup(void)
     root = RootWindow(dpy, screen);
     xinitvisual();
     drw = drw_create(dpy, screen, root, sw, sh, visual, depth, cmap);
-    if (drw_fontset_create(drw, fonts, LENGTH(fonts)) == NULL)
+    if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
         die("no fonts could be loaded.");
     lrpad = drw->fonts->h;
     bh = drw->fonts->h + 2;
@@ -2604,8 +2596,7 @@ seturgent(Client *c, int urg)
     XWMHints *wmh;
 
     c->isurgent = urg;
-    wmh = XGetWMHints(dpy, c->win);
-    if (wmh == NULL)
+    if (!(wmh = XGetWMHints(dpy, c->win)))
         return;
     wmh->flags = urg ? (wmh->flags | XUrgencyHint) : (wmh->flags & ~XUrgencyHint);
     XSetWMHints(dpy, c->win, wmh);
@@ -3229,6 +3220,7 @@ updatesystrayiconstate(Client *i, XPropertyEvent *ev)
 {
     long flags = getatomprop(i, xatom[XembedInfo]);
     int code = 0;
+
     if (!showsystray || i == NULL || ev->atom != xatom[XembedInfo] ||
             !flags)
         return;
