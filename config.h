@@ -138,7 +138,8 @@ static const Layout layouts[] = {
 };
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
-#define MODKEY Mod4Mask
+#define MODKEY Mod1Mask
+#define MODKEY_1 Mod4Mask
 #define TAGKEYS(KEY, TAG, cmd) \
     { MODKEY,              KEY, view,       {.ui = 1 << TAG, .v = cmd} }, \
     { MODKEY|ShiftMask,    KEY, tag,        {.ui = 1 << TAG} }, \
@@ -182,7 +183,7 @@ static const Key keys[] = {
     /* super + shift + i (取消隐藏窗口) */
     { MODKEY|ShiftMask,    XK_i,            restorewin,       {0} },
     /* super + enter (打开终端) */
-    { MODKEY,              XK_Return,       spawn,            SHCMD("kitty") },
+    { MODKEY,              XK_Return,       spawn,            SHCMD("st") },
     /* super + shift + enter (将当前聚焦窗口置为主窗口) */
     { MODKEY|ShiftMask,    XK_Return,       zoom,             {0} },
     /* super + v (切换浮动模式(聚焦窗口)) */
@@ -200,7 +201,7 @@ static const Key keys[] = {
     { MODKEY,              XK_b,            focusmon,         {.i = +1} },               /* super b            |  光标移动到另一个显示器 */
     { MODKEY|ShiftMask,    XK_b,            tagmon,           {.i = +1} },               /* super shift b      |  将聚焦窗口移动到另一个显示器 */
     /* super + c (关闭窗口)  */
-    { MODKEY,              XK_c,            killclient,       {0} },
+    { MODKEY,              XK_x,            killclient,       {0} },
     /* super + ctrl + c (强制关闭窗口(处理某些情况下无法销毁的窗口)) */
     { MODKEY|ControlMask,  XK_c,            forcekillclient,  {0} },
     /* super + shift + q (退出) */
@@ -218,10 +219,10 @@ static const Key keys[] = {
     { MODKEY|ControlMask,  XK_Left,         movewin,          {.ui = LEFT} },            /* super ctrl left    |  移动窗口 */
     { MODKEY|ControlMask,  XK_Right,        movewin,          {.ui = RIGHT} },           /* super ctrl right   |  移动窗口 */
 
-    { MODKEY|Mod1Mask,     XK_Up,           resizewin,        {.ui = V_REDUCE} },        /* super alt up       |  调整窗口 */
-    { MODKEY|Mod1Mask,     XK_Down,         resizewin,        {.ui = V_EXPAND} },        /* super alt down     |  调整窗口 */
-    { MODKEY|Mod1Mask,     XK_Left,         resizewin,        {.ui = H_REDUCE} },        /* super alt left     |  调整窗口 */
-    { MODKEY|Mod1Mask,     XK_Right,        resizewin,        {.ui = H_EXPAND} },        /* super alt right    |  调整窗口 */
+    { MODKEY|MODKEY_1,     XK_Up,           resizewin,        {.ui = V_REDUCE} },        /* super alt up       |  调整窗口 */
+    { MODKEY|MODKEY_1,     XK_Down,         resizewin,        {.ui = V_EXPAND} },        /* super alt down     |  调整窗口 */
+    { MODKEY|MODKEY_1,     XK_Left,         resizewin,        {.ui = H_REDUCE} },        /* super alt left     |  调整窗口 */
+    { MODKEY|MODKEY_1,     XK_Right,        resizewin,        {.ui = H_EXPAND} },        /* super alt right    |  调整窗口 */
 
   	{ MODKEY,              XK_k,            focusdir,         {.i = UP } },              /* super k            | 二维聚焦窗口 */
   	{ MODKEY,              XK_j,            focusdir,         {.i = DOWN } },            /* super j            | 二维聚焦窗口 */
@@ -235,15 +236,15 @@ static const Key keys[] = {
     /* spawn + SHCMD 执行对应命令(已下部分建议完全自己重新定义) */
 
     /* super s          |    打开scratch终端 */
-    { MODKEY,              XK_s,                        togglescratch,  SHCMD("kitty --title scratchpad --class float -o initial_window_width=70c -o initial_window_height=17c") },
+    { MODKEY,              XK_s,                        togglescratch,  SHCMD("st -t scratchpad -c float") },
     /* super -          |    打开全局终端 */
-    { MODKEY,              XK_minus,                    spawn,          SHCMD("kitty --class FG -o initial_window_width=70c -o initial_window_height=17c") },
+    { MODKEY,              XK_minus,                    spawn,          SHCMD("st -c FG") },
     /* super space      |    打开浮动st终端 */
-    { MODKEY,              XK_space,                    spawn,          SHCMD("kitty --class float -o initial_window_width=70c -o initial_window_height=17c") },
+    { MODKEY,              XK_space,                    spawn,          SHCMD("st -c float") },
     /* super n          |    锁定屏幕 */
     { MODKEY,              XK_n,                        spawn,          SHCMD("sh $HOME/wm/config/lock/blurlock.sh") },
     /* alt a            |    截图 */
-    { 0|Mod1Mask,          XK_a,                        spawn,          SHCMD("flameshot gui") },
+    { 0|MODKEY_1,          XK_a,                        spawn,          SHCMD("flameshot gui") },
     /* super shift c    |    选中某个窗口并强制kill */
     { MODKEY|ShiftMask,    XK_c,                        spawn,          SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") },
     /* super p          |    打开 rofi run */
@@ -286,19 +287,15 @@ static const Button buttons[] = {
     /* 点击窗口操作 */
     { ClkClientWin,        MODKEY,          Button1,          movemouse,     {0} },                                   // super+左键  |  拖拽窗口     |  拖拽窗口
     { ClkClientWin,        MODKEY,          Button3,          resizemouse,   {0} },                                   // super+右键  |  拖拽窗口     |  改变窗口大小
-    /* 点击tag操作 */
+    /* 点击 tag 操作 */
     { ClkTagBar,           0,               Button1,          view,          {0} },                                   // 左键        |  点击tag      |  切换tag
 	{ ClkTagBar,           0,               Button3,          toggleview,    {0} },                                   // 右键        |  点击tag      |  切换是否显示tag
     { ClkTagBar,           MODKEY,          Button1,          tag,           {0} },                                   // super+左键  |  点击tag      |  将窗口移动到对应tag
     { ClkTagBar,           0,               Button4,          viewtoleft,    {0} },                                   // 鼠标滚轮上  |  tag          |  向前切换tag
 	{ ClkTagBar,           0,               Button5,          viewtoright,   {0} },                                   // 鼠标滚轮下  |  tag          |  向后切换tag
-    /* 点击状态栏操作 */
-    { ClkStatusText,       0,               Button1,          clickstatusbar,{0} },                                   // 左键        |  点击状态栏   |  根据状态栏的信号执行 ~/scripts/dwmstatusbar.sh $signal L
-    { ClkStatusText,       0,               Button2,          clickstatusbar,{0} },                                   // 中键        |  点击状态栏   |  根据状态栏的信号执行 ~/scripts/dwmstatusbar.sh $signal M
-    { ClkStatusText,       0,               Button3,          clickstatusbar,{0} },                                   // 右键        |  点击状态栏   |  根据状态栏的信号执行 ~/scripts/dwmstatusbar.sh $signal R
-    { ClkStatusText,       0,               Button4,          clickstatusbar,{0} },                                   // 鼠标滚轮上  |  状态栏       |  根据状态栏的信号执行 ~/scripts/dwmstatusbar.sh $signal U
-    { ClkStatusText,       0,               Button5,          clickstatusbar,{0} },                                   // 鼠标滚轮下  |  状态栏       |  根据状态栏的信号执行 ~/scripts/dwmstatusbar.sh $signal D
-    /* 点击bar空白处 */
+    /* 点击布局 */
+    { ClkLtSymbol,         0,               Button1,          selectlayout,  {.v = &layouts[1]}},
+    /* 点击 bar 空白处 */
     { ClkBarEmpty,         0,               Button1,          spawn, SHCMD("~/scripts/call_rofi.sh window") },        // 左键        |  bar空白处    |  rofi 执行 window
     { ClkBarEmpty,         0,               Button3,          spawn, SHCMD("~/scripts/call_rofi.sh drun") },          // 右键        |  bar空白处    |  rofi 执行 drun
 };
