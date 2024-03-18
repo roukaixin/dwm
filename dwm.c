@@ -2249,6 +2249,7 @@ resizemouse(const Arg *arg)
                 if (c->isfloating)
                     resize(c, c->x, c->y, nw, nh, 1);
                 break;
+            default: break;
         }
     } while (ev.type != ButtonRelease);
     XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
