@@ -2907,8 +2907,18 @@ toggleborder(const Arg *arg)
     // 判断是否窗口浮动
     if (!selmon->sel->isfloating) {
         // 判断是否只有一个窗口
-        Client * client = nexttiled(selmon->clients);
-        if (client && client == selmon->sel && client->next == NULL) {
+        const Client * c = NULL;
+        int tile_client_count = 0;
+
+        for (c = selmon->clients; c; c = c->next) {
+            if (ISVISIBLE(c) && !HIDDEN(c) && !c->isfloating) {
+                tile_client_count ++;
+            }
+            if (tile_client_count == 2) {
+                break;
+            }
+        }
+        if (tile_client_count != 2) {
             return;
         }
     }
