@@ -2169,17 +2169,30 @@ resizebarwin(Monitor *m) {
     XMoveResizeWindow(dpy, m->barwin, m->wx + sp, m->by + vp, w -  2 * sp - (m == systraytomon(m) && system_w ? systrayspadding : 0), bh); // 如果托盘存在 额外减去systrayspadding
 }
 
+/**
+ * 重新调整客户端
+ * @param c 客户端
+ * @param x x坐标
+ * @param y y坐标
+ * @param w 宽度
+ * @param h 高度
+ */
 void
 resizeclient(Client *c, int x, int y, int w, int h)
 {
     XWindowChanges wc;
 
-    c->oldx = c->x; c->x = wc.x = x;
-    c->oldy = c->y; c->y = wc.y = y;
-    c->oldw = c->w; c->w = wc.width = w;
-    c->oldh = c->h; c->h = wc.height = h;
+    c->oldx = c->x;
+    c->x = wc.x = x;
+    c->oldy = c->y;
+    c->y = wc.y = y;
+    c->oldw = c->w;
+    c->w = wc.width = w;
+    c->oldh = c->h;
+    c->h = wc.height = h;
     wc.border_width = c->bw;
 
+    // 判断是否只有一个 tile 窗口
     if (nexttiled(c->mon->clients) == c && nexttiled(c->next) == NULL
         && !c->isfullscreen && !c->isfloating && !c->isglobal) {
         c->w = wc.width += c->bw * 2;
@@ -2872,7 +2885,7 @@ toggleglobal(const Arg *arg)
     // 判断当前是否选中
     if (selmon->sel == NULL)
         return;
-    // is scratchpad always global
+    // 判断是否是便签窗口
     if (selmon->sel->isscratchpad)
         return;
     selmon->sel->isglobal ^= 1;
@@ -2887,27 +2900,20 @@ toggleglobal(const Arg *arg)
 void
 toggleborder(const Arg *arg)
 {
-    int tile_client_count = 0;
-    Client *c = NULL;
     // 判断当前是否选中客户端
     if (selmon->sel == NULL)
         return;
+    // 判断是否窗口浮动
     if (!selmon->sel->isfloating) {
         // 判断是否只有一个窗口
-        for (c = selmon->clients; c; c = c->next) {
-            if (ISVISIBLE(c) && !HIDDEN(c) && !c->isfloating) {
-                tile_client_count ++;
-            }
-            if (tile_client_count == 2) {
-                break;
-            }
-        }
-        if (tile_client_count == 1) {
+        Client * client = nexttiled(selmon->clients);
+        if (client && client == selmon->sel && client->next == NULL) {
             return;
         }
     }
 
     selmon->sel->isnoborder ^= 1;
+    // borderpx 边框大小
     selmon->sel->bw = selmon->sel->isnoborder ? 0 : borderpx;
     int diff = (selmon->sel->isnoborder ? -1 : 1) * borderpx;
     // TODO: 当有动画效果时 会有闪烁问题
