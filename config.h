@@ -95,18 +95,19 @@ static const Rule rules[] = {
          * 优先级高 越在上面优先度越高
          */
         // QQ 规则
-        { "QQ",                 "qq",                   "图片查看器",         0,          1,          0,          0,          -1,        0 },
-        { "QQ",                 "qq",                   "群公告",            0,          1,          0,          0,          -1,        0 },
-        { "QQ",                 "qq",                   "视频播放器",         0,          1,          0,          0,          -1,        0 },
-        { "QQ",                 "qq",                   "文件管理器",         0,          1,          0,          0,          -1,        0 },
-        { "QQ",                 "qq",                   "收藏",              0,          1,          0,          0,          -1,        0 },
-        { "QQ",                 "qq",                   "QQ",               1 << 6,     0,          0,          1,          -1,         0 },
+        { "QQ",                                     "qq",                                       "图片查看器",         0,          1,          0,          0,          -1,        0 },
+        { "QQ",                                     "qq",                                       "群公告",            0,          1,          0,          0,          -1,        0 },
+        { "QQ",                                     "qq",                                       "视频播放器",         0,          1,          0,          0,          -1,        0 },
+        { "QQ",                                     "qq",                                       "文件管理器",         0,          1,          0,          0,          -1,        0 },
+        { "QQ",                                     "qq",                                       "收藏",              0,          1,          0,          0,          -1,        0 },
+        { "QQ",                                     "qq",                                       "QQ",               1 << 6,     0,          0,          1,          -1,         0 },
         // 微信规则
-        { "wechat",             "wechat",               "Preview",          0,           1,          0,          0,         -1,        0 },
-        { "wechat",             "wechat",               "微信",              1 << 7,     0,          0,          1,          -1,         0 },
-        { "obs",                NULL,                   NULL,               1 << 3,     0,          0,          0,          -1,         0 },
-        { "Google-chrome",      "google-chrome",        NULL,               1 << 4,     0,          0,          0,          -1,         0 },
-        { "Chromium",           NULL,                   NULL,               1 << 4,     0,          0,          0,          -1,         0 },
+        { NULL,                                     NULL,                                       "图片查看",          0,           1,          0,          0,         -1,        0 },
+        { "wechat",                                 "wechat",                                   "微信",              1 << 7,     0,          0,          1,          -1,         0 },
+        { "obs",                                    NULL,                                       NULL,               1 << 3,     0,          0,          0,          -1,         0 },
+        { "Google-chrome",                          "google-chrome",                            NULL,               1 << 4,     0,          0,          0,          -1,         0 },
+        { "Chromium",                               NULL,                                       NULL,               1 << 4,     0,          0,          0,          -1,         0 },
+        { "polkit-kde-authentication-agent-1",      "polkit-kde-authentication-agent-1",        NULL,               0,          1,          0,          0,          -1,         0 },
         // 音乐
         { "qqmusic",            "qqmusic",              "qqmusic",          1 << 5,     0,          0,          1,          -1,         0 },
         { "Vncviewer",          NULL,                   NULL,               0,          1,          0,          1,          -1,         2 },            // Vncviewer           浮动、无边框 屏幕顶部
