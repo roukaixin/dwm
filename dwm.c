@@ -1191,7 +1191,7 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 
     len = strlen(stext) + 1 ;
     text = (char*) malloc(sizeof(char)*len);
-    if (!text)
+    if (text == NULL)
         die("malloc");
     p = text;
     memcpy(text, stext, len);
@@ -1502,7 +1502,7 @@ gettextprop(Window w, Atom atom, char *text, unsigned int size)
     int n;
     XTextProperty name;
 
-    if (!text || size == 0)
+    if (text == NULL || size == 0)
         return 0;
     text[0] = '\0';
     if (!XGetTextProperty(dpy, w, &name, atom) || !name.nitems)
@@ -1552,7 +1552,7 @@ grabkeys(void)
         XUngrabKey(dpy, AnyKey, AnyModifier, root);
         XDisplayKeycodes(dpy, &start, &end);
         syms = XGetKeyboardMapping(dpy, start, end - start + 1, &skip);
-        if (!syms)
+        if (syms == NULL)
             return;
         for (k = start; k <= end; k++)
             for (i = 0; i < LENGTH(keys); i++)
@@ -2507,7 +2507,7 @@ setmfact(const Arg *arg)
 {
     float f;
 
-    if (!arg)
+    if (arg == NULL)
         return;
     f = arg->f < 1.0 ? arg->f + selmon->mfact : arg->f - 1.0;
     if (f < 0.05 || f > 0.95)
@@ -2542,7 +2542,7 @@ setup(void)
     root = RootWindow(dpy, screen);
     xinitvisual();
     drw = drw_create(dpy, screen, root, sw, sh, visual, depth, cmap);
-    if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
+    if (drw_fontset_create(drw, fonts, LENGTH(fonts)) == NULL)
         die("no fonts could be loaded.");
     lrpad = drw->fonts->h;
     bh = drw->fonts->h + 2;
@@ -3751,7 +3751,7 @@ main(int argc, char *argv[])
         die("dwm-6.3");
     else if (argc != 1)
         die("usage: dwm [-v]");
-    if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
+    if (setlocale(LC_CTYPE, "") == NULL || !XSupportsLocale())
         fputs("warning: no locale support\n", stderr);
     dpy = XOpenDisplay(NULL);
     if (dpy == NULL)
