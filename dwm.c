@@ -526,7 +526,6 @@ applyrules(Client *c)
 int
 applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact)
 {
-    int baseismin;
     Monitor *m = c->mon;
 
     /* set minimum possible */
@@ -559,7 +558,7 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact)
         if (!c->hintsvalid)
             updatesizehints(c);
         /* see last two sentences in ICCCM 4.1.2.3 */
-        baseismin = c->basew == c->minw && c->baseh == c->minh;
+        const int baseismin = c->basew == c->minw && c->baseh == c->minh;
         if (!baseismin) { /* temporarily remove base dimensions */
             *w -= c->basew;
             *h -= c->baseh;
@@ -2272,7 +2271,9 @@ resizemouse(const Arg *arg)
     } while (ev.type != ButtonRelease);
     XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
     XUngrabPointer(dpy, CurrentTime);
-    while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+    while (XCheckMaskEvent(dpy, EnterWindowMask, &ev)) {
+        continue;
+    }
     if ((m = recttomon(c->x, c->y, c->w, c->h)) != selmon) {
         sendmon(c, m);
         selmon = m;
