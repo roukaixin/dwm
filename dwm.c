@@ -618,19 +618,23 @@ arrangemon(Monitor *m)
     }
 }
 
+/**
+ * 新打开一个客户端调用的方法
+ * @param c 新打开的客户端
+ */
 void
 attach(Client *c)
 {
-    if (!newclientathead) {
+    if (newclientathead) {
+        c->next = c->mon->clients;
+        c->mon->clients = c;
+    } else {
         Client **tc;
         for (tc = &c->mon->clients; *tc; ) {
             tc = &(*tc)->next;
         }
         *tc = c;
         c->next = NULL;
-    } else {
-        c->next = c->mon->clients;
-        c->mon->clients = c;
     }
 }
 
