@@ -2106,9 +2106,14 @@ propertynotify(XEvent *e)
         switch(ev->atom) {
             default: break;
             case XA_WM_TRANSIENT_FOR:
-                     if (!c->isfloating && (XGetTransientForHint(dpy, c->win, &trans)) &&
-                             (c->isfloating = (wintoclient(trans)) != NULL))
-                         arrange(c->mon);
+                     if (!c->isfloating && XGetTransientForHint(dpy, c->win, &trans)) {
+                         const int i = wintoclient(trans) != NULL;
+                         c->isfloating = i;
+                         if (c->isfloating) {
+                             arrange(c->mon);
+                         }
+
+                     }
                      break;
             case XA_WM_NORMAL_HINTS:
                      updatesizehints(c);
@@ -2811,7 +2816,12 @@ togglescratch(const Arg *arg)
 
     // 判断是否存在 scratchpad 便签
     for (m = mons; m && !found; m = m->next) {
-        for (c = m->clients; c && !(found = c->isscratchpad); c = c->next);
+        for (c = m->clients; c ; c = c->next) {
+            if (c->isscratchpad) {
+                found = c->isscratchpad;
+                break;
+            }
+        }
     }
     if (found) {
         // 存在 scratchpad 便签
