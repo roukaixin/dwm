@@ -1322,10 +1322,13 @@ expose(XEvent *e)
     Monitor *m;
     XExposeEvent *ev = &e->xexpose;
 
-    if (ev->count == 0 && (m = wintomon(ev->window))) {
-        drawbar(m);
-        if (m == selmon)
-            updatesystray();
+    if (ev->count == 0) {
+        m = wintomon(ev->window);
+        if (m) {
+            drawbar(m);
+            if (m == selmon)
+                updatesystray();
+        }
     }
 }
 
@@ -1734,9 +1737,12 @@ manage(Window w, XWindowAttributes *wa)
     c->bw = borderpx;
 
     updatetitle(c);
-    if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
-        c->mon = t->mon;
-        c->tags = t->tags;
+    if (XGetTransientForHint(dpy, w, &trans)) {
+        t = wintoclient(trans);
+        if (t) {
+            c->mon = t->mon;
+            c->tags = t->tags;
+        }
     } else {
         c->mon = selmon;
         applyrules(c);
@@ -1846,7 +1852,8 @@ movemouse(const Arg *arg)
     XEvent ev;
     Time lasttime = 0;
 
-    if (!(c = selmon->sel))
+    c = selmon->sel;
+    if (c == NULL)
         return;
     if (c->isfullscreen) /* no support moving fullscreen windows by mouse */
         return;
@@ -2218,7 +2225,8 @@ resizemouse(const Arg *arg)
     XEvent ev;
     Time lasttime = 0;
 
-    if (!(c = selmon->sel))
+    c = selmon->sel;
+    if (c == NULL)
         return;
     if (c->isfullscreen) /* no support resizing fullscreen windows by mouse */
         return;
@@ -2615,7 +2623,8 @@ seturgent(Client *c, int urg)
     XWMHints *wmh;
 
     c->isurgent = urg;
-    if (!(wmh = XGetWMHints(dpy, c->win)))
+    wmh = XGetWMHints(dpy, c->win);
+    if (wmh == NULL)
         return;
     wmh->flags = urg ? (wmh->flags | XUrgencyHint) : (wmh->flags & ~XUrgencyHint);
     XSetWMHints(dpy, c->win, wmh);
