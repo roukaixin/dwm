@@ -2718,6 +2718,9 @@ togglesystray()
 void
 togglebar(const Arg *arg)
 {
+    if (selmon->sel && selmon->sel->isfullscreen && !selmon->showbar) {
+        return;
+    }
     selmon->showbar = selmon->pertag->showbars[selmon->pertag->curtag] = !selmon->showbar;
     updatebarpos(selmon);
     resizebarwin(selmon);
@@ -3738,8 +3741,10 @@ zoom(const Arg *arg)
 
     if (selmon->lt[selmon->sellt]->arrange == NULL || c == NULL || c->isfloating || c->isfullscreen)
     		return;
-    if (c == nexttiled(selmon->clients) && !(c = nexttiled(c->next))) {
-	    return;
+    if (c == nexttiled(selmon->clients)) {
+        if (c == NULL || (c = nexttiled(c->next)) == NULL) {
+            return;
+        }
 	}
     pop(c);
 }
