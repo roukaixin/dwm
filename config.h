@@ -106,12 +106,10 @@ static const Rule rules[] = {
         { "wechat",                                 "wechat",                                   "微信",              1 << 7,     0,          0,          1,          -1,         0 },
         { "obs",                                    NULL,                                       NULL,               1 << 3,     0,          0,          0,          -1,         0 },
         { "Google-chrome",                          "google-chrome",                            NULL,               1 << 4,     0,          0,          0,          -1,         0 },
-        { "Chromium",                               NULL,                                       NULL,               1 << 4,     0,          0,          0,          -1,         0 },
         { "polkit-kde-authentication-agent-1",      "polkit-kde-authentication-agent-1",        NULL,               0,          1,          0,          0,          -1,         0 },
         // 音乐
         { "qqmusic",            "qqmusic",              "qqmusic",          1 << 5,     0,          0,          1,          -1,         0 },
         { "Vncviewer",          NULL,                   NULL,               0,          1,          0,          1,          -1,         2 },            // Vncviewer           浮动、无边框 屏幕顶部
-        { "flameshot",          NULL,                   NULL,               0,          1,          0,          0,          -1,         0 },            // 火焰截图            浮动
         { "scratchpad",         "scratchpad",           "scratchpad",       TAGMASK,    1,          1,          1,          -1,         2 },            // scratchpad          浮动、全局、无边框 屏幕顶部
         { "wemeetapp",          NULL,                   NULL,               TAGMASK,    1,          1,          0,          -1,         0 },            // !!!腾讯会议在切换tag时有诡异bug导致退出 变成global来规避该问题
 
