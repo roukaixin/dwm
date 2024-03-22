@@ -426,7 +426,6 @@ void
 applyrules(Client *c)
 {
     const char *class, *instance;
-    unsigned int i, null_count, match_count;
     const Rule *r;
     Monitor *m;
     XClassHint ch = { NULL, NULL };
@@ -441,9 +440,9 @@ applyrules(Client *c)
     class    = ch.res_class ? ch.res_class : broken;
     instance = ch.res_name  ? ch.res_name  : broken;
 
-    for (i = 0; i < LENGTH(rules); i++) {
-        null_count = 0;
-        match_count = 0;
+    for (unsigned int i = 0; i < LENGTH(rules); i++) {
+        unsigned int null_count = 0;
+        unsigned int match_count = 0;
         r = &rules[i];
         r-> class ? strstr(class, r->class) ? match_count ++ : 0 : null_count ++;
         r->instance ? strstr(instance, r->instance) ? match_count ++ : 0 : null_count ++;
@@ -510,10 +509,12 @@ applyrules(Client *c)
             break;
         }
     }
+    // 判断是否是 scratchpad 便签
     if (!strcmp(c->name, scratchpadname) || !strcmp(class, scratchpadname) || !strcmp(instance, scratchpadname)) {
         c->isscratchpad = 1;
         c->isfloating = 1;
-        c->isglobal = 1; // scratchpad is default global
+        // scratchpad is default global
+        c->isglobal = 1;
     } 
     if (ch.res_class)
         XFree(ch.res_class);
