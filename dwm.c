@@ -30,9 +30,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/time.h>
 #include <X11/cursorfont.h>
-#include <X11/keysym.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
@@ -3403,7 +3401,6 @@ view(const Arg *arg)
     int i;
     unsigned int tmptag;
     Client *c;
-    int n = 0;
 
     selmon->seltags ^= 1; /* toggle sel tagset */
     if (arg->ui & TAGMASK) {
@@ -3438,6 +3435,7 @@ view(const Arg *arg)
 
     // 若当前tag无窗口 且附加了v参数 则执行
     if (arg->v) {
+        int n = 0;
         for (c = selmon->clients; c; c = c->next)
             if (c->tags & arg->ui && !HIDDEN(c) && !c->isglobal)
                 n++;
@@ -3723,7 +3721,6 @@ xinitvisual()
     XVisualInfo *infos;
     XRenderPictFormat *fmt;
     int nitems;
-    int i;
 
     XVisualInfo tpl = {
         .screen = screen,
@@ -3734,7 +3731,7 @@ xinitvisual()
 
     infos = XGetVisualInfo(dpy, masks, &tpl, &nitems);
     visual = NULL;
-    for(i = 0; i < nitems; i ++) {
+    for(int i = 0; i < nitems; i ++) {
         fmt = XRenderFindVisualFormat(dpy, infos[i].visual);
         if (fmt->type == PictTypeDirect && fmt->direct.alphaMask) {
             visual = infos[i].visual;
