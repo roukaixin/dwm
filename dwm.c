@@ -423,8 +423,6 @@ struct Pertag {
 void
 applyrules(Client *c)
 {
-    const char *class, *instance;
-    const Rule *r;
     Monitor *m;
     XClassHint ch = { NULL, NULL };
 
@@ -435,13 +433,13 @@ applyrules(Client *c)
     c->isscratchpad = 0;
     c->tags = 0;
     XGetClassHint(dpy, c->win, &ch);
-    class    = ch.res_class ? ch.res_class : broken;
-    instance = ch.res_name  ? ch.res_name  : broken;
+    const char * class    = ch.res_class ? ch.res_class : broken;
+    const char * instance = ch.res_name  ? ch.res_name  : broken;
 
     for (unsigned int i = 0; i < LENGTH(rules); i++) {
         unsigned int null_count = 0;
         unsigned int match_count = 0;
-        r = &rules[i];
+        const Rule * r = &rules[i];
         r-> class ? strstr(class, r->class) ? match_count ++ : 0 : null_count ++;
         r->instance ? strstr(instance, r->instance) ? match_count ++ : 0 : null_count ++;
         r->title ? strstr(c->name, r->title) ? match_count ++ : 0 : null_count ++;
@@ -698,12 +696,22 @@ buttonpress(XEvent *e)
             c = m->clients;
 
             if (m->bt != 0)
-                do {
-                    if (!ISVISIBLE(c))
-                        continue;
-                    else
+                // ev->x : 点击的 x 坐标
+                while (c) {
+                    if (ISVISIBLE(c)) {
                         x += c->taskw;
-                } while (ev->x > x && (c = c->next));
+                        if (ev->x <= x) {
+                            break;
+                        }
+                        c = c->next;
+                    }
+                }
+                // do {
+                //     if (!ISVISIBLE(c))
+                //         continue;
+                //     else
+                //         x += c->taskw;
+                // } while (ev->x > x && (c = c->next));
 
             if (c) {
                 click = ClkWinTitle;
