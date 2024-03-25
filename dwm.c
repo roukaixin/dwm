@@ -30,7 +30,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/time.h>
 #include <X11/cursorfont.h>
+#include <X11/keysym.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
@@ -353,7 +355,7 @@ static const char broken[] = "broken";
 static char stext[1024];
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
-static int bh;      /* bar height */
+static int bh, blw = 0;       /* bar geometry */
 static int lrpad;            /* sum of left and right padding for text */
 static int vp;               /* vertical padding for bar */
 static int sp;               /* side padding for bar */
@@ -663,7 +665,7 @@ buttonpress(XEvent *e)
     int system_w = getsystraywidth();
     if (ev->window == selmon->barwin || (c == NULL && selmon->showbar && (topbar ? ev->y <= selmon->wy : ev->y >= selmon->wy + selmon->wh))) { // 点击在bar上
         i = x = 0;
-        // blw = TEXTW(selmon->ltsymbol);
+        blw = TEXTW(selmon->ltsymbol);
         
         if (selmon->isoverview) {
             x += TEXTW(overviewtag);
@@ -683,7 +685,7 @@ buttonpress(XEvent *e)
         if (i < LENGTH(tags)) {
             click = ClkTagBar;
             arg.ui = 1 << i;
-        } else if (ev->x < x + TEXTW(selmon->ltsymbol))
+        } else if (ev->x < x + blw)
             click = ClkLtSymbol;
         else if (ev->x > selmon->ww - status_w - 2 * sp - (selmon == systraytomon(selmon) ? (system_w ? system_w + systraypinning + 2 : 0) : 0)) {
             click = ClkStatusText;
@@ -692,26 +694,17 @@ buttonpress(XEvent *e)
         } else {
             click = ClkBarEmpty;
 
-            x += TEXTW(selmon->ltsymbol);
+            x += blw;
             c = m->clients;
 
             if (m->bt != 0)
                 // ev->x : 点击的 x 坐标
-                while (c) {
-                    if (ISVISIBLE(c)) {
+                do {
+                    if (!ISVISIBLE(c))
+                        continue;
+                    else
                         x += c->taskw;
-                        if (ev->x <= x) {
-                            break;
-                        }
-                        c = c->next;
-                    }
-                }
-                // do {
-                //     if (!ISVISIBLE(c))
-                //         continue;
-                //     else
-                //         x += c->taskw;
-                // } while (ev->x > x && (c = c->next));
+                } while (ev->x > x && (c = c->next));
 
             if (c) {
                 click = ClkWinTitle;
@@ -1747,6 +1740,9 @@ manage(Window w, XWindowAttributes *wa)
         if (t) {
             c->mon = t->mon;
             c->tags = t->tags;
+        } else {
+            c->mon = selmon;
+            applyrules(c);
         }
     } else {
         c->mon = selmon;
