@@ -237,7 +237,7 @@ static void pointerfocuswin(Client *c);
 static Atom getatomprop(Client *c, Atom prop);
 static int getrootptr(int *x, int *y);
 static long getstate(Window w);
-static unsigned int getsystraywidth();
+static unsigned int getsystraywidth(void);
 static int gettextprop(Window w, Atom atom, char *text, unsigned int size);
 
 static void grabbuttons(Client *c, int focused);
@@ -303,7 +303,7 @@ static void tagtoleft(const Arg *arg);
 static void tagtoright(const Arg *arg);
 
 static void togglebar(const Arg *arg);
-static void togglesystray();
+static void togglesystray(void);
 static void togglefloating(const Arg *arg);
 static void toggleallfloating(const Arg *arg);
 static void togglescratch(const Arg *arg);
@@ -346,7 +346,7 @@ static Client *wintosystrayicon(Window w);
 static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
-static void xinitvisual();
+static void xinitvisual(void);
 static void zoom(const Arg *arg);
 
 /* variables */
@@ -1484,7 +1484,7 @@ getstate(Window w)
 }
 
 unsigned int
-getsystraywidth()
+getsystraywidth(void)
 {
     unsigned int w = 0;
     Client *i;
@@ -2546,7 +2546,7 @@ setup(void)
 	sa.sa_handler = SIG_IGN;
 	sigaction(SIGCHLD, &sa, NULL);
 
-	/* clean up any zombies (inherited from .xinitrc etc) immediately */
+	/* clean up any zombies (inherited from .xinitrc etc。) immediately */
 	while (waitpid(-1, NULL, WNOHANG) > 0) {
 
 	}
@@ -2720,7 +2720,7 @@ tagmon(const Arg *arg)
 }
 
 void
-togglesystray()
+togglesystray(void)
 {
     if (showsystray) {
         showsystray = 0;
@@ -3071,7 +3071,7 @@ updatebarpos(Monitor *m)
 }
 
 void
-updateclientlist()
+updateclientlist(void)
 {
     Client *c;
     Monitor *m;
@@ -3720,7 +3720,7 @@ systraytomon(Monitor *m) {
 }
 
 void
-xinitvisual()
+xinitvisual(void)
 {
     XVisualInfo *infos;
     XRenderPictFormat *fmt;
