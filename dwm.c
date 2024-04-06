@@ -3394,8 +3394,8 @@ updatewmhints(Client *c)
 void
 setgap(const Arg *arg)
 {
-    gappi = arg->i ? MAX(gappi + arg->i, 0) : _gappi;
-    gappo = arg->i ? MAX(gappo + arg->i, 0) : _gappo;
+    gappi = arg->i ? MAX(gappi + arg->i, 0) : g_gappi;
+    gappo = arg->i ? MAX(gappo + arg->i, 0) : g_gappo;
     arrange(selmon);
 }
 
