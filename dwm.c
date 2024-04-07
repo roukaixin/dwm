@@ -110,7 +110,7 @@ enum { V_EXPAND, V_REDUCE, H_EXPAND, H_REDUCE }; /* resizewins */
 typedef struct {
 	int i;
 	unsigned int ui;
-	float f;
+	double f;
 	const void *v;
 } Arg;
 
@@ -158,7 +158,10 @@ typedef struct {
 typedef struct Pertag Pertag;
 struct Monitor {
 	char ltsymbol[16];
-	float mfact;
+    /**
+     * 主区域占比
+     */
+	double mfact;
 	int nmaster;
 	int num;
 	int by;               /* bar geometry */
@@ -420,7 +423,7 @@ struct Pertag {
     /**
      * 主区域占比
      */
-	float mfacts[LENGTH(tags) + 1];
+	double mfacts[LENGTH(tags) + 1];
 
     /**
      * 布局
@@ -643,7 +646,7 @@ arrangemon(Monitor *m)
         strncpy(m->ltsymbol, overviewlayout.symbol, sizeof m->ltsymbol);
         overviewlayout.arrange(m);
     } else {
-        strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->ltsymbol);
+        strlcpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof(m->ltsymbol));
         m->lt[m->sellt]->arrange(m);
     }
 }
@@ -2497,13 +2500,18 @@ setlayout(const Arg *arg)
     arrange(selmon);
 }
 
+/**
+ * 设置主区域占比
+ * @param arg
+ */
 void
 setmfact(const Arg *arg)
 {
-    float f;
+    double f;
 
     if (!arg)
         return;
+    // 获取调整后的占比
     f = arg->f < 1.0 ? arg->f + selmon->mfact : arg->f - 1.0;
     if (f < 0.05 || f > 0.95)
         return;
