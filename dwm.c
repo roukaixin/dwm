@@ -73,7 +73,7 @@
 
 #define VERSION_MAJOR               0
 #define VERSION_MINOR               0
-#define XEMBED_EMBEDDED_VERSION (VERSION_MAJOR << 16) | VERSION_MINOR
+#define XEMBED_EMBEDDED_VERSION ((VERSION_MAJOR << 16) | VERSION_MINOR)
 
 #define OPAQUE                  0xffU
 
@@ -3439,8 +3439,10 @@ tile(Monitor *m)
     else
         mw = m->ww - 2 * gappo + gappi;
 
-    mh = m->nmaster == 0 ? 0 : (m->wh - 2 * gappo - gappi * (m->nmaster - 1)) / m->nmaster;           // 单个master的高度
-    sh = n == m->nmaster ? 0 : (m->wh - 2 * gappo - gappi * (n - m->nmaster - 1)) / (n - m->nmaster); // 单个stack的高度
+    // 单个master的高度
+    mh = m->nmaster == 0 ? 0 : (m->wh - 2 * gappo - gappi * (m->nmaster - 1)) / m->nmaster;
+    // 单个stack的高度
+    sh = n == m->nmaster ? 0 : (m->wh - 2 * gappo - gappi * (n - m->nmaster - 1)) / (n - m->nmaster);
 
     for (i = 0, my = sy = gappo, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
         if (i < m->nmaster) {
