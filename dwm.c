@@ -480,7 +480,7 @@ applyrules(Client *c)
         unsigned int null_count = 0;
         unsigned int match_count = 0;
         r = &rules[i];
-        r-> class ? strstr(class, r->class) ? match_count ++ : 0 : null_count ++;
+        r->class ? strstr(class, r->class) ? match_count ++ : 0 : null_count ++;
         r->instance ? strstr(instance, r->instance) ? match_count ++ : 0 : null_count ++;
         r->title ? strstr(c->name, r->title) ? match_count ++ : 0 : null_count ++;
         // 当 rule 中定义了一个或多个属性时，只要有全部属性匹配，就认为匹配成功
@@ -2628,20 +2628,23 @@ show(Client *c)
     arrange(c->mon);
 }
 
-// 该方法为显示当前tag下的窗口的func，切换时会将原窗口下的win放到屏幕之外 (左边的屏幕隐藏到屏幕左边 右边的屏幕隐藏到屏幕右边)
+/**
+ * 该方法为显示当前tag下的窗口的func，切换时会将原窗口下的win放到屏幕之外 (左边的屏幕隐藏到屏幕左边 右边的屏幕隐藏到屏幕右边)
+ * @param c
+ */
 void
 showtag(Client *c)
 {
     if (!c)
         return;
     if (ISVISIBLE(c)) {
-        /** 将可见的client从屏幕边缘移动到屏幕内 */
+        // 将可见的 client 从屏幕边缘移动到屏幕内
         XMoveWindow(dpy, c->win, c->x, c->y);
         if (c->isfloating && !c->isfullscreen)
             resize(c, c->x, c->y, c->w, c->h, 0);
         showtag(c->snext);
     } else {
-        /* 将不可见的client移动到屏幕之外 */
+        // 将不可见的 client 移动到屏幕之外
         showtag(c->snext);
         if (c->mon->mx == 0) {
             XMoveWindow(dpy, c->win, WIDTH(c) * -1.5, c->y);
