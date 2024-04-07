@@ -303,7 +303,7 @@ static void tagtoleft(const Arg *arg);
 static void tagtoright(const Arg *arg);
 
 static void togglebar(const Arg *arg);
-static void togglesystray(void);
+static void togglesystray(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void toggleallfloating(const Arg *arg);
 static void togglescratch(const Arg *arg);
@@ -2720,7 +2720,7 @@ tagmon(const Arg *arg)
 }
 
 void
-togglesystray(void)
+togglesystray(const Arg *arg)
 {
     if (showsystray) {
         showsystray = 0;
