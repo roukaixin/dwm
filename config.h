@@ -8,8 +8,8 @@ static const unsigned int systrayspacing = 1;         /* 托盘间距 */
 static const unsigned int systrayspadding = 5;        /* 托盘和状态栏的间隙 */
 static int gappi                         = 12;        /* 窗口与窗口 缝隙大小 */
 static int gappo                         = 12;        /* 窗口与边缘 缝隙大小 */
-static const int _gappo                  = 12;        /* 窗口与窗口 缝隙大小 不可变 用于恢复时的默认值 */
-static const int _gappi                  = 12;        /* 窗口与边缘 缝隙大小 不可变 用于恢复时的默认值 */
+static const int g_gappo                 = 12;        /* 窗口与窗口 缝隙大小 不可变 用于恢复时的默认值 */
+static const int g_gappi                 = 12;        /* 窗口与边缘 缝隙大小 不可变 用于恢复时的默认值 */
 static const int vertpad                 = 5;         /* vertical padding of bar */
 static const int sidepad                 = 5;         /* horizontal padding of bar */
 static const int overviewgappi           = 24;        /* overview时 窗口与边缘 缝隙大小 */
@@ -26,7 +26,6 @@ static const char *fonts[]               = {
         "JetBrains Mono:style=ExtraLight,Regular:size=14:antialias=true:autohint=true",
         "WenQuanYi Zen Hei Mono:size=14:type=Regular:antialias=true:autohint=true"
 };
-static const char dmenufont[]            = "WenQuanYi Zen Hei Mono:size=14";
 static const char *colors[][3]           = {
         /* 颜色设置               ColFg：字体颜色      ColBg：背景颜色       ColBorder：边框颜色 */
         [SchemeNorm]        = { "#bbbbbb",          "#333333",          "#444444" },
