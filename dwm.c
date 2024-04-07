@@ -78,7 +78,12 @@
 #define OPAQUE                  0xffU
 
 /* enums */
-enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
+enum {
+    CurNormal,
+    CurResize,
+    CurMove,
+    CurLast
+}; /* cursor */
 enum {
     SchemeNorm,       // 普通
     SchemeSel,        // 选中的
@@ -125,6 +130,9 @@ struct Client {
 	int x, y, w, h;
 	int oldx, oldy, oldw, oldh;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh, hintsvalid;
+    /**
+     * bw：边框的宽度，oldbw：旧的边框宽度
+     */
 	int bw, oldbw;
     int taskw;
 	unsigned int tags;
@@ -197,7 +205,7 @@ static void logtofile(const char *fmt, ...);
 static void tile(Monitor *m);
 static void magicgrid(Monitor *m);
 static void overview(Monitor *m);
-static void grid(Monitor *m, uint gappo, uint uappi);
+static void grid(Monitor *m, uint local_gappo, uint local_gappi);
 
 static void applyrules(Client *c);
 static int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact);
@@ -399,12 +407,35 @@ static Client *hiddenWinStack[100];
 #include "config.h"
 
 struct Pertag {
-	unsigned int curtag, prevtag; /* current and previous tag */
-	int nmasters[LENGTH(tags) + 1]; /* number of windows in master area */
-	float mfacts[LENGTH(tags) + 1]; /* mfacts per tag */
-	unsigned int sellts[LENGTH(tags) + 1]; /* selected layouts */
-	const Layout *ltidxs[LENGTH(tags) + 1][2]; /* matrix of tags and layouts indexes  */
-	int showbars[LENGTH(tags) + 1]; /* display bar for the current tag */
+    /**
+     * curtag： 当前 tag，prevtag： 上一个 tag
+     */
+	unsigned int curtag, prevtag;
+
+    /**
+     * 主区域窗户数量
+     */
+	int nmasters[LENGTH(tags) + 1];
+
+    /**
+     * 主区域占比
+     */
+	float mfacts[LENGTH(tags) + 1];
+
+    /**
+     * 布局
+     */
+	unsigned int sellts[LENGTH(tags) + 1];
+
+    /**
+     * 标签和布局索引矩阵（matrix of tags and layouts indexes）
+     */
+	const Layout *ltidxs[LENGTH(tags) + 1][2];
+
+    /**
+     * 当前标签的 bar（display bar for the current tag）
+     */
+	int showbars[LENGTH(tags) + 1];
 };
 
 /* function implementations */
@@ -3477,7 +3508,7 @@ overview(Monitor *m)
 }
 
 void
-grid(Monitor *m, uint gappo, uint gappi)
+grid(Monitor *m, uint local_gappo, uint local_gappi)
 {
     unsigned int i, n;
     unsigned int cx, cy, cw, ch;
@@ -3489,11 +3520,11 @@ grid(Monitor *m, uint gappo, uint gappi)
     if (n == 0) return;
     if (n == 1) {
         c = nexttiled(m->clients);
-        cw = (m->ww - 2 * gappo) * 0.7;
-        ch = (m->wh - 2 * gappo) * 0.65;
+        cw = (m->ww - 2 * local_gappo) * 0.7;
+        ch = (m->wh - 2 * local_gappo) * 0.65;
         resize(c,
-               m->mx + (m->mw - cw) / 2 + gappo,
-               m->my + (m->mh - ch) / 2 + gappo,
+               m->mx + (m->mw - cw) / 2 + local_gappo,
+               m->my + (m->mh - ch) / 2 + local_gappo,
                cw - 2 * c->bw,
                ch - 2 * c->bw,
                0);
@@ -3501,17 +3532,17 @@ grid(Monitor *m, uint gappo, uint gappi)
     }
     if (n == 2) {
         c = nexttiled(m->clients);
-        cw = (m->ww - 2 * gappo - gappi) / 2;
-        ch = (m->wh - 2 * gappo) * 0.65;
+        cw = (m->ww - 2 * local_gappo - local_gappi) / 2;
+        ch = (m->wh - 2 * local_gappo) * 0.65;
         resize(c,
-               m->mx + gappo,
-               m->my + (m->mh - ch) / 2 + gappo,
+               m->mx + local_gappo,
+               m->my + (m->mh - ch) / 2 + local_gappo,
                cw - 2 * c->bw,
                ch - 2 * c->bw,
                0);
         resize(nexttiled(c->next),
-               m->mx + cw + gappo + gappi,
-               m->my + (m->mh - ch) / 2 + gappo,
+               m->mx + cw + local_gappo + local_gappi,
+               m->my + (m->mh - ch) / 2 + local_gappo,
                cw - 2 * c->bw,
                ch - 2 * c->bw,
                0);
@@ -3522,20 +3553,20 @@ grid(Monitor *m, uint gappo, uint gappi)
         if (cols * cols >= n)
             break;
     rows = (cols && (cols - 1) * cols >= n) ? cols - 1 : cols;
-	ch = (m->wh - 2 * gappo - (rows - 1) * gappi) / rows;
-	cw = (m->ww - 2 * gappo - (cols - 1) * gappi) / cols;
+	ch = (m->wh - 2 * local_gappo - (rows - 1) * local_gappi) / rows;
+	cw = (m->ww - 2 * local_gappo - (cols - 1) * local_gappi) / cols;
 
     overcols = n % cols;
-    if (overcols) dx = (m->ww - overcols * cw - (overcols - 1) * gappi) / 2 - gappo;
+    if (overcols) dx = (m->ww - overcols * cw - (overcols - 1) * local_gappi) / 2 - local_gappo;
 	for (i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++) {
-        cx = m->wx + (i % cols) * (cw + gappi);
-        cy = m->wy + (i / cols) * (ch + gappi);
+        cx = m->wx + (i % cols) * (cw + local_gappi);
+        cy = m->wy + (i / cols) * (ch + local_gappi);
         if (overcols && i >= n - overcols) {
             cx += dx;
         }
         resize(c,
-               cx + gappo,
-               cy + gappo,
+               cx + local_gappo,
+               cy + local_gappo,
                cw - 2 * c->bw,
                ch - 2 * c->bw,
                0);
