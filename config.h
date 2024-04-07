@@ -56,7 +56,9 @@ static const char *autostartshell = "$HOME/wm/config/dwm/autostart.sh";
 static const char scratchpadname[] = "scratchpad";
 
 /* commands */
-static const char *rofi_cmd[] = { "rofi", "-show", "run", NULL };
+static const char *dmenucmd[] = {
+        "dmenu_run", "-nb", "#222222", "-nf", "#bbbbbb", "-sb", "#005577", "-sf", "#eeeeee", NULL
+};
 /* 增加亮度 */
 static const char *brighter[] = { "brightnessctl", "set", "1%+", NULL };
 /* 减少亮度 */
@@ -172,8 +174,10 @@ static const Key keys[] = {
     { MODKEY|ShiftMask,    XK_Right,        tagtoright,       {0} },
     /* super + a (显示所有tag 或 跳转到聚焦窗口的tag) */
     { MODKEY,              XK_a,            toggleoverview,   {0} },
-    { MODKEY,              XK_comma,        setmfact,         {.f = -0.05} },            /* super ,            |  缩小主工作区 */
-    { MODKEY,              XK_period,       setmfact,         {.f = +0.05} },            /* super .            |  放大主工作区 */
+    /* super ,            |  缩小主工作区 */
+    { MODKEY,              XK_comma,        setmfact,         {.f = -0.05} },
+    /* super .            |  放大主工作区 */
+    { MODKEY,              XK_period,       setmfact,         {.f = +0.05} },
     /* super + iv (隐藏窗口) */
     { MODKEY,              XK_i,            hidewin,          {0} },
     /* super + shift + i (取消隐藏窗口) */
@@ -246,7 +250,7 @@ static const Key keys[] = {
     /* super shift c    |    选中某个窗口并强制kill */
     { MODKEY|ShiftMask,    XK_c,                        spawn,          SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") },
     /* super p          |    打开 rofi run */
-    { MODKEY,              XK_p,                        spawn,          {.v = rofi_cmd} },
+    { MODKEY,              XK_p,                        spawn,          {.v = dmenucmd } },
     // 降低亮度（window下的调节快捷键）
     { 0,                   XF86XK_MonBrightnessDown,    spawn,          {.v = dimmer } },
     // 升高亮度（window下的调节快捷键）
