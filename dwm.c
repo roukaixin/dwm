@@ -110,7 +110,7 @@ enum { V_EXPAND, V_REDUCE, H_EXPAND, H_REDUCE }; /* resizewins */
 typedef struct {
 	int i;
 	unsigned int ui;
-	double f;
+	float f;
 	const void *v;
 } Arg;
 
@@ -161,7 +161,7 @@ struct Monitor {
     /**
      * 主区域占比
      */
-	double mfact;
+	float mfact;
 	int nmaster;
 	int num;
 	int by;               /* bar geometry */
@@ -367,6 +367,9 @@ static const char broken[] = "broken";
 static char stext[1024];
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
+/**
+ * bh：bar 高度，blw：
+ */
 static int bh, blw = 0;       /* bar geometry */
 static int lrpad;            /* sum of left and right padding for text */
 static int vp;               /* vertical padding for bar */
@@ -423,7 +426,7 @@ struct Pertag {
     /**
      * 主区域占比
      */
-	double mfacts[LENGTH(tags) + 1];
+	float mfacts[LENGTH(tags) + 1];
 
     /**
      * 布局
@@ -489,7 +492,7 @@ applyrules(Client *c)
             c->isglobal = r->isglobal;
             c->isnoborder = r->isnoborder;
             c->tags |= r->tags;
-            c->bw = c->isnoborder ? 0 : borderpx;
+            c->bw = c->isnoborder ? 0 : (int)borderpx;
             for (m = mons; m && m->num != r->monitor; m = m->next);
             if (m)
                 c->mon = m;
@@ -600,9 +603,9 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact)
         }
         /* adjust for aspect limits */
         if (c->mina > 0 && c->maxa > 0) {
-            if (c->maxa < (float)*w / *h)
+            if (c->maxa < (float)*w / (float)*h)
                 *w = *h * c->maxa + 0.5;
-            else if (c->mina < (float)*h / *w)
+            else if (c->mina < (float)*h / (float)*w)
                 *h = *w * c->mina + 0.5;
         }
         if (baseismin) { /* increment calculation requires this */
@@ -2507,12 +2510,12 @@ setlayout(const Arg *arg)
 void
 setmfact(const Arg *arg)
 {
-    double f;
+    float f;
 
     if (!arg)
         return;
     // 获取调整后的占比
-    f = arg->f < 1.0 ? arg->f + selmon->mfact : arg->f - 1.0;
+    f = arg->f < 1.0f ? arg->f + selmon->mfact : arg->f - 1.0f;
     if (f < 0.05 || f > 0.95)
         return;
     selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag] = f;
@@ -2538,8 +2541,8 @@ setup(void)
     drw = drw_create(dpy, screen, root, sw, sh, visual, depth, cmap);
     if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
         die("no fonts could be loaded.");
-    lrpad = drw->fonts->h;
-    bh = drw->fonts->h + 2;
+    lrpad = (int)drw->fonts->h;
+    bh = (int)drw->fonts->h + 2;
 	sp = sidepad;
 	vp = (topbar == 1) ? vertpad : - vertpad;
     updategeom();
@@ -3254,8 +3257,14 @@ updatesystrayiconstate(Client *i, XPropertyEvent *ev)
     }
     else
         return;
-    sendevent(i->win, xatom[Xembed], StructureNotifyMask, CurrentTime, code, 0,
-            systray->win, XEMBED_EMBEDDED_VERSION);
+    sendevent(i->win,
+              xatom[Xembed],
+              StructureNotifyMask,
+              CurrentTime,
+              code,
+              0,
+              (long)systray->win,
+              XEMBED_EMBEDDED_VERSION);
 }
 
 void
@@ -3274,7 +3283,7 @@ updatesystray(void)
         /* init systray */
         if (!(systray = (Systray *)calloc(1, sizeof(Systray))))
             die("fatal: could not malloc() %u bytes\n", sizeof(Systray));
-        systray->win = XCreateSimpleWindow(dpy, root, x - sp, m->by + vp, w, bh, 0, 0, scheme[SchemeSystray][ColBg].pixel);
+        systray->win = XCreateSimpleWindow(dpy, root, (int)x - sp, m->by + vp, w, bh, 0, 0, scheme[SchemeSystray][ColBg].pixel);
         wa.event_mask        = ButtonPressMask | ExposureMask;
         wa.override_redirect = True;
         wa.background_pixel  = scheme[SchemeSystray][ColBg].pixel;
@@ -3285,7 +3294,15 @@ updatesystray(void)
         XMapRaised(dpy, systray->win);
         XSetSelectionOwner(dpy, netatom[NetSystemTray], systray->win, CurrentTime);
         if (XGetSelectionOwner(dpy, netatom[NetSystemTray]) == systray->win) {
-            sendevent(root, xatom[Manager], StructureNotifyMask, CurrentTime, netatom[NetSystemTray], systray->win, 0, 0);
+            sendevent(
+                    root,
+                    xatom[Manager],
+                    StructureNotifyMask,
+                    CurrentTime,
+                    (long)netatom[NetSystemTray],
+                    (long)systray->win,
+                    0,
+                    0);
             XSync(dpy, False);
         }
         else {
@@ -3726,10 +3743,12 @@ zoom(const Arg *arg)
     pop(c);
 }
 
-Client *direction_select(const Arg *arg) {
+Client
+*direction_select(const Arg *arg)
+{
     Client *tempClients[100];
     Client *c = NULL, *tc = selmon->sel;
-    int last = -1, cur = 0, issingle = issinglewin(NULL);
+    int last = -1, issingle = issinglewin(NULL);
 
     if (tc && tc->isfullscreen) /* no support for focusstack with fullscreen windows */
         return NULL;
@@ -3742,7 +3761,6 @@ Client *direction_select(const Arg *arg) {
         if (ISVISIBLE(c) && (issingle || !HIDDEN(c))) {
             last ++;
             tempClients[last] = c;
-            if (c == tc) cur = last;
         }
     }
 
@@ -3750,7 +3768,6 @@ Client *direction_select(const Arg *arg) {
     int sel_x=tc->x;
     int sel_y=tc->y;
     long long int distance=LLONG_MAX;
-    int temp_focus=0;
     Client *tempFocusClients=NULL;
 
     switch (arg->i) {
@@ -3894,7 +3911,9 @@ Client *direction_select(const Arg *arg) {
     return c;
 }
 
-void focusdir(const Arg *arg) {
+void
+focusdir(const Arg *arg)
+{
     Client *c = NULL;
     int issingle = issinglewin(NULL);
 
@@ -3911,7 +3930,9 @@ void focusdir(const Arg *arg) {
     }
 }
 
-void exchange_two_client(Client *c1, Client *c2) {
+void
+exchange_two_client(Client *c1, Client *c2)
+{
     if (c1 == NULL || c2 == NULL || c1->mon != c2->mon) {
         return;
     }
@@ -3986,7 +4007,9 @@ void exchange_two_client(Client *c1, Client *c2) {
     pointerfocuswin(c1);
 }
 
-void exchange_client(const Arg *arg) {
+void
+exchange_client(const Arg *arg)
+{
     Client *c = selmon->sel;
     if (c == NULL || c->isfloating || c->isfullscreen)
         return;

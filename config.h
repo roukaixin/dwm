@@ -16,7 +16,7 @@ static const int overviewgappi           = 24;        /* overview时 窗口与�
 static const int overviewgappo           = 60;        /* overview时 窗口与窗口 缝隙大小 */
 static const int showbar                 = 1;         /* 是否显示状态栏 */
 static const int topbar                  = 1;         /* 指定状态栏位置 0底部 1顶部 */
-static const double mfact                = 0.6;       /* 主工作区 大小比例 */
+static const float mfact                 = 0.60f;     /* 主工作区 大小比例 */
 static const int   nmaster               = 1;         /* 主工作区 窗口数量 */
 static const unsigned int snap           = 10;        /* 边缘依附宽度 */
 static const unsigned int baralpha       = 0xc0;      /* 状态栏透明度 */
@@ -175,9 +175,9 @@ static const Key keys[] = {
     /* super + a (显示所有tag 或 跳转到聚焦窗口的tag) */
     { MODKEY,              XK_a,            toggleoverview,   {0} },
     /* super ,            |  缩小主工作区 */
-    { MODKEY,              XK_comma,        setmfact,         {.f = -0.05} },
+    { MODKEY,              XK_comma,        setmfact,         {.f = -0.05f} },
     /* super .            |  放大主工作区 */
-    { MODKEY,              XK_period,       setmfact,         {.f = +0.05} },
+    { MODKEY,              XK_period,       setmfact,         {.f = +0.05f} },
     /* super + iv (隐藏窗口) */
     { MODKEY,              XK_i,            hidewin,          {0} },
     /* super + shift + i (取消隐藏窗口) */
