@@ -49,8 +49,19 @@ static const unsigned int alphas[][3]    = {
         [SchemeStatusText]  = { OPAQUE,             0x88,               null_alpha },
 };
 
-// 自启动脚本位置
-static const char *autostartshell = "$HOME/wm/config/dwm/autostart.sh";
+// 自启动
+static const char *autostart[] = {
+        "fcitx5",                                       "&",    NULL,
+        "numlockx",                                     "&",    NULL,
+        "nm-applet",                                    "&",    NULL,
+        "blueman-applet",                               "&",    NULL,
+        "/usr/lib/polkit-kde-authentication-agent-1",  "&",    NULL,
+        "slstatus",     "&",        NULL,
+        "picom",        "&",        NULL,
+        "dunst",        "&",        NULL,
+        "xss-lock",     "--",       "bash", "~/wm/config/lock/blurlock.sh", "&",    NULL,
+        "'while",       "true;",    "do",   "sleep",    "10;",   "feh",  "--bg-fill",    "--randomize",  "--no-fehbg",    "~/wm/wallpaper/*.png;", "sleep",    "1800;", "done'",    "&",    NULL
+};
 
 /* 自定义 scratchpad instance */
 static const char scratchpadname[] = "scratchpad";

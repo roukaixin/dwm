@@ -1193,9 +1193,18 @@ drawbars(void)
         drawbar(m);
 }
 
+/**
+ * 绘制状态栏 bar
+ * @param m
+ * @param bh
+ * @param stext
+ * @return
+ */
 int
 drawstatusbar(Monitor *m, int bh, char* stext) {
-    int status_w = 0, i, w, x, len, system_w = 0;
+    int status_w = 0, i, x;
+    uint system_w = 0, w;
+    size_t len;
     short isCode = 0;
     char *text;
     char *p;
@@ -1234,8 +1243,8 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
         isCode = 0;
     text = p;
 
-    // w += 2; /* 1px padding on both sides */
-    x = m->ww - w - system_w - 2 * sp - (system_w ? systrayspadding : 0); // 托盘存在时 额外多-一个systrayspadding
+    // 托盘存在时 额外多-一个 systrayspadding。w += 2; /* 1px padding on both sides
+    x = m->ww - w - system_w - 2 * sp - (system_w ? systrayspadding : 0);
 
     drw_setscheme(drw, scheme[LENGTH(colors)]);
     drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
@@ -1311,7 +1320,10 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
     return status_w - 2;
 }
 
-// 禁用焦点跟随鼠标
+/**
+ * 禁用焦点跟随鼠标
+ * @param e
+ */
 void
 enternotify(XEvent *e)
 {
@@ -2317,9 +2329,22 @@ run(void)
 
 void
 runAutostart(void) {
-    char cmd [100];
-    sprintf(cmd, "%s %s &", "sh", autostartshell);
-    system(cmd);
+    char source_command[1024] = {0};
+    char target_command[1024] = {0};
+    char bash[1024] = "sh -c ";
+    for (int i = 0; i < LENGTH(autostart); ++i) {
+        if (autostart[i] == NULL) {
+            strcat(target_command, bash);
+            strcat(target_command, source_command);
+            printf("3->%s\n", target_command);
+            system(target_command);
+            memset(target_command, 0, sizeof(target_command));
+            memset(source_command, 0, sizeof(source_command));
+        } else {
+            strcat(source_command, autostart[i]);
+            strcat(source_command, " ");
+        }
+    }
 }
 
 void
