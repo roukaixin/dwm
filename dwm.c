@@ -2332,11 +2332,12 @@ runAutostart(void) {
     char source_command[1024] = {0};
     char target_command[1024] = {0};
     char bash[1024] = "sh -c ";
+    char nohup[4] = "&";
     for (int i = 0; i < LENGTH(autostart); ++i) {
         if (autostart[i] == NULL) {
             strcat(target_command, bash);
             strcat(target_command, source_command);
-            printf("3->%s\n", target_command);
+            strcat(target_command, nohup);
             system(target_command);
             memset(target_command, 0, sizeof(target_command));
             memset(source_command, 0, sizeof(source_command));
