@@ -59,7 +59,7 @@ static const char *autostart[] = {
         "slstatus",                                      NULL,
         "picom",                                         NULL,
         "dunst",                                         NULL,
-        "xss-lock",     "--",       "bash",     "~/wm/config/lock/blurlock.sh",     NULL,
+        "'xss-lock",    "--",       "bash",     "~/wm/config/lock/blurlock.sh'",     NULL,
         "'while",       "true;",    "do",       "feh",      "--bg-fill",        "--randomize",  "--no-fehbg",    "~/wm/wallpaper/*.png;", "sleep",    "1800;", "done'",        NULL
 };
 
