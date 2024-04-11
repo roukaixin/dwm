@@ -4045,12 +4045,16 @@ exchange_client(const Arg *arg)
 int
 main(int argc, char *argv[])
 {
+    // 打印 dwm 版本。dwm -v : argc 就是等于 2，strcmp : 比较两个字符串,相等就等于0
     if (argc == 2 && !strcmp("-v", argv[1]))
-        die("dwm-6.3");
+        die("dwm-%s",VERSION);
+    // 提示命令，不支持其他的参数
     else if (argc != 1)
         die("usage: dwm [-v]");
+    // setlocale: 获取locale是否值 ，XSupportsLocale ：支持locale
     if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
         fputs("warning: no locale support\n", stderr);
+    // 打开屏幕。
     if (!(dpy = XOpenDisplay(NULL)))
         die("dwm: cannot open display");
     checkotherwm();
