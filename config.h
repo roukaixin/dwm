@@ -87,7 +87,7 @@ static const char *tags[] = {"󰎤", "󰎧", "󰎪", "󰎭", "󰎱", "󰎳", "�
 
 
 /**
- * 自定义窗口显示规则
+ * 自定义窗口显示规则，越在上面优先级越高
  *
  * class instance title 主要用于定位窗口适合哪个规则
  * tags mask 定义符合该规则的窗口的tag 0 表示当前tag
@@ -117,7 +117,8 @@ static const Rule rules[] = {
                 0,
                 0,
                 -1,
-                0
+                0,
+                false
         },
         {
                 "QQ",
@@ -128,7 +129,8 @@ static const Rule rules[] = {
                 0,
                 0,
                 -1,
-                0
+                0,
+                false
         },
         {
                 "QQ",
@@ -139,7 +141,8 @@ static const Rule rules[] = {
                 0,
                 0,
                 -1,
-                0
+                0,
+                false
         },
         {
                 "QQ",
@@ -150,7 +153,8 @@ static const Rule rules[] = {
                 0,
                 0,
                 -1,
-                0
+                0,
+                false
         },
         {
                 "QQ",
@@ -161,7 +165,8 @@ static const Rule rules[] = {
                 0,
                 0,
                 -1,
-                0
+                0,
+                false
         },
         {
                 "QQ",
@@ -172,7 +177,8 @@ static const Rule rules[] = {
                 0,
                 1,
                 -1,
-                0
+                0,
+                false
         },
         // 微信规则
         {
@@ -184,7 +190,8 @@ static const Rule rules[] = {
                 0,
                 0,
                 -1,
-                0
+                0,
+                false
         },
         {
                 "wechat",
@@ -195,7 +202,8 @@ static const Rule rules[] = {
                 0,
                 1,
                 -1,
-                0
+                0,
+                false
         },
         // telegram-desktop 规则
         {
@@ -207,8 +215,22 @@ static const Rule rules[] = {
                 0,
                 0,
                 -1,
-                0
+                0,
+                false
         },
+        {
+                "com-jetbrains-toolbox-entry-ToolboxEntry",
+                "com-jetbrains-toolbox-entry-ToolboxEntry",
+                "JetBrains Toolbox",
+                0,
+                1,
+                0,
+                0,
+                -1,
+                3,
+                false
+        },
+
         {
                 "obs",
                 NULL,
@@ -218,7 +240,8 @@ static const Rule rules[] = {
                 0,
                 0,
                 -1,
-                0
+                0,
+                false
         },
         {
                 "Google-chrome",
@@ -229,7 +252,8 @@ static const Rule rules[] = {
                 0,
                 0,
                 -1,
-                0
+                0,
+                false
         },
         {
                 "polkit-kde-authentication-agent-1",
@@ -240,9 +264,10 @@ static const Rule rules[] = {
                 0,
                 0,
                 -1,
-                0
+                0,
+                false
         },
-        // 音乐
+        // Vncviewer           浮动、无边框 屏幕顶部
         {
                 "Vncviewer",
                 NULL,
@@ -252,8 +277,9 @@ static const Rule rules[] = {
                 0,
                 1,
                 -1,
-                2
-        },            // Vncviewer           浮动、无边框 屏幕顶部
+                2,
+                false
+        },
         {
                 "scratchpad",
                 "scratchpad",
@@ -263,7 +289,8 @@ static const Rule rules[] = {
                 1,
                 1,
                 -1,
-                2
+                2,
+                false
         },            // scratchpad          浮动、全局、无边框 屏幕顶部
         {
                 "wemeetapp",
@@ -274,7 +301,8 @@ static const Rule rules[] = {
                 1,
                 0,
                 -1,
-                0
+                0,
+                false
         },            // !!!腾讯会议在切换tag时有诡异bug导致退出 变成global来规避该问题
         /** 部分特殊class的规则 */
         {
@@ -285,7 +313,8 @@ static const Rule rules[] = {
                 0,
                 0,
                 -1,
-                0
+                0,
+                false
         },            // class = float       浮动
         {
                 "global",
@@ -296,7 +325,8 @@ static const Rule rules[] = {
                 1,
                 0,
                 -1,
-                0
+                0,
+                false
         },            // class = gloabl      全局
         {
                 "noborder",
@@ -307,7 +337,8 @@ static const Rule rules[] = {
                 0,
                 1,
                 -1,
-                0
+                0,
+                false
         },            // class = noborder    无边框
         {
                 "FGN",
@@ -318,7 +349,8 @@ static const Rule rules[] = {
                 1,
                 1,
                 -1,
-                0
+                0,
+                false
         },            // class = FGN         浮动、全局、无边框
         {
                 "FG",
@@ -329,7 +361,8 @@ static const Rule rules[] = {
                 1,
                 0,
                 -1,
-                0
+                0,
+                false
         },            // class = FG          浮动、全局
         {
                 "FN",
@@ -340,7 +373,8 @@ static const Rule rules[] = {
                 0,
                 1,
                 -1,
-                0
+                0,
+                false
         },            // class = FN          浮动、无边框
         {
                 "GN",
@@ -351,9 +385,10 @@ static const Rule rules[] = {
                 1,
                 1,
                 -1,
-                0
+                0,
+                false
         },            // CLASS = GN          全局、无边框
-        /** 优先度低 越在上面优先度越低 */
+        // 错误载入时 会有crx_ 浮动
         {
                 NULL,
                 NULL,
@@ -363,8 +398,10 @@ static const Rule rules[] = {
                 0,
                 0,
                 -1,
-                0
-        },            // 错误载入时 会有crx_ 浮动
+                0,
+                false
+        },
+        // 错误载入时 会有broken 浮动
         {
                 NULL,
                 NULL,
@@ -374,8 +411,9 @@ static const Rule rules[] = {
                 0,
                 0,
                 -1,
-                0
-        },            // 错误载入时 会有broken 浮动
+                0,
+                false
+        },
 };
 
 static const char *overviewtag = "OVERVIEW";
