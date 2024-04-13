@@ -42,6 +42,7 @@
 #include <X11/extensions/Xinerama.h>
 #endif /* XINERAMA */
 #include <X11/Xft/Xft.h>
+#include <stdbool.h>
 
 #include "drw.h"
 #include "util.h"
@@ -194,6 +195,7 @@ typedef struct {
 	int isnoborder;
 	int monitor;
     uint floatposition;
+    bool isfullscreen;
 } Rule;
 
 typedef struct Systray   Systray;

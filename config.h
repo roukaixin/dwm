@@ -26,7 +26,7 @@ static const char *fonts[]               = {
         "JetBrains Mono:style=ExtraLight,Regular:size=14:antialias=true:autohint=true",
         "WenQuanYi Zen Hei Mono:size=14:type=Regular:antialias=true:autohint=true"
 };
-static const char *colors[][3]           = {
+static const char *colors[][3] = {
         /* 颜色设置               ColFg：字体颜色      ColBg：背景颜色       ColBorder：边框颜色 */
         [SchemeNorm]        = { "#bbbbbb",          "#333333",          "#444444" },
         [SchemeSel]         = { "#ffffff",          "#37474F",          "#42A5F5" },
@@ -38,7 +38,7 @@ static const char *colors[][3]           = {
         [SchemeSelTag]      = { "#eeeeee",          "#333333",          NULL },
         [SchemeBarEmpty]    = { NULL,               "#111111",          NULL },
 };
-static const unsigned int alphas[][3]    = {
+static const unsigned int alphas[][3] = {
         /* 颜色设置               ColFg：字体颜色      ColBg：背景颜色       ColBorder：边框颜色 */
         [SchemeNorm]        = { OPAQUE,             baralpha,           borderalpha },
         [SchemeSel]         = { OPAQUE,             baralpha,           borderalpha },
@@ -71,19 +71,19 @@ static const char *dmenucmd[] = {
         "dmenu_run", "-nb", "#222222", "-nf", "#bbbbbb", "-sb", "#005577", "-sf", "#eeeeee", NULL
 };
 /* 增加亮度 */
-static const char *brighter[] = { "brightnessctl", "set", "1%+", NULL };
+static const char *brighter[] = {"brightnessctl", "set", "1%+", NULL};
 /* 减少亮度 */
-static const char *dimmer[]   = { "brightnessctl", "set", "1%-", NULL };
+static const char *dimmer[] = {"brightnessctl", "set", "1%-", NULL};
 /* 增加音量 */
-static const char *up_vol[]   = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "+5%", NULL };
+static const char *up_vol[] = {"pactl", "set-sink-volume", "@DEFAULT_SINK@", "+5%", NULL};
 /* 减少音量 */
-static const char *down_vol[] = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "-5%", NULL };
+static const char *down_vol[] = {"pactl", "set-sink-volume", "@DEFAULT_SINK@", "-5%", NULL};
 /* 切换是否为静音 */
-static const char *mute_vol[] = { "pactl", "set-sink-mute",   "@DEFAULT_SINK@", "toggle", NULL };
+static const char *mute_vol[] = {"pactl", "set-sink-mute", "@DEFAULT_SINK@", "toggle", NULL};
 
 
 /* 显示 tags */
-static const char *tags[] = { "󰎤", "󰎧", "󰎪", "󰎭", "󰎱", "󰎳", "󰎶", "󰎹", "󰎼" };
+static const char *tags[] = {"󰎤", "󰎧", "󰎪", "󰎭", "󰎱", "󰎳", "󰎶", "󰎹", "󰎼"};
 
 
 /**
@@ -96,6 +96,7 @@ static const char *tags[] = { "󰎤", "󰎧", "󰎪", "󰎭", "󰎱", "󰎳", "�
  * isnoborder 定义符合该规则的窗口是否无边框。1无边框，0有边宽
  * monitor 定义符合该规则的窗口显示在哪个显示器上 -1 为当前屏幕
  * floatposition 定义符合该规则的窗口显示的位置 0 中间，1到9分别为9宫格位置，例如1左上，9右下，3右上
+ * isfullscreen 是否全屏，只有当 isfloating 为 1 时，才有效。true全屏、false不全屏
  */
 static const Rule rules[] = {
         /**
@@ -107,44 +108,283 @@ static const Rule rules[] = {
          * 优先级高 越在上面优先度越高
          */
         // QQ 规则
-        { "QQ",                                     "qq",                                       "图片查看器",         0,          1,          0,          0,          -1,        0 },
-        { "QQ",                                     "qq",                                       "群公告",            0,          1,          0,          0,          -1,        0 },
-        { "QQ",                                     "qq",                                       "视频播放器",         0,          1,          0,          0,          -1,        0 },
-        { "QQ",                                     "qq",                                       "文件管理器",         0,          1,          0,          0,          -1,        0 },
-        { "QQ",                                     "qq",                                       "收藏",              0,          1,          0,          0,          -1,        0 },
-        { "QQ",                                     "qq",                                       "QQ",               1 << 6,     0,          0,          1,          -1,         0 },
+        {
+                "QQ",
+                "qq",
+                "图片查看器",
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0
+        },
+        {
+                "QQ",
+                "qq",
+                "群公告",
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0
+        },
+        {
+                "QQ",
+                "qq",
+                "视频播放器",
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0
+        },
+        {
+                "QQ",
+                "qq",
+                "文件管理器",
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0
+        },
+        {
+                "QQ",
+                "qq",
+                "收藏",
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0
+        },
+        {
+                "QQ",
+                "qq",
+                "QQ",
+                1 << 6,
+                0,
+                0,
+                1,
+                -1,
+                0
+        },
         // 微信规则
-        { NULL,                                     NULL,                                       "图片查看",          0,           1,          0,          0,         -1,        0 },
-        { "wechat",                                 "wechat",                                   "微信",              1 << 7,     0,          0,          1,          -1,         0 },
-        { "obs",                                    NULL,                                       NULL,               1 << 3,     0,          0,          0,          -1,         0 },
-        { "Google-chrome",                          "google-chrome",                            NULL,               1 << 4,     0,          0,          0,          -1,         0 },
-        { "polkit-kde-authentication-agent-1",      "polkit-kde-authentication-agent-1",        NULL,               0,          1,          0,          0,          -1,         0 },
+        {
+                NULL,
+                NULL,
+                "图片查看",
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0
+        },
+        {
+                "wechat",
+                "wechat",
+                "微信",
+                1 << 7,
+                0,
+                0,
+                1,
+                -1,
+                0
+        },
+        // telegram-desktop 规则
+        {
+                "TelegramDesktop",
+                "telegram-desktop",
+                "Media viewer",
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0
+        },
+        {
+                "obs",
+                NULL,
+                NULL,
+                1 << 3,
+                0,
+                0,
+                0,
+                -1,
+                0
+        },
+        {
+                "Google-chrome",
+                "google-chrome",
+                NULL,
+                1 << 4,
+                0,
+                0,
+                0,
+                -1,
+                0
+        },
+        {
+                "polkit-kde-authentication-agent-1",
+                "polkit-kde-authentication-agent-1",
+                NULL,
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0
+        },
         // 音乐
-        { "Vncviewer",          NULL,                   NULL,               0,          1,          0,          1,          -1,         2 },            // Vncviewer           浮动、无边框 屏幕顶部
-        { "scratchpad",         "scratchpad",           "scratchpad",       TAGMASK,    1,          1,          1,          -1,         2 },            // scratchpad          浮动、全局、无边框 屏幕顶部
-        { "wemeetapp",          NULL,                   NULL,               TAGMASK,    1,          1,          0,          -1,         0 },            // !!!腾讯会议在切换tag时有诡异bug导致退出 变成global来规避该问题
-
+        {
+                "Vncviewer",
+                NULL,
+                NULL,
+                0,
+                1,
+                0,
+                1,
+                -1,
+                2
+        },            // Vncviewer           浮动、无边框 屏幕顶部
+        {
+                "scratchpad",
+                "scratchpad",
+                "scratchpad",
+                TAGMASK,
+                1,
+                1,
+                1,
+                -1,
+                2
+        },            // scratchpad          浮动、全局、无边框 屏幕顶部
+        {
+                "wemeetapp",
+                NULL,
+                NULL,
+                TAGMASK,
+                1,
+                1,
+                0,
+                -1,
+                0
+        },            // !!!腾讯会议在切换tag时有诡异bug导致退出 变成global来规避该问题
         /** 部分特殊class的规则 */
-        { "float",              NULL,                   NULL,               0,          1,          0,          0,          -1,         0 },            // class = float       浮动
-        { "global",             NULL,                   NULL,               TAGMASK,    0,          1,          0,          -1,         0 },            // class = gloabl      全局
-        { "noborder",           NULL,                   NULL,               0,          0,          0,          1,          -1,         0 },            // class = noborder    无边框
-        { "FGN",                NULL,                   NULL,               TAGMASK,    1,          1,          1,          -1,         0 },            // class = FGN         浮动、全局、无边框
-        { "FG",                 NULL,                   NULL,               TAGMASK,    1,          1,          0,          -1,         0 },            // class = FG          浮动、全局
-        { "FN",                 NULL,                   NULL,               0,          1,          0,          1,          -1,         0 },            // class = FN          浮动、无边框
-        { "GN",                 NULL,                   NULL,               TAGMASK,    0,          1,          1,          -1,         0 },            // CLASS = GN          全局、无边框
-
+        {
+                "float",
+                NULL,                                                        NULL,
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0
+        },            // class = float       浮动
+        {
+                "global",
+                NULL,
+                NULL,
+                TAGMASK,
+                0,
+                1,
+                0,
+                -1,
+                0
+        },            // class = gloabl      全局
+        {
+                "noborder",
+                NULL,
+                NULL,
+                0,
+                0,
+                0,
+                1,
+                -1,
+                0
+        },            // class = noborder    无边框
+        {
+                "FGN",
+                NULL,
+                NULL,
+                TAGMASK,
+                1,
+                1,
+                1,
+                -1,
+                0
+        },            // class = FGN         浮动、全局、无边框
+        {
+                "FG",
+                NULL,
+                NULL,
+                TAGMASK,
+                1,
+                1,
+                0,
+                -1,
+                0
+        },            // class = FG          浮动、全局
+        {
+                "FN",
+                NULL,
+                NULL,
+                0,
+                1,
+                0,
+                1,
+                -1,
+                0
+        },            // class = FN          浮动、无边框
+        {
+                "GN",
+                NULL,
+                NULL,
+                TAGMASK,
+                0,
+                1,
+                1,
+                -1,
+                0
+        },            // CLASS = GN          全局、无边框
         /** 优先度低 越在上面优先度越低 */
-        { NULL,                 NULL,                   "crx_",             0,          1,          0,          0,          -1,         0 },            // 错误载入时 会有crx_ 浮动
-        { NULL,                 NULL,                   "broken",           0,          1,          0,          0,          -1,         0 },            // 错误载入时 会有broken 浮动
+        {
+                NULL,
+                NULL,
+                "crx_",
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0
+        },            // 错误载入时 会有crx_ 浮动
+        {
+                NULL,
+                NULL,
+                "broken",
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0
+        },            // 错误载入时 会有broken 浮动
 };
 
 static const char *overviewtag = "OVERVIEW";
-static const Layout overviewlayout = { "󰕮",  overview };
+static const Layout overviewlayout = {"󰕮", overview};
 
 /* 自定义布局 */
 static const Layout layouts[] = {
-        { "󰙀",        tile },               /* 平铺布局 */
-        { "󰕰",        magicgrid },          /* 网格布局 */
+        {"󰙀", tile},               /* 平铺布局 */
+        {"󰕰", magicgrid},          /* 网格布局 */
 };
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
