@@ -368,6 +368,9 @@ static Systray *systray =  NULL;
 static const char broken[] = "broken";
 static char stext[1024];
 static int screen;
+/**
+ * sw : 屏幕的宽度，sh：屏幕的高度
+ */
 static int sw, sh;           /* X display screen geometry width, height */
 /**
  * bh：bar 高度，blw：
