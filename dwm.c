@@ -170,6 +170,9 @@ struct Monitor {
 	int mx, my, mw, mh;   /* screen size */
 	int wx, wy, ww, wh;   /* window area  */
 	unsigned int seltags;
+    /**
+     * 选中的布局
+     */
 	unsigned int sellt;
 	unsigned int tagset[2];
 	int showbar;
@@ -180,6 +183,9 @@ struct Monitor {
 	Client *stack;
 	Monitor *next;
 	Window barwin;
+    /**
+     * 布局
+     */
 	const Layout *lt[2];
 	Pertag *pertag;
     uint isoverview;
@@ -1753,6 +1759,7 @@ manage(Window w, XWindowAttributes *wa)
     c->oldbw = wa->border_width;
     c->bw = borderpx;
 
+    // 更新标题
     updatetitle(c);
     if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
         c->mon = t->mon;
@@ -1786,8 +1793,10 @@ manage(Window w, XWindowAttributes *wa)
     }
 
     XConfigureWindow(dpy, w, CWBorderWidth, &wc);
+    // 设置窗口边框
     XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
     configure(c); /* propagates border_width, if size doesn't change */
+    // 更新窗口类型
     updatewindowtype(c);
     updatesizehints(c);
     updatewmhints(c);
@@ -1801,6 +1810,7 @@ manage(Window w, XWindowAttributes *wa)
     attachstack(c);
     XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
             (unsigned char *) &(c->win), 1);
+    // 移动窗口并调整大小
     XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* some windows require this */
     if (!HIDDEN(c))
         setclientstate(c, NormalState);
@@ -1808,8 +1818,10 @@ manage(Window w, XWindowAttributes *wa)
         unfocus(selmon->sel, 0);
     c->mon->sel = c;
     arrange(c->mon);
-    if (!HIDDEN(c))
+    if (!HIDDEN(c)) {
         XMapWindow(dpy, c->win);
+    }
+
     focus(NULL);
 }
 
@@ -2680,12 +2692,12 @@ showtag(Client *c)
         showtag(c->snext);
     } else {
         // 将不可见的 client 移动到屏幕之外
-        showtag(c->snext);
         if (c->mon->mx == 0) {
             XMoveWindow(dpy, c->win, WIDTH(c) * -1.5, c->y);
         } else {
             XMoveWindow(dpy, c->win, c->mon->mx + c->mon->mw + WIDTH(c) * 1.5, c->y);
         }
+        showtag(c->snext);
     }
 }
 

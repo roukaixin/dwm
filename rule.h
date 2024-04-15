@@ -131,42 +131,6 @@ static const Rule rules[] = {
                 false
         },
         {
-                "Gimp",
-                "gimp",
-                "图像",
-                0,
-                1,
-                0,
-                0,
-                -1,
-                5,
-                false
-        },
-        {
-                "Gimp",
-                "script-fu",
-                NULL,
-                0,
-                1,
-                0,
-                0,
-                -1,
-                5,
-                false
-        },
-        {
-                "Gimp",
-                "file-jpeg",
-                NULL,
-                0,
-                1,
-                0,
-                0,
-                -1,
-                5,
-                false
-        },
-        {
                 "com-jetbrains-toolbox-entry-ToolboxEntry",
                 "com-jetbrains-toolbox-entry-ToolboxEntry",
                 "JetBrains Toolbox",
