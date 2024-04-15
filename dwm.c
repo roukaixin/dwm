@@ -42,6 +42,7 @@
 #include <X11/extensions/Xinerama.h>
 #endif /* XINERAMA */
 #include <X11/Xft/Xft.h>
+#include <stdbool.h>
 
 #include "drw.h"
 #include "util.h"
@@ -194,6 +195,7 @@ typedef struct {
 	int isnoborder;
 	int monitor;
     uint floatposition;
+    bool isfullscreen;
 } Rule;
 
 typedef struct Systray   Systray;
@@ -366,6 +368,9 @@ static Systray *systray =  NULL;
 static const char broken[] = "broken";
 static char stext[1024];
 static int screen;
+/**
+ * sw : 屏幕的宽度，sh：屏幕的高度
+ */
 static int sw, sh;           /* X display screen geometry width, height */
 /**
  * bh：bar 高度，blw：
@@ -491,13 +496,14 @@ applyrules(Client *c)
             c->isfloating = r->isfloating;
             c->isglobal = r->isglobal;
             c->isnoborder = r->isnoborder;
+            c->isfullscreen = r->isfullscreen;
             c->tags |= r->tags;
             c->bw = c->isnoborder ? 0 : (int)borderpx;
             for (m = mons; m && m->num != r->monitor; m = m->next);
             if (m)
                 c->mon = m;
-            // 如果设定了 floatposition 且未指定xy，设定窗口位置
-            if (r->isfloating && c->x == 0 && c->y == 0) {
+            // 如果设定了 floatposition ，那么就会重新设定窗口位置
+            if (r->isfloating) {
                 switch (r->floatposition) {
                     case 1:
                         // 左上
@@ -3182,6 +3188,10 @@ updatenumlockmask(void)
     XFreeModifiermap(modmap);
 }
 
+/**
+ * 窗口发生改变都会调用这个函数
+ * @param c
+ */
 void
 updatesizehints(Client *c)
 {
@@ -3221,7 +3231,7 @@ updatesizehints(Client *c)
         c->mina = (float)size.min_aspect.y / size.min_aspect.x;
         c->maxa = (float)size.max_aspect.x / size.max_aspect.y;
     } else
-        c->maxa = c->mina = 0.0;
+        c->maxa = c->mina = 0.0f;
     c->isfixed = (c->maxw && c->maxh && c->maxw == c->minw && c->maxh == c->minh);
 }
 
