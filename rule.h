@@ -20,311 +20,47 @@ static const Rule rules[] = {
          * 优先级高 越在上面优先度越高
          */
         // QQ 规则
-        {
-                "QQ",
-                "qq",
-                "图片查看器",
-                0,
-                1,
-                0,
-                0,
-                -1,
-                0,
-                false
-        },
-        {
-                "QQ",
-                "qq",
-                "群公告",
-                0,
-                1,
-                0,
-                0,
-                -1,
-                0,
-                false
-        },
-        {
-                "QQ",
-                "qq",
-                "视频播放器",
-                0,
-                1,
-                0,
-                0,
-                -1,
-                0,
-                false
-        },
-        {
-                "QQ",
-                "qq",
-                "文件管理器",
-                0,
-                1,
-                0,
-                0,
-                -1,
-                0,
-                false
-        },
-        {
-                "QQ",
-                "qq",
-                "收藏",
-                0,
-                1,
-                0,
-                0,
-                -1,
-                0,
-                false
-        },
-        {
-                "QQ",
-                "qq",
-                "QQ",
-                1 << 6,
-                0,
-                0,
-                1,
-                -1,
-                0,
-                false
-        },
+        {"QQ",                                "qq",               "图片查看器",          0,            1, 0, 0, -1, 0, false},
+        {"QQ",                                "qq",               "群公告",              0,            1, 0, 0, -1, 0, false},
+        {"QQ",                                "qq",               "视频播放器",          0,            1, 0, 0, -1, 0, false},
+        {"QQ",                                "qq",               "文件管理器",          0,            1, 0, 0, -1, 0, false},
+        {"QQ",                                "qq",               "收藏",                0,            1, 0, 0, -1, 0, false},
+        {"QQ",                                "qq",               "QQ",                  1
+                                                                                                 << 6, 0, 0, 1, -1, 0, false},
         // 微信规则
-        {
-                NULL,
-                NULL,
-                "图片查看",
-                0,
-                1,
-                0,
-                0,
-                -1,
-                0,
-                false
-        },
-        {
-                "wechat",
-                "wechat",
-                "微信",
-                1 << 7,
-                0,
-                0,
-                1,
-                -1,
-                0,
-                false
-        },
+        {NULL,        NULL,                                       "图片查看",            0,            1, 0, 0, -1, 0, false},
+        {"wechat",                            "wechat",           "微信",                1
+                                                                                                 << 7, 0, 0, 1, -1, 0, false},
         // telegram-desktop 规则
-        {
-                "TelegramDesktop",
-                "telegram-desktop",
-                "Media viewer",
-                0,
-                1,
-                0,
-                0,
-                -1,
-                0,
-                false
-        },
-        {
-                "com-jetbrains-toolbox-entry-ToolboxEntry",
-                "com-jetbrains-toolbox-entry-ToolboxEntry",
-                "JetBrains Toolbox",
-                0,
-                1,
-                0,
-                0,
-                -1,
-                3,
-                false
-        },
-
-        {
-                "obs",
-                NULL,
-                NULL,
-                1 << 3,
-                0,
-                0,
-                0,
-                -1,
-                0,
-                false
-        },
-        {
-                "Google-chrome",
-                "google-chrome",
-                NULL,
-                1 << 4,
-                0,
-                0,
-                0,
-                -1,
-                0,
-                false
-        },
-        {
-                "polkit-kde-authentication-agent-1",
-                "polkit-kde-authentication-agent-1",
-                NULL,
-                0,
-                1,
-                0,
-                0,
-                -1,
-                0,
-                false
-        },
+        {"TelegramDesktop",                   "telegram-desktop", "Media viewer",        0,            1, 0, 0, -1, 0, false},
+        /* 火焰截图            浮动 */
+        {"flameshot", NULL,                                                        NULL, 0,            1, 0, 0, -1, 0, false},
+        {"obs",       NULL,                                                        NULL, 1
+                                                                                                 << 3, 0, 0, 0, -1, 0, false},
+        {"Google-chrome",                     "google-chrome",                     NULL, 1
+                                                                                                 << 4, 0, 0, 0, -1, 0, false},
+        {"polkit-kde-authentication-agent-1", "polkit-kde-authentication-agent-1", NULL, 0,            1, 0, 0, -1, 0, false},
         // Vncviewer           浮动、无边框 屏幕顶部
-        {
-                "Vncviewer",
-                NULL,
-                NULL,
-                0,
-                1,
-                0,
-                1,
-                -1,
-                2,
-                false
-        },
-        {
-                "scratchpad",
-                "scratchpad",
-                "scratchpad",
-                TAGMASK,
-                1,
-                1,
-                1,
-                -1,
-                2,
-                false
-        },            // scratchpad          浮动、全局、无边框 屏幕顶部
-        {
-                "wemeetapp",
-                NULL,
-                NULL,
-                TAGMASK,
-                1,
-                1,
-                0,
-                -1,
-                0,
-                false
-        },            // !!!腾讯会议在切换tag时有诡异bug导致退出 变成global来规避该问题
+        {"Vncviewer", NULL,                                                        NULL, 0,            1, 0, 1, -1, 2, false},
+        // scratchpad          浮动、全局、无边框 屏幕顶部
+        {"scratchpad",                        "scratchpad",       "scratchpad",          TAGMASK,      1, 1, 1, -1, 2, false},
         /** 部分特殊class的规则 */
-        {
-                "float",
-                NULL,
-                NULL,
-                0,
-                1,
-                0,
-                0,
-                -1,
-                0,
-                false
-        },            // class = float       浮动
-        {
-                "global",
-                NULL,
-                NULL,
-                TAGMASK,
-                0,
-                1,
-                0,
-                -1,
-                0,
-                false
-        },            // class = gloabl      全局
-        {
-                "noborder",
-                NULL,
-                NULL,
-                0,
-                0,
-                0,
-                1,
-                -1,
-                0,
-                false
-        },            // class = noborder    无边框
-        {
-                "FGN",
-                NULL,
-                NULL,
-                TAGMASK,
-                1,
-                1,
-                1,
-                -1,
-                0,
-                false
-        },            // class = FGN         浮动、全局、无边框
-        {
-                "FG",
-                NULL,
-                NULL,
-                TAGMASK,
-                1,
-                1,
-                0,
-                -1,
-                0,
-                false
-        },            // class = FG          浮动、全局
-        {
-                "FN",
-                NULL,
-                NULL,
-                0,
-                1,
-                0,
-                1,
-                -1,
-                0,
-                false
-        },            // class = FN          浮动、无边框
-        {
-                "GN",
-                NULL,
-                NULL,
-                TAGMASK,
-                0,
-                1,
-                1,
-                -1,
-                0,
-                false
-        },            // CLASS = GN          全局、无边框
+        // class = float       浮动
+        {"float",     NULL,                                                        NULL, 0,            1, 0, 0, -1, 0, false},
+        // class = gloabl      全局
+        {"global",    NULL,                                                        NULL, TAGMASK,      0, 1, 0, -1, 0, false},
+        // class = noborder    无边框
+        {"noborder",  NULL,                                                        NULL, 0,            0, 0, 1, -1, 0, false},
+        // class = FGN         浮动、全局、无边框
+        {"FGN",       NULL,                                                        NULL, TAGMASK,      1, 1, 1, -1, 0, false},
+        // class = FG          浮动、全局
+        {"FG",        NULL,                                                        NULL, TAGMASK,      1, 1, 0, -1, 0, false},
+        // class = FN          浮动、无边框
+        {"FN",        NULL,                                                        NULL, 0,            1, 0, 1, -1, 0, false},
+        // CLASS = GN          全局、无边框
+        {"GN",        NULL,                                                        NULL, TAGMASK,      0, 1, 1, -1, 0, false},
         // 错误载入时 会有crx_ 浮动
-        {
-                NULL,
-                NULL,
-                "crx_",
-                0,
-                1,
-                0,
-                0,
-                -1,
-                0,
-                false
-        },
+        {NULL,        NULL,                                       "crx_",                0,            1, 0, 0, -1, 0, false},
         // 错误载入时 会有broken 浮动
-        {
-                NULL,
-                NULL,
-                "broken",
-                0,
-                1,
-                0,
-                0,
-                -1,
-                0,
-                false
-        },
+        {NULL,        NULL,                                       "broken",              0,            1, 0, 0, -1, 0, false},
 };
