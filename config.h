@@ -52,11 +52,11 @@ static const unsigned int alphas[][3] = {
 // 自启动
 static const char *autostart[] = {
         "fcitx5",                                          NULL,
-        "flameshot",                                       NULL,
+        "snipaste",                                        NULL,
         "numlockx",                                        NULL,
         "nm-applet",                                       NULL,
         "blueman-applet",                                  NULL,
-        "/usr/lib/polkit-kde-authentication-agent-1",      NULL,
+        "/usr/lib/polkit-kde-authentication-agent-1",    NULL,
         "slstatus",                                      NULL,
         "picom",                                         NULL,
         "dunst",                                         NULL,
@@ -206,8 +206,6 @@ static const Key keys[] = {
     { MODKEY,              XK_space,                    spawn,          SHCMD("kitty --class float -o initial_window_width=70c -o initial_window_height=17c") },
     /* super n          |    锁定屏幕 */
     { MODKEY,              XK_n,                        spawn,          SHCMD("sh $HOME/wm/config/lock/blurlock.sh") },
-    /* alt a            |    截图 */
-    { 0|Mod1Mask,          XK_a,                        spawn,          SHCMD("flameshot gui") },
     /* super shift c    |    选中某个窗口并强制kill */
     { MODKEY|ShiftMask,    XK_c,                        spawn,          SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") },
     /* super p          |    打开 rofi run */
@@ -256,7 +254,4 @@ static const Button buttons[] = {
     { ClkTagBar,           MODKEY,          Button1,          tag,           {0} },                                   // super+左键  |  点击tag      |  将窗口移动到对应tag
     { ClkTagBar,           0,               Button4,          viewtoleft,    {0} },                                   // 鼠标滚轮上  |  tag          |  向前切换tag
 	{ ClkTagBar,           0,               Button5,          viewtoright,   {0} },                                   // 鼠标滚轮下  |  tag          |  向后切换tag
-    /* 点击 bar 空白处 */
-    { ClkBarEmpty,         0,               Button1,          spawn, SHCMD("~/scripts/call_rofi.sh window") },        // 左键        |  bar空白处    |  rofi 执行 window
-    { ClkBarEmpty,         0,               Button3,          spawn, SHCMD("~/scripts/call_rofi.sh drun") },          // 右键        |  bar空白处    |  rofi 执行 drun
 };
