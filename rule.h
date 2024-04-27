@@ -65,7 +65,7 @@ static const Rule rules[] = {
 };
 
 static const TransientRule transientRules[] = {
-        {"Gimp", "gimp", "图像", 0},
+        {"Gimp",              "gimp",              "图像",              0},
         {"jetbrains-toolbox", "JetBrains Toolbox", "JetBrains Toolbox", 3}
 };
 
