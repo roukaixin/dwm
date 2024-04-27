@@ -204,6 +204,25 @@ typedef struct {
     bool isfullscreen;
 } Rule;
 
+/**
+ * 瞬态窗口规则
+ */
+typedef struct {
+    const char *class;
+    const char *instance;
+    const char *title;
+    // 窗口位置
+    unsigned int position;
+} TransientRule;
+
+/**
+ * 瞬态窗口规则
+ */
+typedef struct {
+    const char *title;
+    bool isCenter;
+} PopUpRule;
+
 typedef struct Systray   Systray;
 struct Systray {
 	Window win;
@@ -486,6 +505,7 @@ applyrules(Client *c)
     c->isnoborder = 0;
     c->isscratchpad = 0;
     c->tags = 0;
+    // 获取 client 的 class 和 instance
     XGetClassHint(dpy, c->win, &ch);
     class    = ch.res_class ? ch.res_class : broken;
     instance = ch.res_name  ? ch.res_name  : broken;
@@ -640,11 +660,16 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact)
     return *x != c->x || *y != c->y || *w != c->w || *h != c->h;
 }
 
+/**
+ *
+ * @param m
+ */
 void
 arrange(Monitor *m)
 {
-    if (m)
+    if (m) {
         showtag(m->stack);
+    }
     else for (m = mons; m; m = m->next)
         showtag(m->stack);
     if (m) {
@@ -950,6 +975,10 @@ configurenotify(XEvent *e)
     }
 }
 
+/**
+ * 处理客户端窗口的配置请求事件
+ * @param e
+ */
 void
 configurerequest(XEvent *e)
 {
@@ -957,6 +986,9 @@ configurerequest(XEvent *e)
     Monitor *m;
     XConfigureRequestEvent *ev = &e->xconfigurerequest;
     XWindowChanges wc;
+    const char *class, *instance;
+    const TransientRule *transientRule;
+    XClassHint ch = { NULL, NULL };
 
     if ((c = wintoclient(ev->window))) {
         if (ev->value_mask & CWBorderWidth)
@@ -985,8 +1017,62 @@ configurerequest(XEvent *e)
                 c->y = m->my + (m->mh / 2 - HEIGHT(c) / 2); /* center in y direction */
             if ((ev->value_mask & (CWX|CWY)) && !(ev->value_mask & (CWWidth|CWHeight)))
                 configure(c);
-            if (ISVISIBLE(c))
+            if (ISVISIBLE(c)) {
+                // 获取 client 的 class 和 instance
+                XGetClassHint(dpy, c->win, &ch);
+                class    = ch.res_class ? ch.res_class : broken;
+                instance = ch.res_name  ? ch.res_name  : broken;
+                for (int i = 0; i < LENGTH(transientRules); ++i) {
+                    unsigned int null_count = 0;
+                    unsigned int match_count = 0;
+                    transientRule = &transientRules[i];
+                    transientRule->class ? strstr(class, transientRule->class) ? match_count ++ : 0 : null_count ++;
+                    transientRule->instance ? strstr(instance, transientRule->instance) ? match_count ++ : 0 : null_count ++;
+                    transientRule->title ? strstr(c->name, transientRule->title) ? match_count ++ : 0 : null_count ++;
+                    if (3 - null_count == match_count) {
+                        switch (transientRule->position) {
+                            case 1:
+                                c->x = selmon->wx + gappo;
+                                c->y = selmon->wy + gappo;
+                                break;
+                            case 2:
+                                c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2 - gappo;
+                                c->y = selmon->wy + gappo;
+                                break;
+                            case 3:
+                                c->x = selmon->wx + selmon->ww - WIDTH(c) - gappo;
+                                c->y = selmon->wy + gappo;
+                                break;
+                            case 4:
+                                c->x = selmon->wx + gappo;
+                                c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
+                                break;
+                            case 6:
+                                c->x = selmon->wx + selmon->ww - WIDTH(c) - gappo;
+                                c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
+                                break;
+                            case 7:
+                                c->x = selmon->wx + gappo;
+                                c->y = selmon->wy + selmon->wh - HEIGHT(c) - gappo;
+                                break;
+                            case 8:
+                                c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2;
+                                c->y = selmon->wy + selmon->wh - HEIGHT(c) - gappo;
+                                break;
+                            case 9:
+                                c->x = selmon->wx + selmon->ww - WIDTH(c) - gappo;
+                                c->y = selmon->wy + selmon->wh - HEIGHT(c) - gappo;
+                                break;
+                            default:
+                                // （屏幕宽度 - 客户端宽度） / 2
+                                c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2;
+                                c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
+                                break;
+                        }
+                    }
+                }
                 XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
+            }
         } else
             configure(c);
     } else {
@@ -1742,12 +1828,18 @@ managefloating(Client *c)
     }
 }
 
+/**
+ * 负责将新创建的窗口添加到dwm的管理列表中
+ * @param w 窗口
+ * @param wa 窗口属性
+ */
 void
 manage(Window w, XWindowAttributes *wa)
 {
     Client *c, *t = NULL;
     Window trans = None;
     XWindowChanges wc;
+    const PopUpRule *popUpRule;
 
     c = ecalloc(1, sizeof(Client));
     c->win = w;
@@ -1757,7 +1849,7 @@ manage(Window w, XWindowAttributes *wa)
     c->w = c->oldw = wa->width;
     c->h = c->oldh = wa->height;
     c->oldbw = wa->border_width;
-    c->bw = borderpx;
+    c->bw = (int)borderpx;
 
     // 更新标题
     updatetitle(c);
@@ -1770,10 +1862,12 @@ manage(Window w, XWindowAttributes *wa)
     }
     wc.border_width = c->bw;
 
-    if (c->x + WIDTH(c) > c->mon->mx + c->mon->mw)
+    if (c->x + WIDTH(c) > c->mon->mx + c->mon->mw) {
         c->x = c->mon->mx + c->mon->mw - WIDTH(c);
-    if (c->y + HEIGHT(c) > c->mon->my + c->mon->mh)
+    }
+    if (c->y + HEIGHT(c) > c->mon->my + c->mon->mh) {
         c->y = c->mon->my + c->mon->mh - HEIGHT(c);
+    }
     c->x = MAX(c->x, c->mon->mx);
     /* only fix client y-offset, if the client center might cover the bar */
     c->y = MAX(c->y, ((c->mon->by == c->mon->my) && (c->x + (c->w / 2) >= c->mon->wx)
@@ -1787,7 +1881,7 @@ manage(Window w, XWindowAttributes *wa)
         }
         managefloating(c);
     } else {
-        // if new client is tile, old sel is fullscreen, then close fullscreen
+        // 如果新客户端是平铺的，旧客户端是全屏的，则关闭全屏
         if (c->mon->sel && c->mon->sel->isfullscreen)
             fullscreen(NULL);
     }
@@ -1795,6 +1889,7 @@ manage(Window w, XWindowAttributes *wa)
     XConfigureWindow(dpy, w, CWBorderWidth, &wc);
     // 设置窗口边框
     XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
+    // 配置 client，这里就有可能已经绘制了 client
     configure(c); /* propagates border_width, if size doesn't change */
     // 更新窗口类型
     updatewindowtype(c);
@@ -1808,8 +1903,14 @@ manage(Window w, XWindowAttributes *wa)
         XRaiseWindow(dpy, c->win);
     attach(c);
     attachstack(c);
-    XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
-            (unsigned char *) &(c->win), 1);
+    XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend, (unsigned char *) &(c->win), 1);
+    for (int i = 0; i < LENGTH(popUpRules); ++i) {
+        popUpRule = &popUpRules[i];
+        if (strstr(c->name, popUpRule->title)) {
+            c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2;
+            c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
+        }
+    }
     // 移动窗口并调整大小
     XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* some windows require this */
     if (!HIDDEN(c))
@@ -1835,6 +1936,10 @@ mappingnotify(XEvent *e)
         grabkeys();
 }
 
+/**
+ * 显示请求。新打开窗口显示在屏幕上
+ * @param e
+ */
 void
 maprequest(XEvent *e)
 {
@@ -1847,12 +1952,15 @@ maprequest(XEvent *e)
         updatesystray();
     }
 
-    if (!XGetWindowAttributes(dpy, ev->window, &wa))
+    if (!XGetWindowAttributes(dpy, ev->window, &wa)) {
         return;
-    if (wa.override_redirect)
+    }
+    if (wa.override_redirect) {
         return;
-    if (!wintoclient(ev->window))
+    }
+    if (!wintoclient(ev->window)) {
         manage(ev->window, &wa);
+    }
 }
 
 void
@@ -1978,7 +2086,7 @@ movewin(const Arg *arg)
                 if (!ISVISIBLE(tc) || !tc->isfloating || tc == c) continue;
                 if (c->x + WIDTH(c) < tc->x || c->x > tc->x + WIDTH(tc)) continue;
                 top = tc->y - gappi;
-                if (buttom < top && (ny + HEIGHT(c)) > top) {  
+                if (buttom < top && (ny + HEIGHT(c)) > top) {
                     tar = MIN(tar, top - HEIGHT(c));
                 };
             }
@@ -2069,7 +2177,7 @@ resizewin(const Arg *arg)
                 if (!ISVISIBLE(tc) || !tc->isfloating || tc == c) continue;
                 if (c->x + WIDTH(c) < tc->x || c->x > tc->x + WIDTH(tc)) continue;
                 top = tc->y - gappi;
-                if (buttom < top && (c->y + nh) > top) {  
+                if (buttom < top && (c->y + nh) > top) {
                     tar = MAX(tar, top - c->y - 2 * c->bw);
                 };
             }
@@ -2107,6 +2215,10 @@ pop(Client *c)
     pointerfocuswin(c);
 }
 
+/**
+ * 客户端属性发生改变时调用
+ * @param e
+ */
 void
 propertynotify(XEvent *e)
 {
@@ -2130,30 +2242,37 @@ propertynotify(XEvent *e)
         return; /* ignore */
     else if ((c = wintoclient(ev->window))) {
         switch(ev->atom) {
-            default: break;
             case XA_WM_TRANSIENT_FOR:
                 if (!c->isfloating && (XGetTransientForHint(dpy, c->win, &trans)) &&
                     (c->isfloating = (wintoclient(trans)) != NULL))
                     arrange(c->mon);
                 break;
             case XA_WM_NORMAL_HINTS:
-                     updatesizehints(c);
-                     break;
+                updatesizehints(c);
+                break;
             case XA_WM_HINTS:
-                     updatewmhints(c);
-                     drawbars();
-                     break;
+                updatewmhints(c);
+                drawbars();
+                break;
+            default:
+                break;
         }
         if (ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
             updatetitle(c);
-            if (c == c->mon->sel)
+            if (c == c->mon->sel) {
                 drawbar(c->mon);
+            }
         }
-        if (ev->atom == netatom[NetWMWindowType])
+        if (ev->atom == netatom[NetWMWindowType]) {
             updatewindowtype(c);
+        }
     }
 }
 
+/**
+ * 退出
+ * @param arg
+ */
 void
 quit(const Arg *arg)
 {

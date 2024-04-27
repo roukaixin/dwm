@@ -33,8 +33,7 @@ static const Rule rules[] = {
                                                                                                  << 7, 0, 0, 1, -1, 0, false},
         // telegram-desktop 规则
         {"TelegramDesktop",                   "telegram-desktop", "Media viewer",        0,            1, 0, 0, -1, 0, false},
-        /* 火焰截图            浮动 */
-        {"flameshot", NULL,                                                        NULL, 0,            1, 0, 0, -1, 0, false},
+        {"Gimp",                              "gimp",             "新建模板",            0,            1, 0, 0, -1, 0, false},
         {"obs",       NULL,                                                        NULL, 1
                                                                                                  << 3, 0, 0, 0, -1, 0, false},
         {"Google-chrome",                     "google-chrome",                     NULL, 1
@@ -63,4 +62,13 @@ static const Rule rules[] = {
         {NULL,        NULL,                                       "crx_",                0,            1, 0, 0, -1, 0, false},
         // 错误载入时 会有broken 浮动
         {NULL,        NULL,                                       "broken",              0,            1, 0, 0, -1, 0, false},
+};
+
+static const TransientRule transientRules[] = {
+        {"Gimp", "gimp", "图像", 0},
+        {"jetbrains-toolbox", "JetBrains Toolbox", "JetBrains Toolbox", 3}
+};
+
+static const PopUpRule popUpRules[] = {
+        {"Script-Fu：", true}
 };
