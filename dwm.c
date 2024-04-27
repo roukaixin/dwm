@@ -220,7 +220,8 @@ typedef struct {
  */
 typedef struct {
     const char *title;
-    bool isCenter;
+    // 窗口位置
+    unsigned int position;
 } PopUpRule;
 
 typedef struct Systray   Systray;
@@ -306,6 +307,7 @@ static Client *nexttiled(Client *c);
 static void pop(Client *c);
 static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
+static void set_position(unsigned int rule_position, Client *c);
 static void setup(void);
 static void seturgent(Client *c, int urg);
 static void sigchld(int unused);
@@ -530,49 +532,7 @@ applyrules(Client *c)
                 c->mon = m;
             // 如果设定了 floatposition ，那么就会重新设定窗口位置
             if (r->isfloating) {
-                switch (r->floatposition) {
-                    case 1:
-                        // 左上
-                        c->x = selmon->wx + gappo; c->y = selmon->wy + gappo;
-                        break;
-                    case 2:
-                        // 中上
-                        c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2 - gappo; c->y = selmon->wy + gappo;
-                        break;
-                    case 3:
-                        // 右上
-                        c->x = selmon->wx + selmon->ww - WIDTH(c) - gappo; c->y = selmon->wy + gappo;
-                        break;
-                    case 4:
-                        // 左中
-                        c->x = selmon->wx + gappo; c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
-                        break;
-                    case 0:
-                    case 5:
-                        // 中中(居中)
-                        c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2; c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
-                        break;
-                    case 6:
-                        // 右中
-                        c->x = selmon->wx + selmon->ww - WIDTH(c) - gappo; c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
-                        break;
-                    case 7:
-                        // 左下
-                        c->x = selmon->wx + gappo; c->y = selmon->wy + selmon->wh - HEIGHT(c) - gappo;
-                        break;
-                    case 8:
-                        // 中下
-                        c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2; c->y = selmon->wy + selmon->wh - HEIGHT(c) - gappo;
-                        break;
-                    case 9:
-                        // 右下
-                        c->x = selmon->wx + selmon->ww - WIDTH(c) - gappo; c->y = selmon->wy + selmon->wh - HEIGHT(c) - gappo;
-                        break;
-                    default :
-                        // 居中
-                        c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2; c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
-                        break;
-                }
+                set_position(r->floatposition, c);
             }
             // 有且只会匹配一个第一个符合的rule
             break;
@@ -1030,45 +990,7 @@ configurerequest(XEvent *e)
                     transientRule->instance ? strstr(instance, transientRule->instance) ? match_count ++ : 0 : null_count ++;
                     transientRule->title ? strstr(c->name, transientRule->title) ? match_count ++ : 0 : null_count ++;
                     if (3 - null_count == match_count) {
-                        switch (transientRule->position) {
-                            case 1:
-                                c->x = selmon->wx + gappo;
-                                c->y = selmon->wy + gappo;
-                                break;
-                            case 2:
-                                c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2 - gappo;
-                                c->y = selmon->wy + gappo;
-                                break;
-                            case 3:
-                                c->x = selmon->wx + selmon->ww - WIDTH(c) - gappo;
-                                c->y = selmon->wy + gappo;
-                                break;
-                            case 4:
-                                c->x = selmon->wx + gappo;
-                                c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
-                                break;
-                            case 6:
-                                c->x = selmon->wx + selmon->ww - WIDTH(c) - gappo;
-                                c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
-                                break;
-                            case 7:
-                                c->x = selmon->wx + gappo;
-                                c->y = selmon->wy + selmon->wh - HEIGHT(c) - gappo;
-                                break;
-                            case 8:
-                                c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2;
-                                c->y = selmon->wy + selmon->wh - HEIGHT(c) - gappo;
-                                break;
-                            case 9:
-                                c->x = selmon->wx + selmon->ww - WIDTH(c) - gappo;
-                                c->y = selmon->wy + selmon->wh - HEIGHT(c) - gappo;
-                                break;
-                            default:
-                                // （屏幕宽度 - 客户端宽度） / 2
-                                c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2;
-                                c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
-                                break;
-                        }
+                        set_position(transientRule->position, c);
                     }
                 }
                 XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
@@ -1907,8 +1829,7 @@ manage(Window w, XWindowAttributes *wa)
     for (int i = 0; i < LENGTH(popUpRules); ++i) {
         popUpRule = &popUpRules[i];
         if (strstr(c->name, popUpRule->title)) {
-            c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2;
-            c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
+            set_position(popUpRule->position, c);
         }
     }
     // 移动窗口并调整大小
@@ -2277,6 +2198,49 @@ void
 quit(const Arg *arg)
 {
     running = 0;
+}
+
+void
+set_position(unsigned int rule_position, Client *c) {
+    switch (rule_position) {
+        case 1:
+            c->x = selmon->wx + gappo;
+            c->y = selmon->wy + gappo;
+            break;
+        case 2:
+            c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2 - gappo;
+            c->y = selmon->wy + gappo;
+            break;
+        case 3:
+            c->x = selmon->wx + selmon->ww - WIDTH(c) - gappo;
+            c->y = selmon->wy + gappo;
+            break;
+        case 4:
+            c->x = selmon->wx + gappo;
+            c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
+            break;
+        case 6:
+            c->x = selmon->wx + selmon->ww - WIDTH(c) - gappo;
+            c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
+            break;
+        case 7:
+            c->x = selmon->wx + gappo;
+            c->y = selmon->wy + selmon->wh - HEIGHT(c) - gappo;
+            break;
+        case 8:
+            c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2;
+            c->y = selmon->wy + selmon->wh - HEIGHT(c) - gappo;
+            break;
+        case 9:
+            c->x = selmon->wx + selmon->ww - WIDTH(c) - gappo;
+            c->y = selmon->wy + selmon->wh - HEIGHT(c) - gappo;
+            break;
+        default:
+            // （屏幕宽度 - 客户端宽度） / 2
+            c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2;
+            c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
+            break;
+    }
 }
 
 Monitor *
