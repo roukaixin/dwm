@@ -71,5 +71,6 @@ static const TransientRule transientRules[] = {
 
 static const PopUpRule popUpRules[] = {
         {"Script-Fu：", 0},
-        {"新建虚拟机", 0}
+        {"新建虚拟机", 0},
+        {"所有文件",   0}
 };
