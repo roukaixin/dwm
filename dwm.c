@@ -1530,6 +1530,10 @@ focusin(XEvent *e) {
         setfocus(selmon->sel);
 }
 
+/**
+ * 光标移动到另一个屏幕
+ * @param arg
+ */
 void
 focusmon(const Arg *arg) {
     Monitor *m;
@@ -2003,6 +2007,10 @@ motionnotify(XEvent *e) {
     mon = m;
 }
 
+/**
+ * 鼠标移动
+ * @param arg
+ */
 void
 movemouse(const Arg *arg) {
     int x, y, ocx, ocy, nx, ny;
@@ -2417,6 +2425,10 @@ resizeclient(Client *c, int x, int y, int w, int h) {
     XSync(dpy, False);
 }
 
+/**
+ * 鼠标调整大小
+ * @param arg
+ */
 void
 resizemouse(const Arg *arg) {
     int ocx, ocy, nw, nh;
