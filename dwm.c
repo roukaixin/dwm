@@ -180,10 +180,9 @@ typedef struct {
 typedef struct Pertag Pertag;
 struct Monitor {
     char ltsymbol[16];
-    /**
-     * 主区域占比
-     */
+    // 主区域占比
     float mfact;
+    // 主区域窗口数量
     int nmaster;
     int num;
     int by;               /* bar geometry */
@@ -3670,40 +3669,44 @@ viewtoright(const Arg *arg) {
 
 void
 tile(Monitor *m) {
-    // mw: master的宽度, mh: master的高度, sh: stack的高度, my: master的y坐标, sy: stack的y坐标
-    unsigned int i, n, mw, mh, sh, my, sy;
+    // master_w: master的宽度, master_h: master的高度, master_y: master的y坐标, stack_h: stack的高度, stack_y: stack的y坐标
+    unsigned int i, n, master_w, master_h, master_y, stack_h, stack_y;
     Client *c;
 
     for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
     if (n == 0) return;
 
-    if (n > m->nmaster)
-        mw = m->nmaster ? (m->ww + gappi) * m->mfact : 0;
-    else
-        mw = m->ww - 2 * gappo + gappi;
+    if (n > m->nmaster) {
+        // 如果 client 数量大于定于的 master 区域的数量时，master_w = (屏幕宽度 + 屏幕和 client 的缝隙) * master占比
+        master_w = m->nmaster ? (int) ((float) (m->ww - gappi) * m->mfact) : 0;
+    } else {
+        master_w = m->ww - 2 * gappo + gappi;
+    }
 
     // 单个master的高度
-    mh = m->nmaster == 0 ? 0 : (m->wh - 2 * gappo - gappi * (m->nmaster - 1)) / m->nmaster;
+    master_h = m->nmaster == 0 ? 0 : (m->wh - 2 * gappo - gappi * (m->nmaster - 1)) / m->nmaster;
     // 单个stack的高度
-    sh = n == m->nmaster ? 0 : (m->wh - 2 * gappo - gappi * (n - m->nmaster - 1)) / (n - m->nmaster);
+    stack_h = n == m->nmaster ? 0 : (m->wh - 2 * gappo - gappi * (n - m->nmaster - 1)) / (n - m->nmaster);
 
-    for (i = 0, my = sy = gappo, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+    for (i = 0, master_y = stack_y = gappo, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
         if (i < m->nmaster) {
             resize(c,
                    m->wx + gappo,
-                   m->wy + my,
-                   mw - 2 * c->bw - gappi,
-                   mh - 2 * c->bw,
+                   m->wy + (int) master_y,
+                   (int) master_w - 2 * c->bw - gappi,
+                   (int) master_h - 2 * c->bw,
                    0);
-            my += HEIGHT(c) + gappi;
+            master_y += HEIGHT(c) + gappi;
         } else {
-            resize(c,
-                   m->wx + mw + gappo,
-                   m->wy + sy,
-                   m->ww - mw - 2 * c->bw - 2 * gappo,
-                   sh - 2 * c->bw,
-                   0);
-            sy += HEIGHT(c) + gappi;
+            resize(
+                    c,
+                    m->wx + (int) master_w + gappo,
+                    m->wy + (int) stack_y,
+                    m->ww - (int) master_w - 2 * c->bw - 2 * gappo,
+                    (int) stack_h - 2 * c->bw,
+                    0
+            );
+            stack_y += HEIGHT(c) + gappi;
         }
 }
 
