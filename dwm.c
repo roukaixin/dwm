@@ -216,12 +216,12 @@ typedef struct {
     const char *instance;
     const char *title;
     unsigned int tags;
-    int isfloating;
-    int isglobal;
-    int isnoborder;
+    bool is_floating;
+    bool is_global;
+    bool is_no_border;
     int monitor;
-    uint floatposition;
-    bool isfullscreen;
+    uint float_position;
+    bool is_fullscreen;
 } Rule;
 
 /**
@@ -649,18 +649,18 @@ applyrules(Client *c) {
         r->title ? strstr(c->name, r->title) ? match_count++ : 0 : null_count++;
         // 当 rule 中定义了一个或多个属性时，只要有全部属性匹配，就认为匹配成功
         if (3 - null_count == match_count) {
-            c->isfloating = r->isfloating;
-            c->isglobal = r->isglobal;
-            c->isnoborder = r->isnoborder;
-            c->isfullscreen = r->isfullscreen;
+            c->isfloating = r->is_floating;
+            c->isglobal = r->is_global;
+            c->isnoborder = r->is_no_border;
+            c->isfullscreen = r->is_fullscreen;
             c->tags |= r->tags;
             c->bw = c->isnoborder ? 0 : (int) borderpx;
             for (m = mons; m && m->num != r->monitor; m = m->next);
             if (m)
                 c->mon = m;
             // 如果设定了 floatposition ，那么就会重新设定窗口位置
-            if (r->isfloating) {
-                set_position(r->floatposition, c);
+            if (r->is_floating) {
+                set_position(r->float_position, c);
             }
             // 有且只会匹配一个第一个符合的rule
             break;
