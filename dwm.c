@@ -236,14 +236,6 @@ typedef struct {
     unsigned int position;
 } TransientRule;
 
-/**
- * 瞬态窗口规则
- */
-typedef struct {
-    const char *title;
-    // 窗口位置
-    unsigned int position;
-} PopUpRule;
 
 typedef struct Systray Systray;
 struct Systray {
@@ -306,7 +298,10 @@ static void drawbars(void);
 
 static int drawstatusbar(Monitor *m, int bh, char *text);
 
-// 禁用焦点跟随鼠标
+/**
+ * 禁用焦点跟随鼠标
+ * @param e
+ */
 static void enternotify(XEvent *e);
 
 static void expose(XEvent *e);
@@ -382,6 +377,8 @@ static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
 
 static void set_position(unsigned int rule_position, Client *c);
+
+static void set_transient_rule(Client *c);
 
 static void setup(void);
 
@@ -621,7 +618,7 @@ logtofile(const char *fmt, ...) {
     va_end(ap);
     uint i = strlen((const char *) buf);
 
-    sprintf(cmd, "echo '%.*s' >> ~/log", i, buf);
+    sprintf(cmd, "echo '%.*s' >> ~/.dwm/log", i, buf);
     system(cmd);
 }
 
@@ -1075,9 +1072,6 @@ configurerequest(XEvent *e) {
     Monitor *m;
     XConfigureRequestEvent *ev = &e->xconfigurerequest;
     XWindowChanges wc;
-    const char *class, *instance;
-    const TransientRule *transientRule;
-    XClassHint ch = {NULL, NULL};
 
     if ((c = wintoclient(ev->window))) {
         if (ev->value_mask & CWBorderWidth)
@@ -1107,22 +1101,7 @@ configurerequest(XEvent *e) {
             if ((ev->value_mask & (CWX | CWY)) && !(ev->value_mask & (CWWidth | CWHeight)))
                 configure(c);
             if (ISVISIBLE(c)) {
-                // 获取 client 的 class 和 instance
-                XGetClassHint(dpy, c->win, &ch);
-                class = ch.res_class ? ch.res_class : broken;
-                instance = ch.res_name ? ch.res_name : broken;
-                for (int i = 0; i < LENGTH(transientRules); ++i) {
-                    unsigned int null_count = 0;
-                    unsigned int match_count = 0;
-                    transientRule = &transientRules[i];
-                    transientRule->class ? strstr(class, transientRule->class) ? match_count++ : 0 : null_count++;
-                    transientRule->instance ? strstr(instance, transientRule->instance) ? match_count++ : 0
-                                            : null_count++;
-                    transientRule->title ? strstr(c->name, transientRule->title) ? match_count++ : 0 : null_count++;
-                    if (3 - null_count == match_count) {
-                        set_position(transientRule->position, c);
-                    }
-                }
+                set_transient_rule(c);
                 XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
             }
         } else
@@ -1865,7 +1844,6 @@ manage(Window w, XWindowAttributes *wa) {
     Client *c, *t = NULL;
     Window trans = None;
     XWindowChanges wc;
-    const PopUpRule *popUpRule;
 
     c = ecalloc(1, sizeof(Client));
     c->win = w;
@@ -1930,12 +1908,7 @@ manage(Window w, XWindowAttributes *wa) {
     attach(c);
     attachstack(c);
     XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend, (unsigned char *) &(c->win), 1);
-    for (int i = 0; i < LENGTH(popUpRules); ++i) {
-        popUpRule = &popUpRules[i];
-        if (strstr(c->name, popUpRule->title)) {
-            set_position(popUpRule->position, c);
-        }
-    }
+    set_transient_rule(c);
     // 移动窗口并调整大小
     XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* some windows require this */
     if (!HIDDEN(c))
@@ -2294,6 +2267,29 @@ propertynotify(XEvent *e) {
 void
 quit(const Arg *arg) {
     running = 0;
+}
+
+void
+set_transient_rule(Client *c) {
+    const char *class, *instance;
+    const TransientRule *transientRule;
+    XClassHint ch = {NULL, NULL};
+    // 获取 client 的 class 和 instance
+    XGetClassHint(dpy, c->win, &ch);
+    class = ch.res_class ? ch.res_class : broken;
+    instance = ch.res_name ? ch.res_name : broken;
+    for (int i = 0; i < LENGTH(transientRules); ++i) {
+        unsigned int null_count = 0;
+        unsigned int match_count = 0;
+        transientRule = &transientRules[i];
+        transientRule->class ? strstr(class, transientRule->class) ? match_count++ : 0 : null_count++;
+        transientRule->instance ? strstr(instance, transientRule->instance) ? match_count++ : 0
+                                : null_count++;
+        transientRule->title ? strstr(c->name, transientRule->title) ? match_count++ : 0 : null_count++;
+        if (3 - null_count == match_count) {
+            set_position(transientRule->position, c);
+        }
+    }
 }
 
 void

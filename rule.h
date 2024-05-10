@@ -65,12 +65,11 @@ static const Rule rules[] = {
 };
 
 static const TransientRule transientRules[] = {
-        {"Gimp",              "gimp",              "图像",              0},
-        {"jetbrains-toolbox", "JetBrains Toolbox", "JetBrains Toolbox", 3}
-};
-
-static const PopUpRule popUpRules[] = {
-        {"Script-Fu：", 0},
-        {"新建虚拟机", 0},
-        {"所有文件",   0}
+        {"Gimp",                   "gimp",                   "图像",              0},
+        {"jetbrains-toolbox",      "JetBrains Toolbox",      "JetBrains Toolbox", 3},
+        {"Gimp",                   "script-fu",              "Script-Fu：",        0},
+        {"Xdg-desktop-portal-gtk", "xdg-desktop-portal-gtk", "所有文件",          0},
+        {"Xdg-desktop-portal-gtk", "xdg-desktop-portal-gtk", "打开文件",          0},
+        {"Nm-applet",              "nm-applet",              "Wi-Fi 网络",        0},
+        {"Electron",               "electron",               "打开文件",          0},
 };
