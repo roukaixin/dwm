@@ -508,11 +508,11 @@ static Monitor *wintomon(Window w);
 
 static Client *wintosystrayicon(Window w);
 
-static int xerror(Display *dpy, XErrorEvent *ee);
+static int xerror(Display *display, XErrorEvent *ee);
 
-static int xerrordummy(Display *dpy, XErrorEvent *ee);
+static int xerrordummy(Display *display, XErrorEvent *ee);
 
-static int xerrorstart(Display *dpy, XErrorEvent *ee);
+static int xerrorstart(Display *display, XErrorEvent *ee);
 
 static void xinitvisual(void);
 
@@ -724,9 +724,9 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact) {
         /* adjust for aspect limits */
         if (c->mina > 0 && c->maxa > 0) {
             if (c->maxa < (float) *w / (float) *h)
-                *w = *h * c->maxa + 0.5;
+                *w = (int) ((float) *h * c->maxa + 0.5);
             else if (c->mina < (float) *h / (float) *w)
-                *h = *w * c->mina + 0.5;
+                *h = (int) ((float) *w * c->mina + 0.5);
         }
         if (baseismin) { /* increment calculation requires this */
             *w -= c->basew;
@@ -818,7 +818,7 @@ buttonpress(XEvent *e) {
         focus(NULL);
     }
     int status_w = drawstatusbar(selmon, bh, stext);
-    int system_w = getsystraywidth();
+    int system_w = (int) getsystraywidth();
     if (ev->window == selmon->barwin ||
         (!c && selmon->showbar && (topbar ? ev->y <= selmon->wy : ev->y >= selmon->wy + selmon->wh))) { // 点击在bar上
         i = x = 0;
@@ -847,8 +847,9 @@ buttonpress(XEvent *e) {
         else if (ev->x > selmon->ww - status_w - 2 * sp -
                          (selmon == systraytomon(selmon) ? (system_w ? system_w + systraypinning + 2 : 0) : 0)) {
             click = ClkStatusText;
-            arg.i = ev->x - (selmon->ww - status_w - 2 * sp -
-                             (selmon == systraytomon(selmon) ? (system_w ? system_w + systraypinning + 2 : 0) : 0));
+            arg.i = ev->x - (int) (selmon->ww - status_w - 2 * sp -
+                                   (selmon == systraytomon(selmon) ? (system_w ? system_w + systraypinning + 2 : 0)
+                                                                   : 0));
             arg.ui = ev->button; // 1 => L，2 => M，3 => R, 5 => U, 6 => D
         } else {
             click = ClkBarEmpty;
@@ -1214,7 +1215,7 @@ drawbar(Monitor *m) {
 
     // 获取系统托盘的宽度
     if (showsystray && m == systraytomon(m))
-        system_w = getsystraywidth();
+        system_w = (int) getsystraywidth();
 
     // 绘制STATUSBAR
     status_w = drawstatusbar(m, bh, stext);
@@ -1247,7 +1248,7 @@ drawbar(Monitor *m) {
 
             w = TEXTW(tags[i]);
             drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSelTag : SchemeNormTag]);
-            drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
+            drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], (int) urg & 1 << i);
             if (m->tagset[m->seltags] & 1 << i) {
                 drw_setscheme(drw, scheme[SchemeUnderline]);
                 drw_rect(drw, x + 2, bh - boxw, w + lrpad - 4, boxw, 1, 0);
@@ -1295,13 +1296,13 @@ drawbar(Monitor *m) {
      * 绘制空白bar
      * 空白部分的宽度 = 总宽度 - 状态栏的宽度 - 托盘的宽度 - sp (托盘存在时 额外多-一个 systrayspadding)
      */
-    empty_w = m->ww - x - status_w - system_w - 2 * sp - (system_w ? systrayspadding : 0);
+    empty_w = (int) (m->ww - x - status_w - system_w - 2 * sp - (system_w ? systrayspadding : 0));
     if (empty_w > 0) {
         drw_setscheme(drw, scheme[SchemeBarEmpty]);
         drw_rect(drw, x, 0, empty_w, bh, 1, 1);
     }
 
-    m->bt = n;
+    m->bt = (int) n;
     drw_map(drw, m->barwin, 0, 0, m->ww - system_w, bh);
 
     resizebarwin(m);
@@ -1366,7 +1367,7 @@ drawstatusbar(Monitor *m, int bh, char *stext) {
     text = p;
 
     // 托盘存在时 额外多-一个 systrayspadding。w += 2; /* 1px padding on both sides
-    x = m->ww - w - system_w - 2 * sp - (system_w ? systrayspadding : 0);
+    x = (int) (m->ww - w - system_w - 2 * sp - (system_w ? systrayspadding : 0));
 
     drw_setscheme(drw, scheme[LENGTH(colors)]);
     drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
@@ -1743,12 +1744,14 @@ showonlyorall(const Arg *arg) {
 
 void
 incnmaster(const Arg *arg) {
-    int nmaster = selmon->nmaster + arg->i;
-    if (selmon->bt <= 1)
-        nmaster = 1;
-    else if (nmaster >= 3)
-        nmaster = 1;
-    selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag] = MAX(nmaster, 1);
+    int master_num = selmon->nmaster + arg->i;
+    if (selmon->bt <= 1) {
+        master_num = 1;
+    }
+    if (master_num >= 3) {
+        master_num = 1;
+    }
+    selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag] = MAX(master_num, 1);
     arrange(selmon);
 }
 
@@ -2076,7 +2079,7 @@ movewin(const Arg *arg) {
                 buttom = tc->y + HEIGHT(tc) + gappi;
                 if (top > buttom && ny < buttom) {
                     tar = MAX(tar, buttom);
-                };
+                }
             }
             ny = tar == -99999 ? ny : tar;
             ny = MAX(ny, c->mon->wy + gappo);
@@ -2092,7 +2095,7 @@ movewin(const Arg *arg) {
                 top = tc->y - gappi;
                 if (buttom < top && (ny + HEIGHT(c)) > top) {
                     tar = MIN(tar, top - HEIGHT(c));
-                };
+                }
             }
             ny = tar == 99999 ? ny : tar;
             ny = MIN(ny, c->mon->wy + c->mon->wh - gappo - HEIGHT(c));
@@ -2108,7 +2111,7 @@ movewin(const Arg *arg) {
                 right = tc->x + WIDTH(tc) + gappi;
                 if (left > right && nx < right) {
                     tar = MAX(tar, right);
-                };
+                }
             }
             nx = tar == -99999 ? nx : tar;
             nx = MAX(nx, c->mon->wx + gappo);
@@ -2124,7 +2127,7 @@ movewin(const Arg *arg) {
                 left = tc->x - gappi;
                 if (right < left && (nx + WIDTH(c)) > left) {
                     tar = MIN(tar, left - WIDTH(c));
-                };
+                }
             }
             nx = tar == 99999 ? nx : tar;
             nx = MIN(nx, c->mon->wx + c->mon->ww - gappo - WIDTH(c));
@@ -2161,7 +2164,7 @@ resizewin(const Arg *arg) {
                 left = tc->x - gappi;
                 if (right < left && (c->x + nw) > left) {
                     tar = MIN(tar, left - c->x - 2 * c->bw);
-                };
+                }
             }
             nw = tar == 99999 ? nw : tar;
             if (c->x + nw + gappo + 2 * c->bw > selmon->wx + selmon->ww)
@@ -2182,7 +2185,7 @@ resizewin(const Arg *arg) {
                 top = tc->y - gappi;
                 if (buttom < top && (c->y + nh) > top) {
                     tar = MAX(tar, top - c->y - 2 * c->bw);
-                };
+                }
             }
             nh = tar == -99999 ? nh : tar;
             if (c->y + nh + gappo + 2 * c->bw > selmon->wy + selmon->wh)
@@ -2862,7 +2865,7 @@ showtag(Client *c) {
         if (c->mon->mx == 0) {
             XMoveWindow(dpy, c->win, WIDTH(c) * -1.5, c->y);
         } else {
-            XMoveWindow(dpy, c->win, c->mon->mx + c->mon->mw + WIDTH(c) * 1.5, c->y);
+            XMoveWindow(dpy, c->win, c->mon->mx + c->mon->mw + (int) (WIDTH(c) * 1.5), c->y);
         }
         showtag(c->snext);
     }
@@ -2993,7 +2996,8 @@ toggleallfloating(const Arg *arg) {
         for (c = selmon->clients; c; c = c->next)
             if (ISVISIBLE(c) && !HIDDEN(c)) {
                 c->isfloating = 1;
-                resize(c, c->x + 2 * snap, c->y + 2 * snap, MAX(c->w - 4 * snap, snap), MAX(c->h - 4 * snap, snap), 0);
+                resize(c, c->x + (int) (2 * snap), c->y + (int) (2 * snap), MAX(c->w - 4 * snap, snap),
+                       MAX(c->h - 4 * snap, snap), 0);
             }
     }
     pointerfocuswin(selmon->sel);
@@ -3134,8 +3138,8 @@ toggleborder(const Arg *arg) {
 
     selmon->sel->isnoborder ^= 1;
     // borderpx 边框大小
-    selmon->sel->bw = selmon->sel->isnoborder ? 0 : borderpx;
-    int diff = (selmon->sel->isnoborder ? -1 : 1) * borderpx;
+    selmon->sel->bw = selmon->sel->isnoborder ? 0 : (int) borderpx;
+    int diff = (int) ((selmon->sel->isnoborder ? -1 : 1) * borderpx);
     // TODO: 当有动画效果时 会有闪烁问题
     resizeclient(
             selmon->sel,
@@ -3385,8 +3389,8 @@ updatesizehints(Client *c) {
     } else
         c->minw = c->minh = 0;
     if (size.flags & PAspect) {
-        c->mina = (float) size.min_aspect.y / size.min_aspect.x;
-        c->maxa = (float) size.max_aspect.x / size.max_aspect.y;
+        c->mina = (float) size.min_aspect.y / (float) size.min_aspect.x;
+        c->maxa = (float) size.max_aspect.x / (float) size.max_aspect.y;
     } else
         c->maxa = c->mina = 0.0f;
     c->isfixed = (c->maxw && c->maxh && c->maxw == c->minw && c->maxh == c->minh);
@@ -3505,7 +3509,7 @@ updatesystray(void) {
         XChangeWindowAttributes(dpy, i->win, CWBackPixel, &wa);
         XMapRaised(dpy, i->win);
         w += systrayspacing;
-        i->x = w;
+        i->x = (int) w;
         XMoveResizeWindow(dpy, i->win, i->x + 3, 0 + 3, MAX(i->w - 6, bh - 6), bh - 6); // 限制过大的图标
         w += MAX(i->w, bh);
         if (i->mon != m)
@@ -3513,10 +3517,10 @@ updatesystray(void) {
     }
     w = w ? w + systrayspacing : 1;
     x -= w;
-    XMoveResizeWindow(dpy, systray->win, x - sp, m->by + vp, w, bh);
-    wc.x = x - sp;
+    XMoveResizeWindow(dpy, systray->win, (int) x - sp, m->by + vp, w, bh);
+    wc.x = (int) x - sp;
     wc.y = m->by + vp;
-    wc.width = w;
+    wc.width = (int) w;
     wc.height = bh;
     wc.stack_mode = Above;
     wc.sibling = m->barwin;
@@ -3729,35 +3733,36 @@ grid(Monitor *m, unsigned int local_gappo, unsigned int local_gappi) {
     unsigned int cols, rows, overcols;
     Client *c;
 
+    // 获取多少个 client
     for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
     if (n == 0) return;
     if (n == 1) {
         c = nexttiled(m->clients);
-        cw = (m->ww - 2 * local_gappo) * 0.7;
-        ch = (m->wh - 2 * local_gappo) * 0.65;
+        cw = (int) ((m->ww - 2 * local_gappo) * 0.7);
+        ch = (int) ((m->wh - 2 * local_gappo) * 0.65);
         resize(c,
-               m->mx + (m->mw - cw) / 2 + local_gappo,
-               m->my + (m->mh - ch) / 2 + local_gappo,
-               cw - 2 * c->bw,
-               ch - 2 * c->bw,
+               (int) (m->mx + (m->mw - cw) / 2 + local_gappo),
+               (int) (m->my + (m->mh - ch) / 2 + local_gappo),
+               (int) cw - 2 * c->bw,
+               (int) ch - 2 * c->bw,
                0);
         return;
     }
     if (n == 2) {
         c = nexttiled(m->clients);
         cw = (m->ww - 2 * local_gappo - local_gappi) / 2;
-        ch = (m->wh - 2 * local_gappo) * 0.65;
+        ch = (int) ((m->wh - 2 * local_gappo) * 0.65);
         resize(c,
-               m->mx + local_gappo,
-               m->my + (m->mh - ch) / 2 + local_gappo,
-               cw - 2 * c->bw,
-               ch - 2 * c->bw,
+               m->mx + (int) local_gappo,
+               (int) (m->my + (m->mh - ch) / 2 + local_gappo),
+               (int) cw - 2 * c->bw,
+               (int) ch - 2 * c->bw,
                0);
         resize(nexttiled(c->next),
-               m->mx + cw + local_gappo + local_gappi,
-               m->my + (m->mh - ch) / 2 + local_gappo,
-               cw - 2 * c->bw,
-               ch - 2 * c->bw,
+               (int) (m->mx + cw + local_gappo + local_gappi),
+               (int) (m->my + (m->mh - ch) / 2 + local_gappo),
+               (int) cw - 2 * c->bw,
+               (int) ch - 2 * c->bw,
                0);
         return;
     }
@@ -3778,10 +3783,10 @@ grid(Monitor *m, unsigned int local_gappo, unsigned int local_gappi) {
             cx += dx;
         }
         resize(c,
-               cx + local_gappo,
-               cy + local_gappo,
-               cw - 2 * c->bw,
-               ch - 2 * c->bw,
+               (int) (cx + local_gappo),
+               (int) (cy + local_gappo),
+               (int) cw - 2 * c->bw,
+               (int) ch - 2 * c->bw,
                0);
     }
 }
@@ -3828,7 +3833,7 @@ wintomon(Window w) {
  * ignored (especially on UnmapNotify's). Other types of errors call Xlibs
  * default error handler, which may call exit. */
 int
-xerror(Display *dpy, XErrorEvent *ee) {
+xerror(Display *display, XErrorEvent *ee) {
     if (ee->error_code == BadWindow
         || (ee->request_code == X_SetInputFocus && ee->error_code == BadMatch)
         || (ee->request_code == X_PolyText8 && ee->error_code == BadDrawable)
@@ -3841,18 +3846,18 @@ xerror(Display *dpy, XErrorEvent *ee) {
         return 0;
     fprintf(stderr, "dwm: fatal error: request code=%d, error code=%d\n",
             ee->request_code, ee->error_code);
-    return xerrorxlib(dpy, ee); /* may call exit */
+    return xerrorxlib(display, ee); /* may call exit */
 }
 
 int
-xerrordummy(Display *dpy, XErrorEvent *ee) {
+xerrordummy(Display *display, XErrorEvent *ee) {
     return 0;
 }
 
 /* Startup Error handler to check if another window manager
  * is already running. */
 int
-xerrorstart(Display *dpy, XErrorEvent *ee) {
+xerrorstart(Display *display, XErrorEvent *ee) {
     die("dwm: another window manager is already running");
     return -1;
 }
