@@ -296,7 +296,7 @@ static void drawbar(Monitor *m);
 
 static void drawbars(void);
 
-static int drawstatusbar(Monitor *m, int bh, char *text);
+static int drawstatusbar(Monitor *m, int bar_h, char *status_text);
 
 /**
  * 禁用焦点跟随鼠标
@@ -981,13 +981,15 @@ clientmessage(XEvent *e) {
             swa.background_pixel = scheme[SchemeNorm][ColBg].pixel;
             XChangeWindowAttributes(dpy, c->win, CWBackPixel, &swa);
             sendevent(c->win, netatom[Xembed], StructureNotifyMask, CurrentTime, XEMBED_EMBEDDED_NOTIFY, 0,
-                      systray->win, XEMBED_EMBEDDED_VERSION);
+                      (long) systray->win, XEMBED_EMBEDDED_VERSION);
             /* FIXME not sure if I have to send these events, too */
-            sendevent(c->win, netatom[Xembed], StructureNotifyMask, CurrentTime, XEMBED_FOCUS_IN, 0, systray->win,
+            sendevent(c->win, netatom[Xembed], StructureNotifyMask, CurrentTime, XEMBED_FOCUS_IN, 0,
+                      (long) systray->win,
                       XEMBED_EMBEDDED_VERSION);
             sendevent(c->win, netatom[Xembed], StructureNotifyMask, CurrentTime, XEMBED_WINDOW_ACTIVATE, 0,
-                      systray->win, XEMBED_EMBEDDED_VERSION);
-            sendevent(c->win, netatom[Xembed], StructureNotifyMask, CurrentTime, XEMBED_MODALITY_ON, 0, systray->win,
+                      (long) systray->win, XEMBED_EMBEDDED_VERSION);
+            sendevent(c->win, netatom[Xembed], StructureNotifyMask, CurrentTime, XEMBED_MODALITY_ON, 0,
+                      (long) systray->win,
                       XEMBED_EMBEDDED_VERSION);
             XSync(dpy, False);
             resizebarwin(selmon);
@@ -1319,14 +1321,14 @@ drawbars(void) {
 /**
  * 绘制状态栏 bar
  * @param m
- * @param bh
- * @param stext
+ * @param bar_h
+ * @param status_text
  * @return
  */
 int
-drawstatusbar(Monitor *m, int bh, char *stext) {
-    int status_w = 0, i, x;
-    unsigned int system_w = 0, w;
+drawstatusbar(Monitor *m, int bar_h, char *status_text) {
+    int i, x;
+    unsigned int status_w = 0, systray_w = 0, w;
     size_t len;
     short isCode = 0;
     char *text;
@@ -1335,13 +1337,13 @@ drawstatusbar(Monitor *m, int bh, char *stext) {
     unsigned int textsalpha;
 
     if (showsystray && m == systraytomon(m))
-        system_w = getsystraywidth();
+        systray_w = getsystraywidth();
 
-    len = strlen(stext) + 1;
+    len = strlen(status_text) + 1;
     if (!(text = (char *) malloc(sizeof(char) * len)))
         die("malloc");
     p = text;
-    memcpy(text, stext, len);
+    memcpy(text, status_text, len);
 
     /* compute width of the status text */
     w = 0;
@@ -1367,12 +1369,12 @@ drawstatusbar(Monitor *m, int bh, char *stext) {
     text = p;
 
     // 托盘存在时 额外多-一个 systrayspadding。w += 2; /* 1px padding on both sides
-    x = (int) (m->ww - w - system_w - 2 * sp - (system_w ? systrayspadding : 0));
+    x = (int) (m->ww - w - systray_w - 2 * sp - (systray_w ? systrayspadding : 0));
 
     drw_setscheme(drw, scheme[LENGTH(colors)]);
     drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
     drw->scheme[ColBg] = scheme[SchemeNorm][ColBg];
-    drw_rect(drw, x, 0, w, bh, 1, 1);
+    drw_rect(drw, x, 0, w, bar_h, 1, 1);
     x++;
 
     /* process status text */
@@ -1383,10 +1385,10 @@ drawstatusbar(Monitor *m, int bh, char *stext) {
 
             text[i] = '\0';
             w = TEXTW(text) - lrpad;
-            drw_text(drw, x, 0, w, bh, 0, text, 0);
+            drw_text(drw, x, 0, w, bar_h, 0, text, 0);
             status_w += w;
 
-            x += w;
+            x += (int) w;
 
             /* process code */
             while (text[++i] != '^') {
@@ -1433,14 +1435,14 @@ drawstatusbar(Monitor *m, int bh, char *stext) {
 
     if (!isCode) {
         w = TEXTW(text) - lrpad;
-        drw_text(drw, x, 0, w, bh, 0, text, 0);
+        drw_text(drw, x, 0, w, bar_h, 0, text, 0);
         status_w += w;
     }
 
     drw_setscheme(drw, scheme[SchemeNorm]);
     free(p);
 
-    return status_w - 2;
+    return (int) status_w - 2;
 }
 
 /**
@@ -1790,7 +1792,7 @@ killclient(const Arg *arg) {
 
     if (!selmon->sel)
         return;
-    if (!sendevent(selmon->sel->win, wmatom[WMDelete], NoEventMask, wmatom[WMDelete], CurrentTime, 0, 0, 0)) {
+    if (!sendevent(selmon->sel->win, wmatom[WMDelete], NoEventMask, (long) wmatom[WMDelete], CurrentTime, 0, 0, 0)) {
         XGrabServer(dpy);
         XSetErrorHandler(xerrordummy);
         XSetCloseDownMode(dpy, DestroyAll);
@@ -1950,7 +1952,8 @@ maprequest(XEvent *e) {
     XMapRequestEvent *ev = &e->xmaprequest;
     Client *i;
     if ((i = wintosystrayicon(ev->window))) {
-        sendevent(i->win, netatom[Xembed], StructureNotifyMask, CurrentTime, XEMBED_WINDOW_ACTIVATE, 0, systray->win,
+        sendevent(i->win, netatom[Xembed], StructureNotifyMask, CurrentTime, XEMBED_WINDOW_ACTIVATE, 0,
+                  (long) systray->win,
                   XEMBED_EMBEDDED_VERSION);
         resizebarwin(selmon);
         updatesystray();
@@ -2659,7 +2662,7 @@ setfocus(Client *c) {
                         XA_WINDOW, 32, PropModeReplace,
                         (unsigned char *) &(c->win), 1);
     }
-    sendevent(c->win, wmatom[WMTakeFocus], NoEventMask, wmatom[WMTakeFocus], CurrentTime, 0, 0, 0);
+    sendevent(c->win, wmatom[WMTakeFocus], NoEventMask, (long) wmatom[WMTakeFocus], CurrentTime, 0, 0, 0);
 }
 
 void
@@ -3430,7 +3433,7 @@ updatesystrayicongeom(Client *i, int w, int h) {
 
 void
 updatesystrayiconstate(Client *i, XPropertyEvent *ev) {
-    long flags;
+    unsigned long flags;
     int code = 0;
 
     if (!showsystray || !i || ev->atom != xatom[XembedInfo] ||
