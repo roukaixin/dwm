@@ -24,6 +24,7 @@
 #include <locale.h>
 #include <signal.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -208,7 +209,7 @@ struct Monitor {
      */
     const Layout *lt[2];
     Pertag *pertag;
-    uint isoverview;
+    unsigned int isoverview;
 };
 
 typedef struct {
@@ -220,7 +221,7 @@ typedef struct {
     bool is_global;
     bool is_no_border;
     int monitor;
-    uint float_position;
+    unsigned int float_position;
     bool is_fullscreen;
 } Rule;
 
@@ -251,7 +252,7 @@ static void magicgrid(Monitor *m);
 
 static void overview(Monitor *m);
 
-static void grid(Monitor *m, uint local_gappo, uint local_gappi);
+static void grid(Monitor *m, unsigned int local_gappo, unsigned int local_gappi);
 
 static void applyrules(Client *c);
 
@@ -615,7 +616,7 @@ logtofile(const char *fmt, ...) {
     va_start(ap, fmt);
     vsprintf((char *) buf, fmt, ap);
     va_end(ap);
-    uint i = strlen((const char *) buf);
+    unsigned int i = strlen((const char *) buf);
 
     sprintf(cmd, "echo '%.*s' >> ~/.dwm/log", i, buf);
     system(cmd);
@@ -1324,13 +1325,13 @@ drawbars(void) {
 int
 drawstatusbar(Monitor *m, int bh, char *stext) {
     int status_w = 0, i, x;
-    uint system_w = 0, w;
+    unsigned int system_w = 0, w;
     size_t len;
     short isCode = 0;
     char *text;
     char *p;
     char buf8[8], buf5[5];
-    uint textsalpha;
+    unsigned int textsalpha;
 
     if (showsystray && m == systraytomon(m))
         system_w = getsystraywidth();
@@ -2378,7 +2379,7 @@ resize(Client *c, int x, int y, int w, int h, int interact) {
 void
 resizebarwin(Monitor *m) {
     unsigned int w = m->ww;
-    uint system_w = getsystraywidth();
+    unsigned int system_w = getsystraywidth();
     if (showsystray && m == systraytomon(m))
         w -= system_w;
     XMoveResizeWindow(dpy, m->barwin, m->wx + sp, m->by + vp,
@@ -3622,7 +3623,7 @@ toggleoverview(const Arg *arg) {
     if (selmon->sel && selmon->sel->isfullscreen) /* no support for fullscreen windows */
         return;
 
-    uint target = selmon->sel && selmon->sel->tags != TAGMASK ? selmon->sel->tags : selmon->seltags;
+    unsigned int target = selmon->sel && selmon->sel->tags != TAGMASK ? selmon->sel->tags : selmon->seltags;
     selmon->isoverview ^= 1;
     view(&(Arg) {.ui = target});
     pointerfocuswin(selmon->sel);
@@ -3721,7 +3722,7 @@ overview(Monitor *m) {
 }
 
 void
-grid(Monitor *m, uint local_gappo, uint local_gappi) {
+grid(Monitor *m, unsigned int local_gappo, unsigned int local_gappi) {
     unsigned int i, n;
     unsigned int cx, cy, cw, ch;
     unsigned int dx;
