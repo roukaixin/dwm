@@ -186,14 +186,14 @@ struct Monitor {
     // 主区域窗口数量
     int nmaster;
     int num;
+    // bar y
     int by;               /* bar geometry */
+    // 任务数量
     int bt;               /* number of tasks */
     int mx, my, mw, mh;   /* screen size */
     int wx, wy, ww, wh;   /* window area  */
     unsigned int seltags;
-    /**
-     * 选中的布局
-     */
+    // 选中的布局
     unsigned int sellt;
     unsigned int tagset[2];
     int showbar;
@@ -524,9 +524,10 @@ static const char broken[] = "broken";
 static char stext[1024];
 static int screen;
 /**
+ * X display screen geometry width, height(X显示屏幕几何宽度、高度)
  * sw : 屏幕的宽度，sh：屏幕的高度
  */
-static int sw, sh;           /* X display screen geometry width, height */
+static int sw, sh;
 /**
  * bh：bar 高度，blw：
  */
@@ -560,6 +561,7 @@ static Atom wmatom[WMLast], netatom[NetLast], xatom[XLast];
 static int running = 1;
 static Cur *cursor[CurLast];
 static Clr **scheme;
+// 显示器
 static Display *dpy;
 static Drw *drw;
 static int useargb = 0;
@@ -898,7 +900,7 @@ checkotherwm(void) {
 
 void
 cleanup(void) {
-    Arg a = {.ui = ~0};
+    Arg a = { .ui = ~0 };
     Layout foo = {"", NULL};
     Monitor *m;
     size_t i;
@@ -1122,6 +1124,10 @@ configurerequest(XEvent *e) {
     XSync(dpy, False);
 }
 
+/**
+ * 创建显示器
+ * @return
+ */
 Monitor *
 createmon(void) {
     Monitor *m;
@@ -2749,10 +2755,10 @@ setup(void) {
     XSetWindowAttributes wa;
     Atom utf8string;
 
-    /* clean up any zombies immediately */
+    /* clean up any zombies immediately (立即清理所有僵尸) */
     sigchld(0);
 
-    /* init screen */
+    /* init screen (初始化屏幕) */
     screen = DefaultScreen(dpy);
     sw = DisplayWidth(dpy, screen);
     sh = DisplayHeight(dpy, screen);
@@ -2762,6 +2768,7 @@ setup(void) {
     if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
         die("no fonts could be loaded.");
     lrpad = (int) drw->fonts->h;
+    // bar 高度
     bh = (int) drw->fonts->h + 2;
     sp = sidepad;
     vp = (topbar == 1) ? vertpad : -vertpad;
@@ -3321,7 +3328,7 @@ updategeom(void) {
         free(unique);
     } else
 #endif /* XINERAMA */
-    { /* default monitor setup */
+    { /* default monitor setup (默认显示器设置) */
         if (!mons)
             mons = createmon();
         if (mons->mw != sw || mons->mh != sh) {
@@ -3883,6 +3890,7 @@ systraytomon(Monitor *m) {
 
 void
 xinitvisual(void) {
+    // 用于描述颜色资源在特定屏幕中的使用方式
     XVisualInfo *infos;
     XRenderPictFormat *fmt;
     int nitems;
@@ -3902,6 +3910,7 @@ xinitvisual(void) {
         if (fmt->type == PictTypeDirect && fmt->direct.alphaMask) {
             visual = infos[i].visual;
             depth = infos[i].depth;
+            // 创建 Colormap
             cmap = XCreateColormap(dpy, root, visual, AllocNone);
             useargb = 1;
             break;
