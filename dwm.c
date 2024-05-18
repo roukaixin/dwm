@@ -522,6 +522,9 @@ static void zoom(const Arg *arg);
 static Systray *systray = NULL;
 static const char broken[] = "broken";
 static char stext[1024];
+/**
+ * 屏幕
+ */
 static int screen;
 /**
  * X display screen geometry width, height(X显示屏幕几何宽度、高度)
@@ -1213,7 +1216,7 @@ void
 drawbar(Monitor *m) {
     int x, empty_w;
     int w = 0;
-    int system_w = 0, tasks_w = 0, status_w;
+    int sys_tray_w = 0, tasks_w = 0, status_w;
     unsigned int i, occ = 0, n = 0, urg = 0, scm;
     Client *c;
     int boxw = 2;
@@ -1223,9 +1226,9 @@ drawbar(Monitor *m) {
 
     // 获取系统托盘的宽度
     if (showsystray && m == systraytomon(m))
-        system_w = (int) getsystraywidth();
+        sys_tray_w = (int) getsystraywidth();
 
-    // 绘制STATUSBAR
+    // 绘制 STATUSBAR
     status_w = drawstatusbar(m, bh, stext);
 
     // 判断tag显示数量
@@ -1285,7 +1288,7 @@ drawbar(Monitor *m) {
 
         // 绘制 TASK。任务栏的最大宽度
         w = MIN(TEXTW(c->name), TEXTW("          "));
-        empty_w = m->ww - x - status_w - system_w;
+        empty_w = m->ww - x - status_w - sys_tray_w;
         if (w > empty_w - TEXTW("...")) { // 如果当前TASK绘制后长度超过最大宽度
             w = empty_w;
             x = drw_text(drw, x, 0, w, bh, lrpad / 2, "...", 0);
@@ -1304,14 +1307,14 @@ drawbar(Monitor *m) {
      * 绘制空白bar
      * 空白部分的宽度 = 总宽度 - 状态栏的宽度 - 托盘的宽度 - sp (托盘存在时 额外多-一个 systrayspadding)
      */
-    empty_w = (int) (m->ww - x - status_w - system_w - 2 * sp - (system_w ? systrayspadding : 0));
+    empty_w = (int) (m->ww - x - status_w - sys_tray_w - 2 * sp - (sys_tray_w ? systrayspadding : 0));
     if (empty_w > 0) {
         drw_setscheme(drw, scheme[SchemeBarEmpty]);
         drw_rect(drw, x, 0, empty_w, bh, 1, 1);
     }
 
     m->bt = (int) n;
-    drw_map(drw, m->barwin, 0, 0, m->ww - system_w, bh);
+    drw_map(drw, m->barwin, 0, 0, m->ww - sys_tray_w, bh);
 
     resizebarwin(m);
 }
@@ -2765,6 +2768,7 @@ setup(void) {
     root = RootWindow(dpy, screen);
     xinitvisual();
     drw = drw_create(dpy, screen, root, sw, sh, visual, depth, cmap);
+    // 创建字体
     if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
         die("no fonts could be loaded.");
     lrpad = (int) drw->fonts->h;
@@ -3409,8 +3413,9 @@ updatesizehints(Client *c) {
 void
 updatestatus(void) {
     Monitor *m;
-    if (!gettextprop(root, XA_WM_NAME, stext, sizeof(stext)))
-        strcpy(stext, "^c#2D1B46^^b#335566^:) ^d^"); // 默认的状态栏文本
+    if (!gettextprop(root, XA_WM_NAME, stext, sizeof(stext))) {
+        strncpy(stext, "^c#2D1B46^^b#335566^:) ^d^", sizeof(stext)); // 默认的状态栏文本
+    }
     for (m = mons; m; m = m->next)
         drawbar(m);
     updatesystray();
@@ -4215,10 +4220,10 @@ main(int argc, char *argv[]) {
         // 提示命令，不支持其他的参数
     else if (argc != 1)
         die("usage: dwm [-v]");
-    // setlocale: 获取locale是否值 ，XSupportsLocale ：支持locale
+    // setlocale: 设置 locale ，XSupportsLocale ：支持 locale
     if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
         fputs("warning: no locale support\n", stderr);
-    // 打开屏幕。
+    // 获取屏幕连接
     if (!(dpy = XOpenDisplay(NULL)))
         die("dwm: cannot open display");
     checkotherwm();
