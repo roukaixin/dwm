@@ -535,9 +535,19 @@ static int sw, sh;
  * bh：bar 高度，blw：
  */
 static int bh, blw = 0;       /* bar geometry */
-static int lrpad;            /* sum of left and right padding for text */
-static int vp;               /* vertical padding for bar */
-static int sp;               /* side padding for bar */
+/**
+ * sum of left and right padding for text（文本左右填充的总和）
+ */
+static int lrpad;
+/**
+ * vertical padding for bar（bar 的垂直边距）
+ */
+static int vp;
+/**
+ * side padding for bar（bar 的水平边距）
+ */
+static int sp;
+
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 
 static unsigned int numlockmask = 0;
@@ -564,7 +574,9 @@ static Atom wmatom[WMLast], netatom[NetLast], xatom[XLast];
 static int running = 1;
 static Cur *cursor[CurLast];
 static Clr **scheme;
-// 显示器
+/**
+ * 连接显示屏信息
+ */
 static Display *dpy;
 static Drw *drw;
 static int useargb = 0;
@@ -611,6 +623,39 @@ struct Pertag {
      */
     int showbars[LENGTH(tags) + 1];
 };
+
+int main(int argc, char *argv[]) {
+    // 打印 dwm 版本。dwm -v : argc 就是等于 2，strcmp : 比较两个字符串,相等就等于0
+    if (argc == 2 && !strcmp("-v", argv[1])) {
+#ifdef VERSION
+        die("dwm-%s",VERSION);
+#else
+        die("dwm-6.5");
+#endif
+    }
+
+        // 提示命令，不支持其他的参数
+    else if (argc != 1)
+        die("usage: dwm [-v]");
+    // setlocale: 设置 locale ，XSupportsLocale ：支持 locale
+    if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
+        fputs("warning: no locale support\n", stderr);
+    // 获取屏幕连接
+    if (!(dpy = XOpenDisplay(NULL)))
+        die("dwm: cannot open display");
+    checkotherwm();
+    setup();
+#ifdef __OpenBSD__
+    if (pledge("stdio rpath proc exec", NULL) == -1)
+        die("pledge");
+#endif /* __OpenBSD__ */
+    scan();
+    runAutostart();
+    run();
+    cleanup();
+    XCloseDisplay(dpy);
+    return EXIT_SUCCESS;
+}
 
 /* function implementations */
 void
@@ -903,7 +948,7 @@ checkotherwm(void) {
 
 void
 cleanup(void) {
-    Arg a = { .ui = ~0 };
+    Arg a = {.ui = ~0};
     Layout foo = {"", NULL};
     Monitor *m;
     size_t i;
@@ -4210,32 +4255,4 @@ exchange_client(const Arg *arg) {
     if (c == NULL || c->isfloating || c->isfullscreen)
         return;
     exchange_two_client(c, direction_select(arg));
-}
-
-int
-main(int argc, char *argv[]) {
-    // 打印 dwm 版本。dwm -v : argc 就是等于 2，strcmp : 比较两个字符串,相等就等于0
-    if (argc == 2 && !strcmp("-v", argv[1]))
-        die("dwm-%s", VERSION);
-        // 提示命令，不支持其他的参数
-    else if (argc != 1)
-        die("usage: dwm [-v]");
-    // setlocale: 设置 locale ，XSupportsLocale ：支持 locale
-    if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
-        fputs("warning: no locale support\n", stderr);
-    // 获取屏幕连接
-    if (!(dpy = XOpenDisplay(NULL)))
-        die("dwm: cannot open display");
-    checkotherwm();
-    setup();
-#ifdef __OpenBSD__
-    if (pledge("stdio rpath proc exec", NULL) == -1)
-        die("pledge");
-#endif /* __OpenBSD__ */
-    scan();
-    runAutostart();
-    run();
-    cleanup();
-    XCloseDisplay(dpy);
-    return EXIT_SUCCESS;
 }
