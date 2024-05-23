@@ -221,8 +221,16 @@ typedef struct {
     bool is_global;
     bool is_no_border;
     int monitor;
+    /**
+     * 显示在屏幕那个位置。取值：0-9
+     */
     unsigned int float_position;
+    /**
+     * 是否全屏
+     */
     bool is_fullscreen;
+
+    bool is_transient_for_hint;
 } Rule;
 
 /**
@@ -628,7 +636,7 @@ int main(int argc, char *argv[]) {
     // 打印 dwm 版本。dwm -v : argc 就是等于 2，strcmp : 比较两个字符串,相等就等于0
     if (argc == 2 && !strcmp("-v", argv[1])) {
 #ifdef VERSION
-        die("dwm-%s",VERSION);
+        die("dwm-%s", VERSION);
 #else
         die("dwm-6.5");
 #endif

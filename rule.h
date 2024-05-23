@@ -19,49 +19,45 @@ static const Rule rules[] = {
          *  class、instance、title、tags mosk、isfloating、isglobal、isnoborder、monitor、floatposition
          * 优先级高 越在上面优先度越高
          */
-        {"obs",       NULL,                                                        NULL, 1
-                                                                                                 << 3, false, false, false, -1, 0, false},
-        {"Google-chrome",                     "google-chrome",                     NULL, 1
-                                                                                                 << 4, false, false, false, -1, 0, false},
-        {"wechat",                            "wechat",           "微信",                1
-                                                                                                 << 7, false, false, true,  -1, 0, false},
-        {"QQ",                                "qq",               "QQ",                  1
-                                                                                                 << 6, false, false, true,  -1, 0, false},
+        { "obs",  NULL,  NULL,  1 << 3,  false,  false,  false,  -1,  0,  false },
+        { "Google-chrome",  "google-chrome",  NULL,1 << 4,  false,  false,  false, -1, 0, false },
+        { "wechat",  "wechat",  "微信",  1 << 7,  false,  false,  true,  -1, 0, false },
+        { "QQ",  "qq",  "QQ",  1 << 6, false, false, true,  -1, 0, false },
         // QQ 规则
-        {"QQ",                                "qq",               "图片查看器",          0,            true,  false, false, -1, 0, false},
-        {"QQ",                                "qq",               "群公告",              0,            true,  false, false, -1, 0, false},
-        {"QQ",                                "qq",               "视频播放器",          0,            true,  false, false, -1, 0, false},
-        {"QQ",                                "qq",               "文件管理器",          0,            true,  false, false, -1, 0, false},
-        {"QQ",                                "qq",               "收藏",                0,            true,  false, false, -1, 0, false},
+        { "QQ",                                "qq",               "图片查看器",          0,            true,  false, false, -1, 0, false },
+        { "QQ",                                "qq",               "群公告",              0,            true,  false, false, -1, 0, false },
+        { "QQ",                                "qq",               "视频播放器",          0,            true,  false, false, -1, 0, false },
+        { "QQ",                                "qq",               "文件管理器",          0,            true,  false, false, -1, 0, false },
+        { "QQ",                                "qq",               "收藏",                0,            true,  false, false, -1, 0, false },
         // 微信规则
-        {NULL,        NULL,                                       "图片查看",            0,            true,  false, false, -1, 0, false},
+        { NULL,        NULL,                                       "图片查看",            0,            true,  false, false, -1, 0, false },
         // telegram-desktop 规则
-        {"TelegramDesktop",                   "telegram-desktop", "Media viewer",        0,            true,  false, false, -1, 0, false},
-        {"Gimp",                              "gimp",             "新建模板",            0,            true,  false, false, -1, 0, false},
-        {"polkit-kde-authentication-agent-1", "polkit-kde-authentication-agent-1", NULL, 0,            true,  false, false, -1, 0, false},
+        { "TelegramDesktop",                   "telegram-desktop", "Media viewer",        0,            true,  false, false, -1, 0, false },
+        { "Gimp",                              "gimp",             "新建模板",            0,            true,  false, false, -1, 0, false },
+        { "polkit-kde-authentication-agent-1", "polkit-kde-authentication-agent-1", NULL, 0,            true,  false, false, -1, 0, false },
         // Vncviewer           浮动、无边框 屏幕顶部
-        {"Vncviewer", NULL,                                                        NULL, 0,            true,  false, true,  -1, 2, false},
+        { "Vncviewer", NULL,                                                        NULL, 0,            true,  false, true,  -1, 2, false },
         // scratchpad          浮动、全局、无边框 屏幕顶部
-        {"scratchpad",                        "scratchpad",       "scratchpad",          TAGMASK,      true,  true,  true,  -1, 2, false},
+        { "scratchpad",                        "scratchpad",       "scratchpad",          TAGMASK,      true,  true,  true,  -1, 2, false },
         /** 部分特殊class的规则 */
         // class = float       浮动
-        {"float",     NULL,                                                        NULL, 0,            true,  false, false, -1, 0, false},
+        { "float",     NULL,                                                        NULL, 0,            true,  false, false, -1, 0, false },
         // class = gloabl      全局
-        {"global",    NULL,                                                        NULL, TAGMASK,      false, true,  false, -1, 0, false},
+        { "global",    NULL,                                                        NULL, TAGMASK,      false, true,  false, -1, 0, false },
         // class = noborder    无边框
-        {"noborder",  NULL,                                                        NULL, 0,            false, false, true,  -1, 0, false},
+        { "noborder",  NULL,                                                        NULL, 0,            false, false, true,  -1, 0, false },
         // class = FGN         浮动、全局、无边框
-        {"FGN",       NULL,                                                        NULL, TAGMASK,      true,  true,  true,  -1, 0, false},
+        { "FGN",       NULL,                                                        NULL, TAGMASK,      true,  true,  true,  -1, 0, false },
         // class = FG          浮动、全局
-        {"FG",        NULL,                                                        NULL, TAGMASK,      true,  true,  false, -1, 0, false},
+        { "FG",        NULL,                                                        NULL, TAGMASK,      true,  true,  false, -1, 0, false },
         // class = FN          浮动、无边框
-        {"FN",        NULL,                                                        NULL, 0,            true,  false, true,  -1, 0, false},
+        { "FN",        NULL,                                                        NULL, 0,            true,  false, true,  -1, 0, false },
         // CLASS = GN          全局、无边框
-        {"GN",        NULL,                                                        NULL, TAGMASK,      false, true,  true,  -1, 0, false},
+        { "GN",        NULL,                                                        NULL, TAGMASK,      false, true,  true,  -1, 0, false },
         // 错误载入时 会有crx_ 浮动
-        {NULL,        NULL,                                       "crx_",                0,            true,  false, false, -1, 0, false},
+        { NULL,        NULL,                                       "crx_",                0,            true,  false, false, -1, 0, false },
         // 错误载入时 会有broken 浮动
-        {NULL,        NULL,                                       "broken",              0,            true,  false, false, -1, 0, false},
+        { NULL,        NULL,                                       "broken",              0,            true,  false, false, -1, 0, false },
 };
 
 static const TransientRule transientRules[] = {
