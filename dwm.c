@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -181,25 +182,37 @@ typedef struct {
 typedef struct Pertag Pertag;
 struct Monitor {
     char ltsymbol[16];
-    // 主区域占比
+    /**
+     * 主区域占比
+     */
     float mfact;
-    // 主区域窗口数量
+    /**
+     * 主区域窗口数量
+     */
     int nmaster;
     int num;
-    // bar y
+    /**
+     * bar y
+     */
     int by;               /* bar geometry */
-    // 任务数量
+    /**
+     * 任务数量
+     */
     int bt;               /* number of tasks */
     int mx, my, mw, mh;   /* screen size */
     int wx, wy, ww, wh;   /* window area  */
     unsigned int seltags;
-    // 选中的布局
+    /**
+     * 选中的布局
+     */
     unsigned int sellt;
     unsigned int tagset[2];
     int showbar;
     int topbar;
     Client *clients;
-    // 选中的窗口
+    /**
+     * 选中的窗口
+     */
     Client *sel;
     Client *stack;
     Monitor *next;
@@ -229,20 +242,11 @@ typedef struct {
      * 是否全屏
      */
     bool is_fullscreen;
-
-    bool is_transient_for_hint;
+    /**
+     * 窗口类型。0：普通窗口、1：瞬时窗口、2：其他窗口
+     */
+    unsigned int client_type;
 } Rule;
-
-/**
- * 瞬态窗口规则
- */
-typedef struct {
-    const char *class;
-    const char *instance;
-    const char *title;
-    // 窗口位置
-    unsigned int position;
-} TransientRule;
 
 
 typedef struct Systray Systray;
@@ -262,7 +266,7 @@ static void overview(Monitor *m);
 
 static void grid(Monitor *m, unsigned int local_gappo, unsigned int local_gappi);
 
-static void applyrules(Client *c);
+static void applyrules(Client *c, unsigned int client_type);
 
 static int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact);
 
@@ -385,8 +389,6 @@ static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
 
 static void set_position(unsigned int rule_position, Client *c);
-
-static void set_transient_rule(Client *c);
 
 static void setup(void);
 
@@ -676,24 +678,26 @@ logtofile(const char *fmt, ...) {
     va_end(ap);
     unsigned int i = strlen((const char *) buf);
 
-    sprintf(cmd, "echo '%.*s' >> ~/.dwm/log", i, buf);
+    sprintf(cmd, "echo '%.*s' >> ~/log", i, buf);
     system(cmd);
 }
 
 void
-applyrules(Client *c) {
+applyrules(Client *c, unsigned int client_type) {
     const char *class, *instance;
     unsigned int i;
     const Rule *r;
     Monitor *m;
     XClassHint ch = {NULL, NULL};
 
-    /* rule matching */
-    c->isfloating = 0;
-    c->isglobal = 0;
-    c->isnoborder = 0;
-    c->isscratchpad = 0;
-    c->tags = 0;
+    if (client_type < 1) {
+        /* rule matching */
+        c->isfloating = 0;
+        c->isglobal = 0;
+        c->isnoborder = 0;
+        c->isscratchpad = 0;
+        c->tags = 0;
+    }
     // 获取 client 的 class 和 instance
     XGetClassHint(dpy, c->win, &ch);
     class = ch.res_class ? ch.res_class : broken;
@@ -703,26 +707,28 @@ applyrules(Client *c) {
         unsigned int null_count = 0;
         unsigned int match_count = 0;
         r = &rules[i];
-        r->class ? strstr(class, r->class) ? match_count++ : 0 : null_count++;
-        r->instance ? strstr(instance, r->instance) ? match_count++ : 0 : null_count++;
-        r->title ? strstr(c->name, r->title) ? match_count++ : 0 : null_count++;
-        // 当 rule 中定义了一个或多个属性时，只要有全部属性匹配，就认为匹配成功
-        if (3 - null_count == match_count) {
-            c->isfloating = r->is_floating;
-            c->isglobal = r->is_global;
-            c->isnoborder = r->is_no_border;
-            c->isfullscreen = r->is_fullscreen;
-            c->tags |= r->tags;
-            c->bw = c->isnoborder ? 0 : (int) borderpx;
-            for (m = mons; m && m->num != r->monitor; m = m->next);
-            if (m)
-                c->mon = m;
-            // 如果设定了 floatposition ，那么就会重新设定窗口位置
-            if (r->is_floating) {
-                set_position(r->float_position, c);
+        if (r->client_type == client_type) {
+            r->class ? strstr(class, r->class) ? match_count++ : 0 : null_count++;
+            r->instance ? strstr(instance, r->instance) ? match_count++ : 0 : null_count++;
+            r->title ? strstr(c->name, r->title) ? match_count++ : 0 : null_count++;
+            // 当 rule 中定义了一个或多个属性时，只要有全部属性匹配，就认为匹配成功
+            if (3 - null_count == match_count) {
+                c->isfloating = r->is_floating;
+                c->isglobal = r->is_global;
+                c->isnoborder = r->is_no_border;
+                c->isfullscreen = r->is_fullscreen;
+                c->tags |= r->tags;
+                c->bw = c->isnoborder ? 0 : (int) borderpx;
+                for (m = mons; m && m->num != r->monitor; m = m->next);
+                if (m)
+                    c->mon = m;
+                // 如果设定了 float_position ，那么就会重新设定窗口位置
+                if (r->is_floating) {
+                    set_position(r->float_position, c);
+                }
+                // 有且只会匹配一个第一个符合的rule
+                break;
             }
-            // 有且只会匹配一个第一个符合的rule
-            break;
         }
     }
     // 判断是否是 scratchpad 便签
@@ -736,7 +742,10 @@ applyrules(Client *c) {
         XFree(ch.res_class);
     if (ch.res_name)
         XFree(ch.res_name);
-    c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : c->mon->tagset[c->mon->seltags];
+    if (client_type < 1) {
+        c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : c->mon->tagset[c->mon->seltags];
+    }
+
 }
 
 int
@@ -1162,7 +1171,7 @@ configurerequest(XEvent *e) {
             if ((ev->value_mask & (CWX | CWY)) && !(ev->value_mask & (CWWidth | CWHeight)))
                 configure(c);
             if (ISVISIBLE(c)) {
-                set_transient_rule(c);
+                applyrules(c, 2);
                 XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
             }
         } else
@@ -1464,7 +1473,7 @@ drawstatusbar(Monitor *m, int bar_h, char *status_text) {
                         memcpy(buf5, (char *) text + i + 1, 4);
                         buf5[4] = '\0';
                         i += 4;
-                        sscanf(buf5, "%x", &textsalpha);
+                        textsalpha = strtoul(buf5, NULL, 16);
                     }
 
                     drw_clr_create(drw, &drw->scheme[ColFg], buf8, textsalpha);
@@ -1478,7 +1487,7 @@ drawstatusbar(Monitor *m, int bar_h, char *status_text) {
                         memcpy(buf5, (char *) text + i + 1, 4);
                         buf5[4] = '\0';
                         i += 4;
-                        sscanf(buf5, "%x", &textsalpha);
+                        textsalpha = strtoul(buf5, NULL, 16);
                     }
                     drw_clr_create(drw, &drw->scheme[ColBg], buf8, textsalpha);
                 } else if (text[i] == 's') {
@@ -1884,6 +1893,8 @@ managefloating(Client *c) {
     Client *tc;
     int d1 = 0, d2 = 0, tx, ty;
     int tryed = 0;
+    // 初始化随机数生成器
+    srandom((unsigned) time(NULL));
     while (tryed++ < 10) {
         int dw, dh, existed = 0;
         dw = (selmon->ww / 20) * d1, dh = (selmon->wh / 20) * d2;
@@ -1899,8 +1910,12 @@ managefloating(Client *c) {
             c->y = ty;
             break;
         } else {
-            while (d1 == 0) d1 = rand() % 7 - 3;
-            while (d2 == 0) d2 = rand() % 7 - 3;
+            while (d1 == 0) {
+                d1 = (int) random() % 7 - 3;
+            }
+            while (d2 == 0) {
+                d2 = (int) random() % 7 - 3;
+            }
         }
     }
 }
@@ -1929,11 +1944,12 @@ manage(Window w, XWindowAttributes *wa) {
     // 更新标题
     updatetitle(c);
     if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
+        applyrules(c, 1);
         c->mon = t->mon;
         c->tags = t->tags;
     } else {
         c->mon = selmon;
-        applyrules(c);
+        applyrules(c, 0);
     }
     wc.border_width = c->bw;
 
@@ -1979,7 +1995,7 @@ manage(Window w, XWindowAttributes *wa) {
     attach(c);
     attachstack(c);
     XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend, (unsigned char *) &(c->win), 1);
-    set_transient_rule(c);
+
     // 移动窗口并调整大小
     XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* some windows require this */
     if (!HIDDEN(c))
@@ -2343,29 +2359,6 @@ propertynotify(XEvent *e) {
 void
 quit(const Arg *arg) {
     running = 0;
-}
-
-void
-set_transient_rule(Client *c) {
-    const char *class, *instance;
-    const TransientRule *transientRule;
-    XClassHint ch = {NULL, NULL};
-    // 获取 client 的 class 和 instance
-    XGetClassHint(dpy, c->win, &ch);
-    class = ch.res_class ? ch.res_class : broken;
-    instance = ch.res_name ? ch.res_name : broken;
-    for (int i = 0; i < LENGTH(transientRules); ++i) {
-        unsigned int null_count = 0;
-        unsigned int match_count = 0;
-        transientRule = &transientRules[i];
-        transientRule->class ? strstr(class, transientRule->class) ? match_count++ : 0 : null_count++;
-        transientRule->instance ? strstr(instance, transientRule->instance) ? match_count++ : 0
-                                : null_count++;
-        transientRule->title ? strstr(c->name, transientRule->title) ? match_count++ : 0 : null_count++;
-        if (3 - null_count == match_count) {
-            set_position(transientRule->position, c);
-        }
-    }
 }
 
 void
@@ -2919,14 +2912,15 @@ show(Client *c) {
  */
 void
 showtag(Client *c) {
-    if (!c)
+    if (!c) {
         return;
+    }
     if (ISVISIBLE(c)) {
         // 将可见的 client 从屏幕边缘移动到屏幕内
         XMoveWindow(dpy, c->win, c->x, c->y);
         if (c->isfloating && !c->isfullscreen)
             resize(c, c->x, c->y, c->w, c->h, 0);
-        showtag(c->snext);
+
     } else {
         // 将不可见的 client 移动到屏幕之外
         if (c->mon->mx == 0) {
@@ -2934,8 +2928,8 @@ showtag(Client *c) {
         } else {
             XMoveWindow(dpy, c->win, c->mon->mx + c->mon->mw + (int) (WIDTH(c) * 1.5), c->y);
         }
-        showtag(c->snext);
     }
+    showtag(c->snext);
 }
 
 void
