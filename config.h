@@ -53,6 +53,7 @@ static const unsigned int alphas[][3] = {
 static const char *autostart[] = {
         "fcitx5",                                          NULL,
         "Snipaste",                                        NULL,
+        "udiskie",                                         NULL,
         "numlockx",                                        NULL,
         "nm-applet",                                       NULL,
         "blueman-applet",                                  NULL,
