@@ -64,6 +64,7 @@
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
+// 1 1111 1111  表示每个tag都被选中
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
 #define SYSTEM_TRAY_REQUEST_DOCK    0
@@ -3702,40 +3703,61 @@ toggleoverview(const Arg *arg) {
 
 void
 viewtoleft(const Arg *arg) {
+    // target 当前 tag
     unsigned int target = selmon->tagset[selmon->seltags], pre;
+    unsigned int target_tag = 0;
     Client *c;
+    // __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1 同时选择两个 tag 不触发
+    if (target == 1 || __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) != 1) {
+        return;
+    }
     while (1) {
         pre = target;
         target >>= 1;
-        if (target == pre) return;
+        if (target == pre)
+            break;
 
         for (c = selmon->clients; c; c = c->next) {
             if (c->isglobal && c->tags == TAGMASK) continue;
-            if (c->tags & target && __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1
-                && selmon->tagset[selmon->seltags] > 1) {
+            // c->tags & target 切换到的 tag
+            if (c->tags & target) {
+                target_tag = target_tag | target;
                 view(&(Arg) {.ui = target});
                 return;
             }
         }
+    }
+    if (target_tag == 0) {
+        view(&(Arg) {.ui = ((selmon->tagset[selmon->seltags]) >> 1)});
     }
 }
 
 void
 viewtoright(const Arg *arg) {
     unsigned int target = selmon->tagset[selmon->seltags];
+    unsigned int target_tag = 0;
     Client *c;
+
+    if (target == ((TAGMASK + 1) >> 1) || __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) != 1) {
+        return;
+    }
+
     while (1) {
-        target = target == 0 ? 1 : target << 1;
-        if (!(target & TAGMASK)) return;
+        target <<= 1;
+        if (target == (TAGMASK + 1))
+            break;
 
         for (c = selmon->clients; c; c = c->next) {
             if (c->isglobal && c->tags == TAGMASK) continue;
-            if (c->tags & target && __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1
-                && selmon->tagset[selmon->seltags] & (TAGMASK >> 1)) {
+            if (c->tags & target) {
+                target_tag = target_tag | target;
                 view(&(Arg) {.ui = target});
                 return;
             }
         }
+    }
+    if (target_tag == 0) {
+        view(&(Arg) {.ui = ((selmon->tagset[selmon->seltags]) << 1)});
     }
 }
 
