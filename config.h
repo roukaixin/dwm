@@ -52,11 +52,11 @@ static const unsigned int alphas[][3] = {
 // 自启动
 static const char *autostart[] = {
         "fcitx5",                                          NULL,
-        "Snipaste",                                        NULL,
+        "snipaste",                                        NULL,
         "udiskie",                                         NULL,
         "numlockx",                                        NULL,
         "nm-applet",                                       NULL,
-        "blueman-applet",                                  NULL,
+        "blueman-applet",                                NULL,
         "/usr/lib/polkit-kde-authentication-agent-1",    NULL,
         "slstatus",                                      NULL,
         "picom",                                         NULL,
@@ -153,7 +153,7 @@ static const Key keys[] = {
     /* super + shift + v (切换浮动模式(tag下全部窗口)) */
     { MODKEY|ShiftMask,    XK_v,            toggleallfloating,{0} },
     /* super + f (打开/关闭全屏) */
-    { MODKEY,              XK_f,            fullscreen,       {0} },
+    { MODKEY,              XK_f,            togglefullscreen, {0} },
     /* super + b (切换 bar) */
     { MODKEY,              XK_b,            togglebar,        {0} },
     { MODKEY,              XK_g,            toggleglobal,     {0} },                     /* super g            |  开启/关闭 全局 */

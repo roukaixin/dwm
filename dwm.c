@@ -433,10 +433,17 @@ static void setfocus(Client *c);
 static void selectlayout(const Arg *arg);
 
 static void setlayout(const Arg *arg);
-
-static void fullscreen(const Arg *arg);
-
+/**
+ * 设置全屏
+ * @param c
+ * @param fullscreen 1全屏，0不全屏
+ */
 static void setfullscreen(Client *c, int fullscreen);
+/**
+ * 切换全屏
+ * @param arg
+ */
+static void togglefullscreen(const Arg *arg);
 
 static void setmfact(const Arg *arg);
 
@@ -1974,7 +1981,7 @@ manage(Window w, XWindowAttributes *wa) {
     } else {
         // 如果新客户端是平铺的，旧客户端是全屏的，则关闭全屏
         if (c->mon->sel && c->mon->sel->isfullscreen)
-            fullscreen(NULL);
+            togglefullscreen(NULL);
     }
 
     XConfigureWindow(dpy, w, CWBorderWidth, &wc);
@@ -2748,17 +2755,15 @@ setfullscreen(Client *c, int fullscreen) {
 }
 
 void
-fullscreen(const Arg *arg) {
+togglefullscreen(const Arg *arg) {
     if (selmon->sel == NULL) {
-        // togglebar(arg);
         return;
     }
+    setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
     if (selmon->sel->isfullscreen) {
-        setfullscreen(selmon->sel, 0);
         if (!selmon->showbar)
             togglebar(arg);
     } else {
-        setfullscreen(selmon->sel, 1);
         if (selmon->showbar)
             togglebar(arg);
     }
@@ -3016,7 +3021,7 @@ togglefloating(const Arg *arg) {
     if (!selmon->sel)
         return;
     if (selmon->sel->isfullscreen) {
-        fullscreen(NULL);
+        togglefullscreen(NULL);
         if (selmon->sel->isfloating)
             return;
     }

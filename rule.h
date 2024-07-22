@@ -34,13 +34,14 @@ static const Rule rules[] = {
     // 微信规则
     {NULL, NULL, "图片查看", 0, true, false, false, -1, 0, false, 0},
     // telegram-desktop 规则
-    {"TelegramDesktop", "telegram-desktop", "Media viewer", 0, true, false,
-     false, -1, 0, false, 0},
+    {"TelegramDesktop", "telegram-desktop", "Media viewer", 0, true, false,false, -1, 0, false, 0},
+    {"TelegramDesktop", "telegram-desktop", "媒体查看器", 0, true, false,false, -1, 0, false, 0},
     {"Gimp", "gimp", "新建模板", 0, true, false, false, -1, 0, false, 0},
     {"Gimp", "gimp", "图像", 0, true, false, false, -1, 0, false, 2},
     {"Gimp", "script-fu", "Script-Fu：", 0, true, false, false, -1, 0, false,
      1},
     {"Gimp", "gimp", "退出 GIMP", 0, true, false, false, -1, 0, false, 0},
+    {"Typora", "typora", "保存", 0, true, false, false, -1, 0, false, 0},
     {"polkit-kde-authentication-agent-1", "polkit-kde-authentication-agent-1",
      NULL, 0, true, false, false, -1, 0, false, 0},
     {"jetbrains-toolbox", "JetBrains Toolbox", "JetBrains Toolbox", 0, true,
