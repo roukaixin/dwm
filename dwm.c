@@ -388,6 +388,10 @@ static void pop(Client *c);
 
 static void propertynotify(XEvent *e);
 
+/**
+ * 退出
+ * @param arg
+ */
 static void quit(const Arg *arg);
 
 static void set_position(unsigned int rule_position, Client *c);
@@ -483,6 +487,10 @@ static void togglewin(const Arg *arg);
 
 static void toggleglobal(const Arg *arg);
 
+/**
+ * 切换边框
+ * @param arg
+ */
 static void toggleborder(const Arg *arg);
 
 static void unfocus(Client *c, int setfocus);
@@ -2356,10 +2364,6 @@ propertynotify(XEvent *e) {
     }
 }
 
-/**
- * 退出
- * @param arg
- */
 void
 quit(const Arg *arg) {
     running = 0;
@@ -3184,10 +3188,6 @@ toggleglobal(const Arg *arg) {
     focus(NULL);
 }
 
-/**
- * 切换边框颜色
- * @param arg
- */
 void
 toggleborder(const Arg *arg) {
     int all_w, all_h;
