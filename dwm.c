@@ -158,6 +158,7 @@ struct Client {
     int taskw;
     unsigned int tags;
     int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen, isglobal, isnoborder, isscratchpad;
+    int fullscreen_hide;
     Client *next;
     Client *snext;
     Monitor *mon;
@@ -233,9 +234,9 @@ typedef struct {
     const char *instance;
     const char *title;
     unsigned int tags;
-    bool is_floating;
-    bool is_global;
-    bool is_no_border;
+    int is_floating;
+    int is_global;
+    int is_no_border;
     int monitor;
     /**
      * 显示在屏幕那个位置。取值：0-9
@@ -244,7 +245,7 @@ typedef struct {
     /**
      * 是否全屏
      */
-    bool is_fullscreen;
+    int is_fullscreen;
     /**
      * 窗口类型。0：普通窗口、1：瞬时窗口、2：其他窗口
      */
@@ -711,6 +712,7 @@ applyrules(Client *c, unsigned int client_type) {
                 c->isglobal = r->is_global;
                 c->isnoborder = r->is_no_border;
                 c->isfullscreen = r->is_fullscreen;
+                c->fullscreen_hide = c->isfullscreen;
                 c->tags |= r->tags;
                 c->bw = c->isnoborder ? 0 : (int) borderpx;
                 for (m = mons; m && m->num != r->monitor; m = m->next);
@@ -2716,6 +2718,8 @@ setfocus(Client *c) {
 
 void
 setfullscreen(Client *c, int fullscreen) {
+    Client *other;
+    // 打开窗口全屏
     if (fullscreen && !c->isfullscreen) {
         XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                         PropModeReplace, (unsigned char *) &netatom[NetWMFullscreen], 1);
@@ -2726,7 +2730,18 @@ setfullscreen(Client *c, int fullscreen) {
         c->isfloating = 1;
         resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
         XRaiseWindow(dpy, c->win);
-    } else if (!fullscreen && c->isfullscreen) {
+        // 隐藏窗口
+        for (other = c->mon->clients; other; other = other->next) {
+            if(other->tags == c->tags && ISVISIBLE(other) && other != c) {
+                if (!HIDDEN(other)) {
+                    other->fullscreen_hide = 1;
+                }
+                hide(other);
+            }
+        }
+    }
+    // 关闭窗口全屏
+    if (!fullscreen && c->isfullscreen) {
         XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                         PropModeReplace, (unsigned char *) 0, 0);
         c->isfullscreen = 0;
@@ -2737,6 +2752,13 @@ setfullscreen(Client *c, int fullscreen) {
         c->w = c->oldw;
         c->h = c->oldh;
         resizeclient(c, c->x, c->y, c->w, c->h);
+        // 显示全部窗口
+        for (other = c->mon->clients; other; other = other->next) {
+            if(other->tags == c->tags && HIDDEN(other) && other != c && other->fullscreen_hide == 1) {
+                other->fullscreen_hide = 0;
+                show(other);
+            }
+        }
         arrange(c->mon);
     }
 }
@@ -2747,13 +2769,7 @@ togglefullscreen(const Arg *arg) {
         return;
     }
     setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
-    if (selmon->sel->isfullscreen) {
-        if (!selmon->showbar)
-            togglebar(arg);
-    } else {
-        if (selmon->showbar)
-            togglebar(arg);
-    }
+    togglebar(arg);
 }
 
 void
