@@ -85,7 +85,7 @@ static const char *mute_vol[] = {"pactl", "set-sink-mute", "@DEFAULT_SINK@", "to
 
 
 /* 显示 tags */
-static const char *tags[] = {"󰎤", "󰎧", "󰎪", "󰎭", "󰎱", "󰎳", "󰎶", "󰎹", "󰎼"};
+static const char *tags[] = {"󰎤", "󰎧", "󰎪", "󰎭", "󰎱", "󰎳", "󰎶", "󰎹", "󰎼" };
 
 /**
  * 自定义窗口显示规则，越在上面优先级越高

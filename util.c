@@ -33,3 +33,18 @@ ecalloc(size_t nmemb, size_t size)
 		die("calloc:");
 	return p;
 }
+
+void
+logtofile(const char *fmt, ...) {
+    char buf[256];
+    char cmd[256];
+    va_list ap;
+    va_start(ap, fmt);
+    vsprintf((char *) buf, fmt, ap);
+    va_end(ap);
+    unsigned int i = strlen((const char *) buf);
+
+    sprintf(cmd, "echo '%.*s' >> ~/log", i, buf);
+    system(cmd);
+}
+

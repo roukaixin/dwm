@@ -48,7 +48,6 @@
 #endif /* XINERAMA */
 
 #include <X11/Xft/Xft.h>
-#include <stdbool.h>
 
 #include "drw.h"
 #include "util.h"
@@ -260,8 +259,6 @@ struct Systray {
 };
 
 /* function declarations */
-static void logtofile(const char *fmt, ...);
-
 static void tile(Monitor *m);
 
 static void magicgrid(Monitor *m);
@@ -399,8 +396,6 @@ static void setup(void);
 static void seturgent(Client *c, int urg);
 
 static int show_tag(unsigned int target);
-
-static void sigchld(int unused);
 
 static void spawn(const Arg *arg);
 
@@ -555,9 +550,9 @@ static int screen;
  */
 static int sw, sh;
 /**
- * bh：bar 高度，blw：
+ * bh：bar 高度：
  */
-static int bh, blw = 0;       /* bar geometry */
+static int bh;       /* bar geometry */
 /**
  * sum of left and right padding for text（文本左右填充的总和）
  */
@@ -681,20 +676,6 @@ int main(int argc, char *argv[]) {
 }
 
 /* function implementations */
-void
-logtofile(const char *fmt, ...) {
-    char buf[256];
-    char cmd[256];
-    va_list ap;
-    va_start(ap, fmt);
-    vsprintf((char *) buf, fmt, ap);
-    va_end(ap);
-    unsigned int i = strlen((const char *) buf);
-
-    sprintf(cmd, "echo '%.*s' >> ~/log", i, buf);
-    system(cmd);
-}
-
 void
 applyrules(Client *c, unsigned int client_type) {
     const char *class, *instance;
@@ -902,7 +883,6 @@ buttonpress(XEvent *e) {
     if (ev->window == selmon->barwin ||
         (!c && selmon->showbar && (topbar ? ev->y <= selmon->wy : ev->y >= selmon->wy + selmon->wh))) { // 点击在bar上
         i = x = 0;
-        blw = TEXTW(selmon->ltsymbol);
 
         if (selmon->isoverview) {
             x += TEXTW(overviewtag);
@@ -922,7 +902,7 @@ buttonpress(XEvent *e) {
         if (i < LENGTH(tags)) {
             click = ClkTagBar;
             arg.ui = 1 << i;
-        } else if (ev->x < x + blw)
+        } else if (ev->x < x + TEXTW(selmon->ltsymbol))
             click = ClkLtSymbol;
         else if (ev->x > selmon->ww - status_w - 2 * sp -
                          (selmon == systraytomon(selmon) ? (system_w ? system_w + systraypinning + 2 : 0) : 0)) {
@@ -934,7 +914,7 @@ buttonpress(XEvent *e) {
         } else {
             click = ClkBarEmpty;
 
-            x += blw;
+            x += TEXTW(selmon->ltsymbol);
             c = m->clients;
 
             if (m->bt != 0)
@@ -1000,6 +980,7 @@ cleanup(void) {
         drw_cur_free(drw, cursor[i]);
     for (i = 0; i < LENGTH(colors) + 1; i++)
         free(scheme[i]);
+    free(scheme);
     XDestroyWindow(dpy, wmcheckwin);
     drw_free(drw);
     XSync(dpy, False);
@@ -1730,13 +1711,11 @@ gettextprop(Window w, Atom atom, char *text, unsigned int size) {
     text[0] = '\0';
     if (!XGetTextProperty(dpy, w, &name, atom) || !name.nitems)
         return 0;
-    if (name.encoding == XA_STRING)
-        strncpy(text, (char *) name.value, size - 1);
-    else {
-        if (XmbTextPropertyToTextList(dpy, &name, &list, &n) >= Success && n > 0 && *list) {
-            strncpy(text, *list, size - 1);
-            XFreeStringList(list);
-        }
+    if (name.encoding == XA_STRING) {
+        strncpy(text, (char *)name.value, size - 1);
+    } else if (XmbTextPropertyToTextList(dpy, &name, &list, &n) >= Success && n > 0 && *list) {
+        strncpy(text, *list, size - 1);
+        XFreeStringList(list);
     }
     text[size - 1] = '\0';
     XFree(name.value);
@@ -1767,16 +1746,26 @@ void
 grabkeys(void) {
     updatenumlockmask();
     {
-        unsigned int i, j;
+        unsigned int i, j, k;
         unsigned int modifiers[] = {0, LockMask, numlockmask, numlockmask | LockMask};
-        KeyCode code;
+        int start, end, skip;
+        KeySym *syms;
 
         XUngrabKey(dpy, AnyKey, AnyModifier, root);
-        for (i = 0; i < LENGTH(keys); i++)
-            if ((code = XKeysymToKeycode(dpy, keys[i].keysym)))
-                for (j = 0; j < LENGTH(modifiers); j++)
-                    XGrabKey(dpy, code, keys[i].mod | modifiers[j], root,
-                             True, GrabModeAsync, GrabModeAsync);
+        XDisplayKeycodes(dpy, &start, &end);
+        syms = XGetKeyboardMapping(dpy, start, end - start + 1, &skip);
+        if (!syms)
+            return;
+        for (k = start; k <= end; k++)
+            for (i = 0; i < LENGTH(keys); i++)
+                /* skip modifier codes, we do that ourselves */
+                if (keys[i].keysym == syms[(k - start) * skip])
+                    for (j = 0; j < LENGTH(modifiers); j++)
+                        XGrabKey(dpy, k,
+                                 keys[i].mod | modifiers[j],
+                                 root, True,
+                                 GrabModeAsync, GrabModeAsync);
+        XFree(syms);
     }
 }
 
@@ -1964,19 +1953,16 @@ manage(Window w, XWindowAttributes *wa) {
         c->mon = selmon;
         applyrules(c, 0);
     }
+
+    if (c->x + WIDTH(c) > c->mon->wx + c->mon->ww)
+        c->x = c->mon->wx + c->mon->ww - WIDTH(c);
+    if (c->y + HEIGHT(c) > c->mon->wy + c->mon->wh)
+        c->y = c->mon->wy + c->mon->wh - HEIGHT(c);
+    c->x = MAX(c->x, c->mon->wx);
+    c->y = MAX(c->y, c->mon->wy);
+    c->bw = (int) borderpx;
+
     wc.border_width = c->bw;
-
-    if (c->x + WIDTH(c) > c->mon->mx + c->mon->mw) {
-        c->x = c->mon->mx + c->mon->mw - WIDTH(c);
-    }
-    if (c->y + HEIGHT(c) > c->mon->my + c->mon->mh) {
-        c->y = c->mon->my + c->mon->mh - HEIGHT(c);
-    }
-    c->x = MAX(c->x, c->mon->mx);
-    /* only fix client y-offset, if the client center might cover the bar */
-    c->y = MAX(c->y, ((c->mon->by == c->mon->my) && (c->x + (c->w / 2) >= c->mon->wx)
-                      && (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : c->mon->my);
-
     if (c->isfloating) {
         // if new client is floating, then manage it as floating
         if (c->x == 0 && c->y == 0) {
@@ -2020,7 +2006,6 @@ manage(Window w, XWindowAttributes *wa) {
     if (!HIDDEN(c)) {
         XMapWindow(dpy, c->win);
     }
-
     focus(NULL);
 }
 
@@ -2050,12 +2035,8 @@ maprequest(XEvent *e) {
         updatesystray();
     }
 
-    if (!XGetWindowAttributes(dpy, ev->window, &wa)) {
+    if (!XGetWindowAttributes(dpy, ev->window, &wa) || wa.override_redirect)
         return;
-    }
-    if (wa.override_redirect) {
-        return;
-    }
     if (!wintoclient(ev->window)) {
         manage(ev->window, &wa);
     }
@@ -2814,9 +2795,16 @@ setup(void) {
     int i;
     XSetWindowAttributes wa;
     Atom utf8string;
+    struct sigaction sa;
 
-    /* clean up any zombies immediately (立即清理所有僵尸) */
-    sigchld(0);
+    /* do not transform children into zombies when they terminate */
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_NOCLDSTOP | SA_NOCLDWAIT | SA_RESTART;
+    sa.sa_handler = SIG_IGN;
+    sigaction(SIGCHLD, &sa, NULL);
+
+    /* clean up any zombies (inherited from .xinitrc etc) immediately */
+    while (waitpid(-1, NULL, WNOHANG) > 0);
 
     /* init screen (初始化屏幕) */
     screen = DefaultScreen(dpy);
@@ -2944,22 +2932,20 @@ showtag(Client *c) {
 }
 
 void
-sigchld(int unused) {
-    if (signal(SIGCHLD, sigchld) == SIG_ERR)
-        die("can't install SIGCHLD handler:");
-    while (0 < waitpid(-1, NULL, WNOHANG));
-}
-
-void
 spawn(const Arg *arg) {
+    struct sigaction sa;
     if (fork() == 0) {
         if (dpy)
             close(ConnectionNumber(dpy));
         setsid();
+
+        sigemptyset(&sa.sa_mask);
+        sa.sa_flags = 0;
+        sa.sa_handler = SIG_DFL;
+        sigaction(SIGCHLD, &sa, NULL);
+
         execvp(((char **) arg->v)[0], (char **) arg->v);
-        fprintf(stderr, "dwm: execvp %s", ((char **) arg->v)[0]);
-        perror(" failed");
-        exit(EXIT_SUCCESS);
+        die("dwm: execvp '%s' failed:", ((char **)arg->v)[0]);
     }
 }
 
@@ -3247,6 +3233,7 @@ unmanage(Client *c, int destroyed) {
         wc.border_width = c->oldbw;
         XGrabServer(dpy); /* avoid race conditions */
         XSetErrorHandler(xerrordummy);
+        XSelectInput(dpy, c->win, NoEventMask);
         XConfigureWindow(dpy, c->win, CWBorderWidth, &wc); /* restore border */
         XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
         setclientstate(c, WithdrawnState);
@@ -4023,8 +4010,7 @@ zoom(const Arg *arg) {
 
     if (c && (c->isfloating || c->isfullscreen))
         return;
-    if (c == nexttiled(selmon->clients))
-        if (!c || !(c = nexttiled(c->next)))
+    if (c == nexttiled(selmon->clients) && !(c = nexttiled(c->next)))
             return;
     pop(c);
 }
