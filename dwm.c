@@ -499,6 +499,10 @@ static void unmanage(Client *c, int destroyed);
 
 static void unmapnotify(XEvent *e);
 
+/**
+ * 更新 bar 位置
+ * @param m
+ */
 static void updatebarpos(Monitor *m);
 
 static void updatebars(void);
@@ -656,7 +660,7 @@ struct Pertag {
     /**
      * 当前标签的 bar（display bar for the current tag）
      */
-    int showbars[LENGTH(tags) + 1];
+    int showbars[LENGTH(tags) + 1], oldshowbars[LENGTH(tags) + 1];
 };
 
 int main(int argc, char *argv[]) {
@@ -1232,6 +1236,7 @@ createmon(void) {
         m->pertag->sellts[i] = m->sellt;
 
         m->pertag->showbars[i] = m->showbar;
+        m->pertag->oldshowbars[i] = m->showbar;
     }
 
     return m;
@@ -2773,8 +2778,13 @@ togglefullscreen(const Arg *arg) {
     if (selmon->sel == NULL) {
         return;
     }
+    selmon->showbar
+        = selmon->pertag->showbars[selmon->pertag->curtag]
+        = selmon->sel->isfullscreen && selmon->pertag->oldshowbars[selmon->pertag->curtag];
+    updatebarpos(selmon);
+    resizebarwin(selmon);
     setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
-    togglebar(arg);
+    updatesystray();
 }
 
 void
@@ -3012,7 +3022,10 @@ togglebar(const Arg *arg) {
     if (selmon->sel && selmon->sel->isfullscreen && !selmon->showbar) {
         return;
     }
-    selmon->showbar = selmon->pertag->showbars[selmon->pertag->curtag] = !selmon->showbar;
+    selmon->showbar
+        = selmon->pertag->showbars[selmon->pertag->curtag]
+        = selmon->pertag->oldshowbars[selmon->pertag->curtag]
+        = !selmon->showbar;
     updatebarpos(selmon);
     resizebarwin(selmon);
     if (showsystray) {
@@ -3665,10 +3678,11 @@ view(const Arg *arg) {
     selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
     selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
     selmon->lt[selmon->sellt ^ 1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt ^ 1];
+    selmon->showbar = selmon->pertag->showbars[selmon->pertag->curtag];
 
-    if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
-        togglebar(NULL);
-
+    updatebarpos(selmon);
+    resizebarwin(selmon);
+    updatestatus();
     focus(NULL);
     arrange(selmon);
 
