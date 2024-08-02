@@ -182,6 +182,9 @@ typedef struct {
 
 typedef struct Pertag Pertag;
 struct Monitor {
+    /**
+     * 布局显示内容
+     */
     char ltsymbol[16];
     /**
      * 主区域占比
@@ -394,6 +397,8 @@ static void set_position(unsigned int rule_position, Client *c);
 static void setup(void);
 
 static void seturgent(Client *c, int urg);
+
+static int show_tag(unsigned int target);
 
 static void sigchld(int unused);
 
@@ -2996,6 +3001,7 @@ togglesystray(const Arg *arg) {
 
 void
 togglebar(const Arg *arg) {
+    // 判断选择的客户端是全屏，并且不显示bar
     if (selmon->sel && selmon->sel->isfullscreen && !selmon->showbar) {
         return;
     }
@@ -3701,64 +3707,70 @@ toggleoverview(const Arg *arg) {
     pointerfocuswin(selmon->sel);
 }
 
+int
+show_tag(unsigned int target)
+{
+    Client *c;
+    int show_tag = 0;
+    for (c = selmon->clients; c; c = c->next) {
+        if (c->isglobal && c->tags == TAGMASK) continue;
+        if (c->tags & target) {
+            show_tag = 1;
+        }
+    }
+    return show_tag;
+}
+
 void
 viewtoleft(const Arg *arg) {
     // target 当前 tag
     unsigned int target = selmon->tagset[selmon->seltags], pre;
     unsigned int target_tag = 0;
-    Client *c;
-    // __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1 同时选择两个 tag 不触发
+    // __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1 : 同时选择两个 tag 不触发
     if (target == 1 || __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) != 1) {
         return;
     }
     while (1) {
         pre = target;
         target >>= 1;
-        if (target == pre)
+        if (target == pre) {
+            target = pre;
             break;
+        }
 
-        for (c = selmon->clients; c; c = c->next) {
-            if (c->isglobal && c->tags == TAGMASK) continue;
-            // c->tags & target 切换到的 tag
-            if (c->tags & target) {
-                target_tag = target_tag | target;
-                view(&(Arg) {.ui = target});
-                return;
-            }
+        if (show_tag(target)) {
+            target_tag = 1;
+            break;
         }
     }
-    if (target_tag == 0) {
-        view(&(Arg) {.ui = ((selmon->tagset[selmon->seltags]) >> 1)});
-    }
+    view(&(Arg) {.ui = target_tag ? target : ((selmon->tagset[selmon->seltags]) >> 1)});
 }
 
 void
 viewtoright(const Arg *arg) {
-    unsigned int target = selmon->tagset[selmon->seltags];
+    unsigned int initial_goal, target = selmon->tagset[selmon->seltags];
     unsigned int target_tag = 0;
-    Client *c;
 
     if (target == ((TAGMASK + 1) >> 1) || __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) != 1) {
         return;
     }
 
+    initial_goal = target;
     while (1) {
         target <<= 1;
-        if (target == (TAGMASK + 1))
+        if (target == (TAGMASK + 1)) {
+            target = initial_goal;
             break;
-
-        for (c = selmon->clients; c; c = c->next) {
-            if (c->isglobal && c->tags == TAGMASK) continue;
-            if (c->tags & target) {
-                target_tag = target_tag | target;
-                view(&(Arg) {.ui = target});
-                return;
-            }
         }
+
+        if (show_tag(target)) {
+            target_tag = 1;
+            break;
+        }
+
+
     }
-    if (target_tag == 0) {
-        view(&(Arg) {.ui = ((selmon->tagset[selmon->seltags]) << 1)});
-    }
+    view(&(Arg) {.ui = target_tag ? target : ((selmon->tagset[selmon->seltags]) << 1)});
 }
 
 void
