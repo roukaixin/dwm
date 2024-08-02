@@ -410,6 +410,14 @@ static void resize(Client *c, int x, int y, int w, int h, int interact);
 
 static void resizebarwin(Monitor *m);
 
+/**
+ * 重新调整客户端
+ * @param c 客户端
+ * @param x x坐标
+ * @param y y坐标
+ * @param w 宽度
+ * @param h 高度
+ */
 static void resizeclient(Client *c, int x, int y, int w, int h);
 
 static void resizemouse(const Arg *arg);
@@ -2444,14 +2452,6 @@ resizebarwin(Monitor *m) {
                       bh); // 如果托盘存在 额外减去systrayspadding
 }
 
-/**
- * 重新调整客户端
- * @param c 客户端
- * @param x x坐标
- * @param y y坐标
- * @param w 宽度
- * @param h 高度
- */
 void
 resizeclient(Client *c, int x, int y, int w, int h) {
     XWindowChanges wc;
@@ -2468,10 +2468,11 @@ resizeclient(Client *c, int x, int y, int w, int h) {
 
     // 判断是否只有一个 tile 窗口
     if (((nexttiled(c->mon->clients) == c && !nexttiled(c->next)))
-        && !c->isfullscreen && !c->isfloating) {
+        && !c->isfullscreen && !c->isfloating && c->bw) {
+        c->isnoborder = 1;
         c->w = wc.width += c->bw * 2;
         c->h = wc.height += c->bw * 2;
-        wc.border_width = 0;
+        c->bw = wc.border_width = 0;
     }
     XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
     configure(c);
@@ -3189,39 +3190,23 @@ toggleglobal(const Arg *arg) {
  */
 void
 toggleborder(const Arg *arg) {
+    int all_w, all_h;
     // 判断当前是否选中客户端
     if (selmon->sel == NULL)
         return;
-    // 判断是否窗口浮动
-    if (!selmon->sel->isfloating) {
-        // 判断是否只有一个窗口
-        const Client *c = NULL;
-        int tile_client_count = 0;
 
-        for (c = selmon->clients; c; c = c->next) {
-            if (ISVISIBLE(c) && !HIDDEN(c) && !c->isfloating) {
-                tile_client_count++;
-            }
-            if (tile_client_count == 2) {
-                break;
-            }
-        }
-        if (tile_client_count != 2) {
-            return;
-        }
-    }
-
+    all_w = selmon->sel->w + selmon->sel->bw * 2;
+    all_h = selmon->sel->h + selmon->sel->bw * 2;
     selmon->sel->isnoborder ^= 1;
     // borderpx 边框大小
     selmon->sel->bw = selmon->sel->isnoborder ? 0 : (int) borderpx;
-    int diff = (int) ((selmon->sel->isnoborder ? -1 : 1) * borderpx);
     // TODO: 当有动画效果时 会有闪烁问题
     resizeclient(
             selmon->sel,
-            selmon->sel->x - diff,
-            selmon->sel->y - diff,
-            selmon->sel->w,
-            selmon->sel->h
+            selmon->sel->x,
+            selmon->sel->y,
+            all_w - 2 * selmon->sel->bw,
+            all_h - 2 * selmon->sel->bw
     );
     focus(NULL);
 }
