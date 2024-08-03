@@ -1784,7 +1784,7 @@ grabkeys(void) {
                 /* skip modifier codes, we do that ourselves */
                 if (keys[i].keysym == syms[(k - start) * skip])
                     for (j = 0; j < LENGTH(modifiers); j++)
-                        XGrabKey(dpy, k,
+                        XGrabKey(dpy, (int) k,
                                  keys[i].mod | modifiers[j],
                                  root, True,
                                  GrabModeAsync, GrabModeAsync);
@@ -2478,10 +2478,9 @@ resizeclient(Client *c, int x, int y, int w, int h) {
     // 判断是否只有一个 tile 窗口
     if (((nexttiled(c->mon->clients) == c && !nexttiled(c->next)))
         && !c->isfullscreen && !c->isfloating && c->bw) {
-        c->isnoborder = 1;
-        c->w = wc.width += c->bw * 2;
-        c->h = wc.height += c->bw * 2;
-        c->bw = wc.border_width = 0;
+        wc.width += c->bw * 2;
+        wc.height += c->bw * 2;
+        wc.border_width = 0;
     }
     XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
     configure(c);
