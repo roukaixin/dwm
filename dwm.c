@@ -2450,6 +2450,7 @@ removesystrayicon(Client *i) {
 
 void
 resize(Client *c, int x, int y, int w, int h, int interact) {
+    // 和之前位置不一样就要重新显示
     if (applysizehints(c, &x, &y, &w, &h, interact)) {
         resizeclient(c, x, y, w, h);
     }
@@ -2483,8 +2484,8 @@ resizeclient(Client *c, int x, int y, int w, int h) {
     // 判断是否只有一个 tile 窗口
     if (((nexttiled(c->mon->clients) == c && !nexttiled(c->next)))
         && !c->isfullscreen && !c->isfloating && c->bw) {
-        wc.width += c->bw * 2;
-        wc.height += c->bw * 2;
+        wc.x += c->bw;
+        wc.y += c->bw;
         wc.border_width = 0;
     }
     XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
@@ -3828,8 +3829,8 @@ grid(Monitor *m, unsigned int local_gappo, unsigned int local_gappi) {
     if (n == 0) return;
     if (n == 1) {
         c = nexttiled(m->clients);
-        cw = (int) ((m->ww - 2 * local_gappo) * 0.7);
-        ch = (int) ((m->wh - 2 * local_gappo) * 0.65);
+        cw = (int) (m->ww * 0.7);
+        ch = (int) (m->wh * 0.65);
         resize(c,
                (int) (m->mx + (m->mw - cw) / 2 + local_gappo),
                (int) (m->my + (m->mh - ch) / 2 + local_gappo),
