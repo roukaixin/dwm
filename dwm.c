@@ -4010,8 +4010,9 @@ xinitvisual(void) {
 void
 zoom(const Arg *arg) {
     Client *c = selmon->sel;
-
-    if (c && (c->isfloating || c->isfullscreen))
+    if (c == NULL)
+        return;
+    if (c->isfloating || c->isfullscreen)
         return;
     if (c == nexttiled(selmon->clients) && !(c = nexttiled(c->next)))
             return;
