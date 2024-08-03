@@ -275,7 +275,10 @@ static int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interac
 static void arrange(Monitor *m);
 
 static void arrangemon(Monitor *m);
-
+/**
+ * 新打开一个客户端调用的方法
+ * @param c 新打开的客户端
+ */
 static void attach(Client *c);
 
 static void attachstack(Client *c);
@@ -293,9 +296,16 @@ static void clientmessage(XEvent *e);
 static void configure(Client *c);
 
 static void configurenotify(XEvent *e);
-
+/**
+ * 处理客户端窗口的配置请求事件
+ * @param e
+ */
 static void configurerequest(XEvent *e);
 
+/**
+ * 创建显示器
+ * @return
+ */
 static Monitor *createmon(void);
 
 static void destroynotify(XEvent *e);
@@ -309,7 +319,13 @@ static Monitor *dirtomon(int dir);
 static void drawbar(Monitor *m);
 
 static void drawbars(void);
-
+/**
+ * 绘制状态栏 bar
+ * @param m
+ * @param bar_h
+ * @param status_text
+ * @return
+ */
 static int drawstatusbar(Monitor *m, int bar_h, char *status_text);
 
 /**
@@ -323,7 +339,10 @@ static void expose(XEvent *e);
 static void focusin(XEvent *e);
 
 static void focus(Client *c);
-
+/**
+ * 光标移动到另一个屏幕
+ * @param arg
+ */
 static void focusmon(const Arg *arg);
 
 static void focusstack(const Arg *arg);
@@ -348,6 +367,10 @@ static void hide(Client *c);
 
 static void show(Client *c);
 
+/**
+ * 该方法为显示当前tag下的窗口的func，切换时会将原窗口下的win放到屏幕之外 (左边的屏幕隐藏到屏幕左边 右边的屏幕隐藏到屏幕右边)
+ * @param c
+ */
 static void showtag(Client *c);
 
 static void hidewin(const Arg *arg);
@@ -367,15 +390,25 @@ static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
 
 static void forcekillclient(const Arg *arg);
-
+/**
+ * 负责将新创建的窗口添加到dwm的管理列表中
+ * @param w 窗口
+ * @param wa 窗口属性
+ */
 static void manage(Window w, XWindowAttributes *wa);
 
 static void mappingnotify(XEvent *e);
-
+/**
+ * 显示请求。新打开窗口显示在屏幕上
+ * @param e
+ */
 static void maprequest(XEvent *e);
 
 static void motionnotify(XEvent *e);
-
+/**
+ * 鼠标移动
+ * @param arg
+ */
 static void movemouse(const Arg *arg);
 
 static void movewin(const Arg *arg);
@@ -386,6 +419,10 @@ static Client *nexttiled(Client *c);
 
 static void pop(Client *c);
 
+/**
+ * 客户端属性发生改变时调用
+ * @param e
+ */
 static void propertynotify(XEvent *e);
 
 /**
@@ -424,6 +461,10 @@ static void resizebarwin(Monitor *m);
  */
 static void resizeclient(Client *c, int x, int y, int w, int h);
 
+/**
+ * 鼠标调整大小
+ * @param arg
+ */
 static void resizemouse(const Arg *arg);
 
 static void resizerequest(XEvent *e);
@@ -459,6 +500,10 @@ static void setfullscreen(Client *c, int fullscreen);
  */
 static void togglefullscreen(const Arg *arg);
 
+/**
+ * 设置主区域占比
+ * @param arg
+ */
 static void setmfact(const Arg *arg);
 
 static void tag(const Arg *arg);
@@ -481,6 +526,10 @@ static void togglescratch(const Arg *arg);
 
 static void toggleview(const Arg *arg);
 
+/**
+ * 切换 overview 布局
+ * @param arg
+ */
 static void toggleoverview(const Arg *arg);
 
 static void togglewin(const Arg *arg);
@@ -513,6 +562,10 @@ static int updategeom(void);
 
 static void updatenumlockmask(void);
 
+/**
+ * 窗口发生改变都会调用这个函数
+ * @param c
+ */
 static void updatesizehints(Client *c);
 
 static void updatestatus(void);
@@ -831,10 +884,6 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact) {
     return *x != c->x || *y != c->y || *w != c->w || *h != c->h;
 }
 
-/**
- *
- * @param m
- */
 void
 arrange(Monitor *m) {
     if (m) {
@@ -861,10 +910,6 @@ arrangemon(Monitor *m) {
     }
 }
 
-/**
- * 新打开一个客户端调用的方法
- * @param c 新打开的客户端
- */
 void
 attach(Client *c) {
     if (newclientathead) {
@@ -1148,10 +1193,6 @@ configurenotify(XEvent *e) {
     }
 }
 
-/**
- * 处理客户端窗口的配置请求事件
- * @param e
- */
 void
 configurerequest(XEvent *e) {
     Client *c;
@@ -1205,10 +1246,6 @@ configurerequest(XEvent *e) {
     XSync(dpy, False);
 }
 
-/**
- * 创建显示器
- * @return
- */
 Monitor *
 createmon(void) {
     Monitor *m;
@@ -1406,13 +1443,6 @@ drawbars(void) {
         drawbar(m);
 }
 
-/**
- * 绘制状态栏 bar
- * @param m
- * @param bar_h
- * @param status_text
- * @return
- */
 int
 drawstatusbar(Monitor *m, int bar_h, char *status_text) {
     int i, x;
@@ -1533,10 +1563,6 @@ drawstatusbar(Monitor *m, int bar_h, char *status_text) {
     return (int) status_w - 2;
 }
 
-/**
- * 禁用焦点跟随鼠标
- * @param e
- */
 void
 enternotify(XEvent *e) {
     Client *c;
@@ -1600,10 +1626,6 @@ focusin(XEvent *e) {
         setfocus(selmon->sel);
 }
 
-/**
- * 光标移动到另一个屏幕
- * @param arg
- */
 void
 focusmon(const Arg *arg) {
     Monitor *m;
@@ -1945,11 +1967,6 @@ managefloating(Client *c) {
     }
 }
 
-/**
- * 负责将新创建的窗口添加到dwm的管理列表中
- * @param w 窗口
- * @param wa 窗口属性
- */
 void
 manage(Window w, XWindowAttributes *wa) {
     Client *c, *t = NULL;
@@ -2041,10 +2058,6 @@ mappingnotify(XEvent *e) {
         grabkeys();
 }
 
-/**
- * 显示请求。新打开窗口显示在屏幕上
- * @param e
- */
 void
 maprequest(XEvent *e) {
     static XWindowAttributes wa;
@@ -2081,10 +2094,6 @@ motionnotify(XEvent *e) {
     mon = m;
 }
 
-/**
- * 鼠标移动
- * @param arg
- */
 void
 movemouse(const Arg *arg) {
     int x, y, ocx, ocy, nx, ny;
@@ -2317,10 +2326,6 @@ pop(Client *c) {
     pointerfocuswin(c);
 }
 
-/**
- * 客户端属性发生改变时调用
- * @param e
- */
 void
 propertynotify(XEvent *e) {
     Client *c;
@@ -2487,10 +2492,6 @@ resizeclient(Client *c, int x, int y, int w, int h) {
     XSync(dpy, False);
 }
 
-/**
- * 鼠标调整大小
- * @param arg
- */
 void
 resizemouse(const Arg *arg) {
     int ocx, ocy, nw, nh;
@@ -2802,10 +2803,6 @@ setlayout(const Arg *arg) {
     arrange(selmon);
 }
 
-/**
- * 设置主区域占比
- * @param arg
- */
 void
 setmfact(const Arg *arg) {
     float f;
@@ -2935,10 +2932,6 @@ show(Client *c) {
     arrange(c->mon);
 }
 
-/**
- * 该方法为显示当前tag下的窗口的func，切换时会将原窗口下的win放到屏幕之外 (左边的屏幕隐藏到屏幕左边 右边的屏幕隐藏到屏幕右边)
- * @param c
- */
 void
 showtag(Client *c) {
     if (!c) {
@@ -3423,10 +3416,6 @@ updatenumlockmask(void) {
     XFreeModifiermap(modmap);
 }
 
-/**
- * 窗口发生改变都会调用这个函数
- * @param c
- */
 void
 updatesizehints(Client *c) {
     long msize;
@@ -3696,7 +3685,6 @@ view(const Arg *arg) {
     }
 }
 
-// 显示所有tag 或 跳转到聚焦窗口的tag
 void
 toggleoverview(const Arg *arg) {
     if (selmon->sel && selmon->sel->isfullscreen) /* no support for fullscreen windows */
