@@ -200,11 +200,17 @@ struct Monitor {
      */
     int by;               /* bar geometry */
     /**
-     * 任务数量
+     * 任务数量（number of tasks）
      */
-    int bt;               /* number of tasks */
-    int mx, my, mw, mh;   /* screen size */
-    int wx, wy, ww, wh;   /* window area  */
+    int bt;
+    /**
+     * 屏幕大小（screen size）
+     */
+    int mx, my, mw, mh;
+    /**
+     * 窗口区域大小（window area） 显示客户端区域大小
+     */
+    int wx, wy, ww, wh;
     unsigned int seltags;
     /**
      * 选中的布局
@@ -2471,6 +2477,13 @@ void
 resizeclient(Client *c, int x, int y, int w, int h) {
     XWindowChanges wc;
 
+    if (!c->isnoborder && !c->bw) {
+        // 恢复之前的 w h
+        c->w -= 2 * (int) borderpx;
+        c->h -= 2 * (int) borderpx;
+        c->bw = (int) borderpx;
+    }
+
     c->oldx = c->x;
     c->x = wc.x = x;
     c->oldy = c->y;
@@ -2484,9 +2497,9 @@ resizeclient(Client *c, int x, int y, int w, int h) {
     // 判断是否只有一个 tile 窗口
     if (((nexttiled(c->mon->clients) == c && !nexttiled(c->next)))
         && !c->isfullscreen && !c->isfloating && c->bw) {
-        wc.x += c->bw;
-        wc.y += c->bw;
-        wc.border_width = 0;
+        c->w = wc.width += 2 * c->bw;
+        c->h = wc.height += 2 * c->bw;
+        c->bw = wc.border_width = 0;
     }
     XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
     configure(c);
@@ -3842,7 +3855,7 @@ grid(Monitor *m, unsigned int local_gappo, unsigned int local_gappi) {
     if (n == 2) {
         c = nexttiled(m->clients);
         cw = (m->ww - 2 * local_gappo - local_gappi) / 2;
-        ch = (int) ((m->wh - 2 * local_gappo) * 0.65);
+        ch = (int) (m->wh * 0.65);
         resize(c,
                m->mx + (int) local_gappo,
                (int) (m->my + (m->mh - ch) / 2 + local_gappo),
@@ -4015,7 +4028,7 @@ zoom(const Arg *arg) {
     if (c->isfloating || c->isfullscreen)
         return;
     if (c == nexttiled(selmon->clients) && !(c = nexttiled(c->next)))
-            return;
+         return;
     pop(c);
 }
 
