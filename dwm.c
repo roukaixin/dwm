@@ -423,6 +423,8 @@ static void resizewin(const Arg *arg);
 
 static Client *nexttiled(Client *c);
 
+static int tile_client_count(Client *c);
+
 static void pop(Client *c);
 
 /**
@@ -2322,6 +2324,21 @@ nexttiled(Client *c) {
     return c;
 }
 
+int
+tile_client_count(Client *c) {
+    Client *sc = c->mon->clients;
+    int count = 0;
+    for (; sc ; sc = sc->next) {
+        logtofile("[tile_client_count] %s", sc->name);
+        if (sc->tags & sc->mon->tagset[sc->mon->seltags] && !sc->isfloating && !HIDDEN(sc)) {
+            count ++;
+            if (count == 2) break;
+        }
+    }
+    logtofile("[tile_client_count] %d", count);
+    return count < 2;
+}
+
 void
 pop(Client *c) {
     detach(c);
@@ -2477,11 +2494,11 @@ void
 resizeclient(Client *c, int x, int y, int w, int h) {
     XWindowChanges wc;
 
-    if (!c->isnoborder && !c->bw) {
+    if (!c->isnoborder && !c->isfullscreen && !c->bw) {
         // 恢复之前的 w h
-        c->w -= 2 * (int) borderpx;
-        c->h -= 2 * (int) borderpx;
         c->bw = (int) borderpx;
+        c->w -= 2 * c->bw;
+        c->h -= 2 * c->bw;
     }
 
     c->oldx = c->x;
@@ -2495,7 +2512,7 @@ resizeclient(Client *c, int x, int y, int w, int h) {
     wc.border_width = c->bw;
 
     // 判断是否只有一个 tile 窗口
-    if (((nexttiled(c->mon->clients) == c && !nexttiled(c->next)))
+    if (tile_client_count(c)
         && !c->isfullscreen && !c->isfloating && c->bw) {
         c->w = wc.width += 2 * c->bw;
         c->h = wc.height += 2 * c->bw;
@@ -2750,6 +2767,8 @@ setfullscreen(Client *c, int fullscreen) {
         c->isfullscreen = 1;
         c->oldstate = c->isfloating;
         c->oldbw = c->bw;
+        c->w += 2 * c->bw;
+        c->h += 2 * c->bw;
         c->bw = 0;
         c->isfloating = 1;
         resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
@@ -2773,16 +2792,16 @@ setfullscreen(Client *c, int fullscreen) {
         c->bw = c->oldbw;
         c->x = c->oldx;
         c->y = c->oldy;
-        c->w = c->oldw;
-        c->h = c->oldh;
-        resizeclient(c, c->x, c->y, c->w, c->h);
-        // 显示全部窗口
+        c->w = c->oldw - 2 * c->bw;
+        c->h = c->oldh - 2 * c->bw;
+        // 显示全部窗口 todo: 要先把隐藏的给显示出来，要不然在 resizeclient() 中获取是否只有一个 tile 有问题
         for (other = c->mon->clients; other; other = other->next) {
             if(other->tags == c->tags && HIDDEN(other) && other != c && other->fullscreen_hide == 1) {
                 other->fullscreen_hide = 0;
                 show(other);
             }
         }
+        resizeclient(c, c->x, c->y, c->w, c->h);
         arrange(c->mon);
     }
 }
