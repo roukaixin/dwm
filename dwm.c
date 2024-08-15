@@ -2329,13 +2329,11 @@ tile_client_count(Client *c) {
     Client *sc = c->mon->clients;
     int count = 0;
     for (; sc ; sc = sc->next) {
-        logtofile("[tile_client_count] %s", sc->name);
         if (sc->tags & sc->mon->tagset[sc->mon->seltags] && !sc->isfloating && !HIDDEN(sc)) {
             count ++;
             if (count == 2) break;
         }
     }
-    logtofile("[tile_client_count] %d", count);
     return count < 2;
 }
 
@@ -3563,6 +3561,7 @@ updatesystray(void) {
     Monitor *m = systraytomon(NULL);
     unsigned int x = m->mx + m->mw;
     unsigned int w = 1;
+    int sbw = 4;
 
     if (!showsystray)
         return;
@@ -3606,7 +3605,7 @@ updatesystray(void) {
         XMapRaised(dpy, i->win);
         w += systrayspacing;
         i->x = (int) w;
-        XMoveResizeWindow(dpy, i->win, i->x + 3, 0 + 3, MAX(i->w - 6, bh - 6), bh - 6); // 限制过大的图标
+        XMoveResizeWindow(dpy, i->win, i->x + 3, 0 + 3, MAX(i->w - 2 * sbw, bh - 2 * sbw), bh - 2 * sbw); // 限制过大的图标
         w += MAX(i->w, bh);
         if (i->mon != m)
             i->mon = m;
