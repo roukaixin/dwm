@@ -321,9 +321,11 @@ static void detach(Client *c);
 static void detachstack(Client *c);
 
 static Monitor *dirtomon(int dir);
-
+/**
+ * 绘制 bar
+ * @param m
+ */
 static void drawbar(Monitor *m);
-
 static void drawbars(void);
 /**
  * 绘制状态栏 bar
@@ -456,7 +458,10 @@ static Monitor *recttomon(int x, int y, int w, int h);
 static void removesystrayicon(Client *i);
 
 static void resize(Client *c, int x, int y, int w, int h, int interact);
-
+/**
+ * 调整 bar
+ * @param m 屏幕
+ */
 static void resizebarwin(Monitor *m);
 
 /**
@@ -553,7 +558,10 @@ static void toggleborder(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
 
 static void unmanage(Client *c, int destroyed);
-
+/**
+ * 窗口关闭通知
+ * @param e 事件
+ */
 static void unmapnotify(XEvent *e);
 
 /**
@@ -601,7 +609,11 @@ static void viewtoright(const Arg *arg);
 static void exchange_client(const Arg *arg);
 
 static void focusdir(const Arg *arg);
-
+/**
+ * 根据 win id 获取到 client
+ * @param w
+ * @return
+ */
 static Client *wintoclient(Window w);
 
 static Monitor *wintomon(Window w);
@@ -3278,6 +3290,12 @@ unmanage(Client *c, int destroyed) {
         XSetErrorHandler(xerror);
         XUngrabServer(dpy);
     }
+    // 如果 c 是全屏，显示 bar
+    m->showbar
+            = m->pertag->showbars[m->pertag->curtag]
+            = m->pertag->oldshowbars[selmon->pertag->curtag];
+    updatebarpos(m);
+    resizebarwin(m);
     free(c);
     focus(NULL);
     updateclientlist();

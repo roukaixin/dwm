@@ -129,10 +129,13 @@ static const Rule rules[] = {
     {"Gimp", "script-fu", "Script-Fu：", 0, 1, 0, 0, -1, 0, 0,1 },
     {"Gimp", "gimp", "退出 GIMP", 0, 1, 0, 0, -1, 0, 0, 0 },
     {"Typora", "typora", "保存", 0, 1, 0, 0, -1, 0, 0, 0 },
+    {"Thunar", "thunar", "文件操作进度", 0, 1, 0, 0, -1, 9, 0, 0 },
     {"polkit-kde-authentication-agent-1", "polkit-kde-authentication-agent-1",NULL, 0, 1, 0, 0, -1, 0, 0, 0 },
     {"jetbrains-toolbox", "JetBrains Toolbox", "JetBrains Toolbox", 0, 1,0, 0, -1, 3, 0, 2 },
     {"Xdg-desktop-portal-gtk", "xdg-desktop-portal-gtk", "所有文件", 0, 1,0, 0, -1, 0, 0, 1 },
     {"Xdg-desktop-portal-gtk", "xdg-desktop-portal-gtk", "打开文件", 0, 1,0, 0, -1, 0, 0, 1 },
+    {"Xdg-desktop-portal-gtk", "xdg-desktop-portal-gtk", "打开文件", 0, 1,0, 0, -1, 0, 0, 0 },
+    {"Xdg-desktop-portal-gtk", "xdg-desktop-portal-gtk", "选择文件夹", 0, 1,0, 0, -1, 0, 0, 1 },
     {"Nm-applet", "nm-applet", "Wi-Fi 网络", 0, 1, 0, 0, -1, 0,0, 1 },
     {"Electron", "electron", "打开文件", 0, 1, 0, 0, -1, 0, 0,1 },
     // Vncviewer           浮动、无边框 屏幕顶部
