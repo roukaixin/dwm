@@ -116,8 +116,15 @@ enum {
     WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast
 }; /* default atoms */
 enum {
-    ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkBarEmpty,
-    ClkClientWin, ClkRootWin, ClkLast
+    ClkTagBar,      //  tag
+    ClkLtSymbol,    // 布局图片
+    ClkStatusText,  // status
+    ClkWinTitle,    // title
+    ClkBarEmpty,    // bar 空白处
+    ClkClientWin,
+    ClkWinSystray,  // 托盘
+    ClkRootWin,
+    ClkLast
 }; /* clicks */
 enum {
     UP, DOWN, LEFT, RIGHT
@@ -966,9 +973,12 @@ buttonpress(XEvent *e) {
         focus(NULL);
     }
     int status_w = drawstatusbar(selmon, bh, stext);
-    int system_w = (int) getsystraywidth();
-    if (ev->window == selmon->barwin ||
-        (!c && selmon->showbar && (topbar ? ev->y <= selmon->wy : ev->y >= selmon->wy + selmon->wh))) { // 点击在bar上
+    int systray_w = (int) getsystraywidth();
+    if (systray && ev->window == systray->win) {
+        // 点击在系统托盘上
+        click = ClkWinSystray;
+    } else if (ev->window == selmon->barwin || (!c && selmon->showbar && (topbar ? ev->y <= selmon->wy : ev->y >= selmon->wy + selmon->wh))) {
+        // 点击在bar上
         i = x = 0;
 
         if (selmon->isoverview) {
@@ -989,13 +999,13 @@ buttonpress(XEvent *e) {
         if (i < LENGTH(tags)) {
             click = ClkTagBar;
             arg.ui = 1 << i;
-        } else if (ev->x < x + TEXTW(selmon->ltsymbol))
+        } else if (ev->x < x + TEXTW(selmon->ltsymbol)) {
             click = ClkLtSymbol;
-        else if (ev->x > selmon->ww - status_w - 2 * sp -
-                         (selmon == systraytomon(selmon) ? (system_w ? system_w + systraypinning + 2 : 0) : 0)) {
+        } else if (ev->x > selmon->ww - status_w - 2 * sp -
+                         (selmon == systraytomon(selmon) ? (systray_w ? systray_w + systraypinning + 2 : 0) : 0)) {
             click = ClkStatusText;
             arg.i = ev->x - (int) (selmon->ww - status_w - 2 * sp -
-                                   (selmon == systraytomon(selmon) ? (system_w ? system_w + systraypinning + 2 : 0)
+                                   (selmon == systraytomon(selmon) ? (systray_w ? systray_w + systraypinning + 2 : 0)
                                                                    : 0));
             arg.ui = ev->button; // 1 => L，2 => M，3 => R, 5 => U, 6 => D
         } else {
@@ -3587,8 +3597,7 @@ updatesystray(void) {
         /* init systray */
         if (!(systray = (Systray *) calloc(1, sizeof(Systray))))
             die("fatal: could not malloc() %u bytes\n", sizeof(Systray));
-        systray->win = XCreateSimpleWindow(dpy, root, (int) x - sp, m->by + vp, w, bh, 0, 0,
-                                           scheme[SchemeSystray][ColBg].pixel);
+        systray->win = XCreateSimpleWindow(dpy, root, (int) x - sp, m->by + vp, w, bh, 0, 0, scheme[SchemeSystray][ColBg].pixel);
         wa.event_mask = ButtonPressMask | ExposureMask;
         wa.override_redirect = True;
         wa.background_pixel = scheme[SchemeSystray][ColBg].pixel;
