@@ -12,8 +12,6 @@ static const int g_gappo                 = 12;        /* 窗口与窗口 缝隙�
 static const int g_gappi                 = 12;        /* 窗口与边缘 缝隙大小 不可变 用于恢复时的默认值 */
 static const int vertpad                 = 5;         /* vertical padding of bar */
 static const int sidepad                 = 5;         /* horizontal padding of bar */
-static const int overviewgappi           = 24;        /* overview时 窗口与边缘 缝隙大小 */
-static const int overviewgappo           = 60;        /* overview时 窗口与窗口 缝隙大小 */
 static const int showbar                 = 1;         /* 是否显示状态栏 */
 static const int topbar                  = 1;         /* 指定状态栏位置 0底部 1顶部 */
 static const float mfact                 = 0.60f;     /* 主工作区 大小比例 */
@@ -162,10 +160,6 @@ static const Rule rules[] = {
     {NULL, NULL, "broken", 0, 1, 0, 0, -1, 0, 0, 0 },
 };
 
-
-static const char *overviewtag = "OVERVIEW";
-static const Layout overviewlayout = {"󰕮", overview};
-
 /* 自定义布局 */
 static const Layout layouts[] = {
         {"󰙀", tile},               /* 平铺布局 */
@@ -208,8 +202,8 @@ static const Key keys[] = {
     { MODKEY|ShiftMask,    XK_Left,         tagtoleft,        {0} },
     /* super + shift + right (将本窗口移动到右边tag) */
     { MODKEY|ShiftMask,    XK_Right,        tagtoright,       {0} },
-    /* super + a (显示所有tag 或 跳转到聚焦窗口的tag) */
-    { MODKEY,              XK_a,            toggleoverview,   {0} },
+    /* super + a (overview) */
+    { MODKEY,              XK_a,            previewallwin,   {0} },
     /* super ,            |  缩小主工作区 */
     { MODKEY,              XK_comma,        setmfact,         {.f = -0.05f} },
     /* super .            |  放大主工作区 */
