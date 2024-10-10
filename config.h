@@ -57,7 +57,7 @@ static const char *autostart[] = {
         "numlockx",                                        NULL,
         "nm-applet",                                       NULL,
         "blueman-applet",                                NULL,
-        "/usr/lib/polkit-kde-authentication-agent-1",    NULL,
+        "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",    NULL,
         "slstatus",                                      NULL,
         "picom",                                         NULL,
         "dunst",                                         NULL,

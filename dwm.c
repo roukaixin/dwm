@@ -751,8 +751,7 @@ int main(int argc, char *argv[]) {
         die("dwm-6.5");
 #endif
     }
-
-        // 提示命令，不支持其他的参数
+    // 提示命令，不支持其他的参数
     else if (argc != 1)
         die("usage: dwm [-v]");
     // setlocale: 设置 locale ，XSupportsLocale ：支持 locale
