@@ -162,6 +162,12 @@ static const Rule rules[] = {
     {NULL, NULL, "broken", 0, 1, 0, 0, -1, 0, 0, 0 },
 };
 
+// 环境变量
+static const Env envs[] = {
+    {"LANG",                                "zh_CN.UTF-8"},
+    {"LANGUAGE",                            "zh_CN:en_US"},
+};
+
 /* 自定义布局 */
 static const Layout layouts[] = {
         {"󰙀", tile},               /* 平铺布局 */

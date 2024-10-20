@@ -268,6 +268,10 @@ typedef struct {
     unsigned int client_type;
 } Rule;
 
+typedef struct {
+    const char *variable;
+    const char *value;
+} Env;
 
 typedef struct Systray Systray;
 struct Systray {
@@ -548,6 +552,8 @@ static void setpreviewwins(unsigned int n, Monitor *m, unsigned int gappo, unsig
 static void focuspreviewwin(Client *focus_c, Monitor *m);
 static XImage *getwindowximage(Client *c);
 static XImage *scaledownimage(Client *c, unsigned int cw, unsigned int ch);
+
+static void set_env();
 
 /* variables */
 static Systray *systray = NULL;
@@ -4185,39 +4191,6 @@ XImage
     return scaled_image;
 }
 
-int main(int argc, char *argv[]) {
-    // 打印 dwm 版本。dwm -v : argc 就是等于 2，strcmp : 比较两个字符串,相等就等于0
-    if (argc == 2 && !strcmp("-v", argv[1])) {
-#ifdef VERSION
-        die("dwm-%s", VERSION);
-#else
-        die("dwm-6.5");
-#endif
-    }
-    // 提示命令，不支持其他的参数
-    else if (argc != 1)
-        die("usage: dwm [-v]");
-    // setlocale: 设置 locale ，XSupportsLocale ：支持 locale
-    if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
-        fputs("warning: no locale support\n", stderr);
-    // 获取屏幕连接
-    if (!(dpy = XOpenDisplay(NULL)))
-        die("dwm: cannot open display");
-    checkotherwm();
-    autostart_exec();
-    setup();
-#ifdef __OpenBSD__
-    if (pledge("stdio rpath proc exec", NULL) == -1)
-        die("pledge");
-#endif /* __OpenBSD__ */
-    scan();
-    run();
-    cleanup();
-    XCloseDisplay(dpy);
-    return EXIT_SUCCESS;
-}
-
-
 Client
 *direction_select(const Arg *arg) {
     Client *tempClients[100];
@@ -4487,4 +4460,46 @@ exchange_client(const Arg *arg)
     if (c == NULL || c->isfloating || c->isfullscreen)
         return;
     exchange_two_client(c, direction_select(arg));
+}
+
+void
+set_env()
+{
+    for (size_t i = 0; i < LENGTH(envs); i++) {
+            setenv(envs[i].variable, envs[i].value, 1);
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    // 打印 dwm 版本。dwm -v : argc 就是等于 2，strcmp : 比较两个字符串,相等就等于0
+    if (argc == 2 && !strcmp("-v", argv[1])) {
+#ifdef VERSION
+        die("dwm-%s", VERSION);
+#else
+        die("dwm-6.5");
+#endif
+    }
+    // 提示命令，不支持其他的参数
+    else if (argc != 1)
+        die("usage: dwm [-v]");
+    // setlocale: 设置 locale ，XSupportsLocale ：支持 locale
+    if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
+        fputs("warning: no locale support\n", stderr);
+    // 获取屏幕连接
+    if (!(dpy = XOpenDisplay(NULL)))
+        die("dwm: cannot open display");
+    checkotherwm();
+    set_env();
+    autostart_exec();
+    setup();
+#ifdef __OpenBSD__
+    if (pledge("stdio rpath proc exec", NULL) == -1)
+        die("pledge");
+#endif /* __OpenBSD__ */
+    scan();
+    run();
+    cleanup();
+    XCloseDisplay(dpy);
+    return EXIT_SUCCESS;
 }
