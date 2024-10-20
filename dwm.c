@@ -445,7 +445,6 @@ static void resizerequest(XEvent *e);
 static void restack(Monitor *m);
 
 static void run(void);
-static void runAutostart(void);
 static void scan(void);
 static int sendevent(Window w, Atom proto, int m, long d0, long d1, long d2, long d3, long d4);
 static void sendmon(Client *c, Monitor *m);
@@ -478,7 +477,7 @@ static void tagtoleft(const Arg *arg);
 static void tagtoright(const Arg *arg);
 
 static void togglebar(const Arg *arg);
-static void togglesystray(void);
+static void togglesystray(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void toggleallfloating(const Arg *arg);
 static void togglescratch(const Arg *arg);
@@ -543,6 +542,7 @@ static int xerrordummy(Display *display, XErrorEvent *ee);
 static int xerrorstart(Display *display, XErrorEvent *ee);
 static void xinitvisual(void);
 static void zoom(const Arg *arg);
+static void autostart_exec(void);
 static void previewallwin();
 static void setpreviewwins(unsigned int n, Monitor *m, unsigned int gappo, unsigned int gappi);
 static void focuspreviewwin(Client *focus_c, Monitor *m);
@@ -621,6 +621,10 @@ static Client *hiddenWinStack[100];
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
+/* dwm will keep pid's of processes from autostart array and kill them at quit */
+static pid_t *autostart_pids;
+static size_t autostart_len;
+
 struct Pertag {
     /**
      * curtag： 当前 tag，prevtag： 上一个 tag
@@ -652,6 +656,30 @@ struct Pertag {
      */
     int showbars[LENGTH(tags) + 1], oldshowbars[LENGTH(tags) + 1];
 };
+
+/* execute command from autostart array */
+static void
+autostart_exec() {
+    const char *const *p;
+    size_t i = 0;
+
+    /* count entries */
+    for (p = autostart; *p; autostart_len++, p++)
+        while (*++p);
+
+    autostart_pids = malloc(autostart_len * sizeof(pid_t));
+    for (p = autostart; *p; i++, p++) {
+        if ((autostart_pids[i] = fork()) == 0) {
+            setsid();
+            execvp(*p, (char *const *)p);
+            fprintf(stderr, "dwm: execvp %s\n", *p);
+            perror(" failed");
+            _exit(EXIT_FAILURE);
+        }
+        /* skip arguments */
+        while (*++p);
+    }
+}
 
 /* function implementations */
 void
@@ -2289,7 +2317,18 @@ propertynotify(XEvent *e)
 }
 
 void
-quit(const Arg *arg) {
+quit(const Arg *arg)
+{
+    size_t i;
+
+    /* kill child processes */
+    for (i = 0; i < autostart_len; i++) {
+        if (0 < autostart_pids[i]) {
+            kill(autostart_pids[i], SIGTERM);
+            waitpid(autostart_pids[i], NULL, 0);
+        }
+    }
+
     running = 0;
 }
 
@@ -2517,27 +2556,6 @@ run(void) {
 }
 
 void
-runAutostart(void) {
-    char source_command[1024] = {0};
-    char target_command[1024] = {0};
-    char bash[1024] = "sh -c ";
-    char nohup[4] = "&";
-    for (int i = 0; i < LENGTH(autostart); ++i) {
-        if (autostart[i] == NULL) {
-            strcat(target_command, bash);
-            strcat(target_command, source_command);
-            strcat(target_command, nohup);
-            system(target_command);
-            memset(target_command, 0, sizeof(target_command));
-            memset(source_command, 0, sizeof(source_command));
-        } else {
-            strcat(source_command, autostart[i]);
-            strcat(source_command, " ");
-        }
-    }
-}
-
-void
 scan(void) {
     unsigned int i, num;
     Window d1, d2, *wins = NULL;
@@ -2744,6 +2762,7 @@ setmfact(const Arg *arg) {
 void
 setup(void) {
     int i;
+    pid_t pid;
     XSetWindowAttributes wa;
     Atom utf8string;
     struct sigaction sa;
@@ -2755,7 +2774,20 @@ setup(void) {
     sigaction(SIGCHLD, &sa, NULL);
 
     /* clean up any zombies (inherited from .xinitrc etc) immediately */
-    while (waitpid(-1, NULL, WNOHANG) > 0);
+    while ((pid = waitpid(-1, NULL, WNOHANG)) > 0) {
+        pid_t *p, *lim;
+
+        if (!(p = autostart_pids))
+            continue;
+        lim = &p[autostart_len];
+
+        for (; p < lim; p++) {
+            if (*p == pid) {
+                *p = -1;
+                break;
+            }
+        }
+    }
 
     /* init screen (初始化屏幕) */
     screen = DefaultScreen(dpy);
@@ -2947,7 +2979,7 @@ tagmon(const Arg *arg)
 }
 
 void
-togglesystray(void)
+togglesystray(const Arg *arg)
 {
     if (showsystray) {
         showsystray = 0;
@@ -4172,13 +4204,13 @@ int main(int argc, char *argv[]) {
     if (!(dpy = XOpenDisplay(NULL)))
         die("dwm: cannot open display");
     checkotherwm();
+    autostart_exec();
     setup();
 #ifdef __OpenBSD__
     if (pledge("stdio rpath proc exec", NULL) == -1)
         die("pledge");
 #endif /* __OpenBSD__ */
     scan();
-    runAutostart();
     run();
     cleanup();
     XCloseDisplay(dpy);

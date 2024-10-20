@@ -48,18 +48,20 @@ static const unsigned int alphas[][3] = {
 };
 
 // 自启动
-static const char *autostart[] = {
-        "fcitx5",                                          NULL,
-        "snipaste",                                        NULL,
-        "udiskie",                                         NULL,
-        "numlockx",                                        NULL,
-        "nm-applet",                                       NULL,
-        "blueman-applet",                                NULL,
-        "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",    NULL,
-        "slstatus",                                      NULL,
-        "dunst",                                         NULL,
-        "'xss-lock",    "--",       "bash",     "~/wm/config/lock/blurlock.sh'",     NULL,
-        "'while",       "true;",    "do",       "feh",      "--bg-fill",        "--randomize",  "--no-fehbg",    "~/wm/wallpaper/*.png;", "sleep",    "1800;", "done'",        NULL
+//        "dunst",                                         NULL,
+//        "'xss-lock",    "--",       "bash",     "~/wm/config/lock/blurlock.sh'",     NULL,
+static const char *const autostart[] = {
+    "fcitx5",                                          NULL,
+    "nm-applet",                                       NULL,
+    "udiskie",                                         NULL,
+    "numlockx",                                        NULL,
+    // fedora : /usr/libexec/polkit-gnome-authentication-agent-1
+    "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",    NULL,
+    "blueman-applet",    NULL,
+    "sh",   "-c",   "while true; do feh --bg-fill --randomize --no-fehbg ~/wm/wallpaper/*.png; sleep 1800; done",    NULL,
+    "snipaste",                                        NULL,
+    "slstatus",                                      NULL,
+    NULL /* terminate */
 };
 
 /* 自定义 scratchpad instance */
