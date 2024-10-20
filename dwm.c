@@ -416,8 +416,8 @@ static void set_position(unsigned int rule_position, Client *c);
 
 static void setup(void);
 static void seturgent(Client *c, int urg);
-/* */
-static int show_tag(unsigned int target);
+/* 判断目标 tag 是否已存在 */
+static int tag_exist(unsigned int target);
 static void spawn(const Arg *arg);
 static Monitor *systraytomon(Monitor *m);
 
@@ -3687,17 +3687,17 @@ view(const Arg *arg) {
 }
 
 int
-show_tag(unsigned int target)
+tag_exist(unsigned int target)
 {
     Client *c;
-    int show_tag = 0;
+    int flag_tag = 0;
     for (c = selmon->clients; c; c = c->next) {
         if (c->isglobal && c->tags == TAGMASK) continue;
         if (c->tags & target) {
-            show_tag = 1;
+            flag_tag = 1;
         }
     }
-    return show_tag;
+    return flag_tag;
 }
 
 void
@@ -3718,7 +3718,7 @@ viewtoleft(const Arg *arg)
             break;
         }
 
-        if (show_tag(target)) {
+        if (tag_exist(target)) {
             target_tag = 1;
             break;
         }
@@ -3743,7 +3743,7 @@ viewtoright(const Arg *arg) {
             break;
         }
 
-        if (show_tag(target)) {
+        if (tag_exist(target)) {
             target_tag = 1;
             break;
         }
