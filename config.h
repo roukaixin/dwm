@@ -167,8 +167,13 @@ static const Rule rules[] = {
 
 // 环境变量
 static const Env envs[] = {
-    {"LANG",                                "zh_CN.UTF-8"},
-    {"LANGUAGE",                            "zh_CN:en_US"},
+    { "LANG",                                "zh_CN.UTF-8" },
+    { "LANGUAGE",                            "zh_CN:en_US" },
+    { "GTK_IM_MODULE",                       "fcitx" },
+    { "QT_IM_MODULE",                        "fcitx" },
+    { "XMODIFIERS",                          "@im=fcitx" },
+    { "SDL_IM_MODULE",                       "fcitx" },
+    { "GLFW_IM_MODULE",                      "ibus" },
 };
 
 /* 自定义布局 */
