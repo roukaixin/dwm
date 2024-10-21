@@ -94,9 +94,10 @@ enum {
     SchemeSelGlobal,  // 全局并选中的
     SchemeHid,        // 隐藏的
     SchemeSystray,    // 托盘
-    SchemeNormTag,    // 普通标签
-    SchemeSelTag,     // 选中的标签
+    SchemeNormTag,    // 普通 tag
+    SchemeSelTag,     // 选中的 tag
     SchemeUnderline,  // 下划线
+    SchemeSelTitle,   // 选中的 title
     SchemeBarEmpty,   // 状态栏空白部分
     SchemeStatusText  // 状态栏文本
 }; /* color schemes */
@@ -324,7 +325,7 @@ static Monitor *dirtomon(int dir);
 static void drawbar(Monitor *m);
 static void drawbars(void);
 /**
- * 绘制状态栏 bar
+ * 绘制  bar 状态栏
  * @param m
  * @param bar_h
  * @param status_text
@@ -1316,7 +1317,7 @@ drawbar(Monitor *m)
         if (!ISVISIBLE(c))
             continue;
         if (m->sel == c)
-            scm = SchemeSel;
+            scm = SchemeSelTitle;
         else if (HIDDEN(c))
             scm = SchemeHid;
         else
