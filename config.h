@@ -24,6 +24,7 @@ static const char *fonts[]                  = {
         "JetBrains Mono:style=ExtraLight,Regular:size=14:antialias=true:autohint=true",
         "WenQuanYi Zen Hei Mono:size=14:type=Regular:antialias=true:autohint=true"
 };
+static const char dmenufont[]               = "JetBrains Mono:size=12";
 static const char *colors[][3] = {
         /* 颜色设置               ColFg：字体颜色      ColBg：背景颜色       ColBorder：边框颜色 */
         [SchemeNorm]        = { "#bbbbbb",          "#333333",          "#444444" },
@@ -69,8 +70,9 @@ static const char *const autostart[] = {
 static const char scratchpadname[] = "scratchpad";
 
 /* commands */
+static char dmenumon[2] = "0";
 static const char *dmenucmd[] = {
-        "dmenu_run", "-nb", "#222222", "-nf", "#bbbbbb", "-sb", "#005577", "-sf", "#eeeeee", NULL
+        "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", "#222222", "-nf", "#bbbbbb", "-sb", "#005577", "-sf", "#eeeeee", NULL
 };
 /* 增加亮度 */
 static const char *brighter[]   = {"brightnessctl", "set", "1%+", NULL};

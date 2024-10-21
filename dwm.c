@@ -1276,10 +1276,10 @@ drawbar(Monitor *m)
     if (showsystray && m == systraytomon(m))
         sys_tray_w = (int) getsystraywidth();
 
-    // 绘制 STATUSBAR
+    // 绘制 status
     status_w = drawstatusbar(m, bh, stext);
 
-    // 判断tag显示数量
+    // 判断 tag 显示数量
     for (c = m->clients; c; c = c->next) {
         if (ISVISIBLE(c))
             n++;
@@ -1288,7 +1288,7 @@ drawbar(Monitor *m)
             urg |= c->tags;
     }
 
-    // 绘制TAGS
+    // 绘制 tags
     x = 0;
 
     for (i = 0; i < LENGTH(tags); i++) {
@@ -2945,6 +2945,9 @@ void
 spawn(const Arg *arg)
 {
     struct sigaction sa;
+
+    if (arg->v == dmenucmd)
+        dmenumon[0] = '0' + selmon->num;
     if (fork() == 0) {
         if (dpy)
             close(ConnectionNumber(dpy));
