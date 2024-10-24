@@ -4469,12 +4469,16 @@ exchange_client(const Arg *arg)
 void
 set_env()
 {
+#ifdef DWM
+        setenv("DWM", DWM, 1);
+#endif
     for (size_t i = 0; i < LENGTH(envs); i++) {
             setenv(envs[i].variable, envs[i].value, 1);
     }
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
     // 打印 dwm 版本。dwm -v : argc 就是等于 2，strcmp : 比较两个字符串,相等就等于0
     if (argc == 2 && !strcmp("-v", argv[1])) {
