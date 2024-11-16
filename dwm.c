@@ -363,7 +363,7 @@ static void grabkeys(void);
 static void hide(Client *c);
 static void show(Client *c);
 /**
- * 该方法为显示当前tag下的窗口的func，切换时会将原窗口下的win放到屏幕之外 (左边的屏幕隐藏到屏幕左边 右边的屏幕隐藏到屏幕右边)
+ * 该方法为显示当前tag下的窗口的func，切换时会将原窗口下的win放到屏幕之外
  * @param c
  */
 static void showtag(Client *c);
@@ -2903,14 +2903,12 @@ showtag(Client *c)
         return;
     }
     if (ISVISIBLE(c)) {
-        // 将可见的 client 从屏幕边缘移动到屏幕内
         XMoveWindow(dpy, c->win, c->x, c->y);
         if (c->isfloating && !c->isfullscreen)
             resize(c, c->x, c->y, c->w, c->h, 0);
 
         showtag(c->snext);
     } else {
-        // 将不可见的 client 移动到屏幕之外
         showtag(c->snext);
 
         // 获取mon数量
@@ -2921,21 +2919,26 @@ showtag(Client *c)
             if (m->mx > maxmx) maxmx = m->mx;
         };
 
-        if (mons_count == 1) XMoveWindow(dpy, c->win, c->mon->mx + c->mon->mw * 1.5, c->y);
-        if (mons_count == 2) {
+        if (mons_count == 1) {
+            // 仅单个mon时，按tag大小觉得从左边或右边显示
+            unsigned int only_tag = (c->tags & (c->tags - 1)) == 0;
+            if (only_tag && (TAGMASK & c->tags) >= 1 << c->mon->pertag->curtag) XMoveWindow(dpy, c->win, c->mon->mx + c->mon->mw, c->y);
+            else XMoveWindow(dpy, c->win, WIDTH(c) * -1, c->y);
+        } else if (mons_count == 2) {
+            // 两个mon时，左边窗口的mon藏在左边，右边窗口的mon藏在右边
             if (c->mon->mx == 0) {
-                XMoveWindow(dpy, c->win, c->mon->mw * -1.5, c->y);
+                XMoveWindow(dpy, c->win, c->mon->mw * -1, c->y);
             } else {
-                XMoveWindow(dpy, c->win, c->mon->mx + c->mon->mw * 1.5, c->y);
+                XMoveWindow(dpy, c->win, c->mon->mx + c->mon->mw, c->y);
             }
-        }
-        if (mons_count > 2) {
+        } else if (mons_count > 2) {
+            // 超过2个时（假定为3个），左边窗口的mon藏在左边，右边窗口的mon藏在右边，中间窗口的mon藏在下边
             if (c->mon->mx == 0) {
-                XMoveWindow(dpy, c->win, c->mon->mw * -1.5, c->y);
+                XMoveWindow(dpy, c->win, c->mon->mw * -1, c->y);
             } else if (c->mon->mx == maxmx) {
-                XMoveWindow(dpy, c->win, c->mon->mx + c->mon->mw * 1.5, c->y);
+                XMoveWindow(dpy, c->win, c->mon->mx + c->mon->mw, c->y);
             } else {
-                XMoveWindow(dpy, c->win, c->x, c->mon->my + c->mon->mh * 1.5);
+                XMoveWindow(dpy, c->win, c->x, c->mon->my + c->mon->mh);
             }
         }
     }
