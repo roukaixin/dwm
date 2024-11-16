@@ -21,8 +21,7 @@ static const unsigned int baralpha          = 0xc0;      /* 状态栏透明度 *
 static const unsigned int borderalpha       = 0xdd;      /* 边框透明度 */
 static const unsigned int null_alpha        = 0x00;
 static const char *fonts[]                  = {
-        "JetBrains Mono:style=ExtraLight,Regular:size=14:antialias=true:autohint=true",
-        "WenQuanYi Zen Hei Mono:size=14:type=Regular:antialias=true:autohint=true"
+        "WenQuanYi Micro Hei:size=14:type=Regular:antialias=true:autohint=true"
 };
 static const char dmenufont[]               = "JetBrains Mono:size=12";
 static const char *colors[][3] = {
