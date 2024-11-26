@@ -52,7 +52,7 @@ static const unsigned int alphas[][3] = {
 //        "dunst",                                         NULL,
 //        "'xss-lock",    "--",       "bash",     "~/wm/config/lock/blurlock.sh'",     NULL,
 static const char *const autostart[] = {
-    "fcitx5",                                                                                                       NULL,
+    "fcitx5",   "-d",                                                                                               NULL,
     "nm-applet",                                                                                                    NULL,
     "udiskie",                                                                                                      NULL,
     "numlockx",                                                                                                     NULL,
@@ -62,6 +62,7 @@ static const char *const autostart[] = {
     "sh",   "-c",   "while true; do feh --bg-fill --randomize --no-fehbg ~/wm/wallpaper/*.png; sleep 1800; done",   NULL,
     "snipaste",                                                                                                     NULL,
     "slstatus",                                                                                                     NULL,
+    "picom",    "--daemon",                                                                                         NULL,
     NULL /* terminate */
 };
 
@@ -126,9 +127,7 @@ static const Rule rules[] = {
     { "QQ", "qq", "视频播放器", 0, 1, 0, 0, -1, 0, 0, 0 },
     { "QQ", "qq", "文件管理器", 0, 1, 0, 0, -1, 0, 0, 0 },
     { "QQ", "qq", "收藏", 0, 1, 0, 0, -1, 0, 0, 0 },
-    // 微信规则
-    { NULL, NULL, "图片查看", 0, 1, 0, 0, -1, 0, 0, 0 },
-    // telegram-desktop 规则
+    { "wechat", "wechat", "预览", 0, 1, 0, 0, -1, 0, 0, 0 },
     { "TelegramDesktop", "telegram-desktop", "Media viewer", 0, 1, 0,0, -1, 0, 0, 0 },
     { "TelegramDesktop", "telegram-desktop", "媒体查看器", 0, 1, 0,0, -1, 0, 0, 0 },
     { "Gimp", "gimp", "新建模板", 0, 1, 0, 0, -1, 0, 0, 0 },
