@@ -21,9 +21,10 @@ static const unsigned int baralpha          = 0xc0;      /* 状态栏透明度 *
 static const unsigned int borderalpha       = 0xdd;      /* 边框透明度 */
 static const unsigned int null_alpha        = 0x00;
 static const char *fonts[]                  = {
-        "WenQuanYi Micro Hei:size=14:type=Regular:antialias=true:autohint=true"
+        "JetBrainsMono Nerd Font:style=Regular:size=13:antialias=true:autohint=true",
+        "monospace:size=13"
 };
-static const char dmenufont[]               = "JetBrains Mono:size=12";
+static const char dmenufont[]               = "JetBrainsMono Nerd Font:size=13";
 static const char *colors[][3] = {
         /* 颜色设置               ColFg：字体颜色      ColBg：背景颜色       ColBorder：边框颜色 */
         [SchemeNorm]        = { "#bbbbbb",          "#333333",          "#444444" },
@@ -135,7 +136,7 @@ static const Rule rules[] = {
     { "Gimp", "script-fu", "Script-Fu：", 0, 1, 0, 0, -1, 0, 0,1 },
     { "Gimp", "gimp", "退出 GIMP", 0, 1, 0, 0, -1, 0, 0, 0 },
     { "Typora", "typora", "保存", 0, 1, 0, 0, -1, 0, 0, 0 },
-    { "Thunar", "thunar", "文件操作进度", 0, 1, 0, 0, -1, 9, 0, 0 },
+    { "Pcmanfm", "pcmanfm", "文件", 0, 1, 0, 0, -1, 5, 0, 0 },
     { "polkit-kde-authentication-agent-1", "polkit-kde-authentication-agent-1",NULL, 0, 1, 0, 0, -1, 0, 0, 0 },
     { "jetbrains-toolbox", "JetBrains Toolbox", "JetBrains Toolbox", 0, 1,0, 0, -1, 3, 0, 2 },
     { "Xdg-desktop-portal-gtk", "xdg-desktop-portal-gtk", "所有文件", 0, 1,0, 0, -1, 0, 0, 1 },
