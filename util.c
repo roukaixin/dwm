@@ -11,9 +11,8 @@ void
 die(const char *fmt, ...)
 {
 	va_list ap;
-	int saved_errno;
 
-	saved_errno = errno;
+	int saved_errno = errno;
 
 	va_start(ap, fmt);
 	vfprintf(stderr, fmt, ap);
@@ -31,7 +30,7 @@ ecalloc(size_t nmemb, size_t size)
 {
 	void *p;
 
-	if (!(p = calloc(nmemb, size)))
+	if (!((p = calloc(nmemb, size))))
 		die("calloc:");
 	return p;
 }

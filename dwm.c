@@ -284,6 +284,7 @@ struct Systray {
 static void tile(Monitor *m);
 static void magicgrid(Monitor *m);
 static void grid(Monitor *m, unsigned int local_gappo, unsigned int local_gappi);
+static void scroll(Monitor *m);
 
 static void applyrules(Client *c, unsigned int client_type);
 static int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact);
@@ -398,6 +399,12 @@ static void motionnotify(XEvent *e);
 static void movemouse(const Arg *arg);
 static void movewin(const Arg *arg);
 static void resizewin(const Arg *arg);
+
+/**
+ * 获取下一个 tile 的 client
+ * @param c
+ * @return
+ */
 static Client *nexttiled(Client *c);
 static int tile_client_count(Client *c);
 static void pop(Client *c);
@@ -456,7 +463,7 @@ static void sendmon(Client *c, Monitor *m);
 static void setclientstate(Client *c, long state);
 static void setfocus(Client *c);
 
-static void selectlayout(const Arg *arg);
+static void toggle_layout(const Arg *arg);
 static void setlayout(const Arg *arg);
 /**
  * 设置全屏
@@ -1917,7 +1924,7 @@ manage(Window w, XWindowAttributes *wa) {
 
     // 更新标题
     updatetitle(c);
-    if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
+    if (XGetTransientForHint(dpy, w, &trans) && ((t = wintoclient(trans)))) {
         applyrules(c, 1);
         c->mon = t->mon;
         c->tags = t->tags;
@@ -2246,7 +2253,7 @@ resizewin(const Arg *arg)
 
 Client *
 nexttiled(Client *c) {
-    for (; c && (c->isfloating || !ISVISIBLE(c) || HIDDEN(c)); c = c->next);
+    for (; c && (c->isfloating || !ISVISIBLE(c) || HIDDEN(c)); c = c->next) {}
     return c;
 }
 
@@ -2401,7 +2408,7 @@ removesystrayicon(Client *i) {
 
     if (!showsystray || !i)
         return;
-    for (ii = &systray->icons; *ii && *ii != i; ii = &(*ii)->next);
+    for (ii = &systray->icons; *ii && *ii != i; ii = &(*ii)->next) {}
     if (ii)
         *ii = i->next;
     free(i);
@@ -2431,13 +2438,6 @@ void
 resizeclient(Client *c, int x, int y, int w, int h) {
     XWindowChanges wc;
 
-    if (!c->isnoborder && !c->isfullscreen && !c->bw) {
-        // 恢复之前的 w h
-        c->bw = (int) borderpx;
-        c->w -= 2 * c->bw;
-        c->h -= 2 * c->bw;
-    }
-
     c->oldx = c->x;
     c->x = wc.x = x;
     c->oldy = c->y;
@@ -2448,13 +2448,6 @@ resizeclient(Client *c, int x, int y, int w, int h) {
     c->h = wc.height = h;
     wc.border_width = c->bw;
 
-    // 判断是否只有一个 tile 窗口
-    if (tile_client_count(c)
-        && !c->isfullscreen && !c->isfloating && c->bw) {
-        c->w = wc.width += 2 * c->bw;
-        c->h = wc.height += 2 * c->bw;
-        c->bw = wc.border_width = 0;
-    }
     XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
     configure(c);
     XSync(dpy, False);
@@ -2468,7 +2461,7 @@ resizemouse(const Arg *arg) {
     XEvent ev;
     Time lasttime = 0;
 
-    if (!(c = selmon->sel))
+    if (!((c = selmon->sel)))
         return;
     if (c->isfullscreen) /* no support resizing fullscreen windows by mouse */
         return;
@@ -2737,10 +2730,21 @@ togglefullscreen(const Arg *arg) {
 }
 
 void
-selectlayout(const Arg *arg) {
+toggle_layout(const Arg *arg) {
+    int target_layout = 0;
     const Layout *cur = selmon->lt[selmon->sellt];
-    const Layout *target = cur == arg->v ? &layouts[0] : arg->v;
-    setlayout(&(Arg) {.v = target});
+    for (int i = 0; i < LENGTH(layouts); i++) {
+        if (&layouts[i] == cur) {
+            if (i == LENGTH(layouts) - 1) {
+                target_layout = 0;
+            }
+            else {
+                target_layout = i + 1;
+            }
+            break;
+        }
+    }
+    setlayout(&(Arg) {.v = &layouts[target_layout]});
 }
 
 void
@@ -3660,7 +3664,7 @@ view(const Arg *arg) {
         if (arg->ui == ~0)
             selmon->pertag->curtag = 0;
         else {
-            for (i = 0; !(arg->ui & 1 << i); i++);
+            for (i = 0; !(arg->ui & 1 << i); i++) {}
             selmon->pertag->curtag = i + 1;
         }
     } else {
@@ -3757,50 +3761,58 @@ viewtoright(const Arg *arg) {
 
 
     }
-    view(&(Arg) {.ui = target_tag ? target : ((selmon->tagset[selmon->seltags]) << 1)});
+    view(&(Arg) {.ui = target_tag ? target : selmon->tagset[selmon->seltags] << 1});
 }
 
 void
 tile(Monitor *m) {
-    // master_w: master的宽度, master_h: master的高度, master_y: master的y坐标, stack_h: stack的高度, stack_y: stack的y坐标
-    unsigned int i, n, master_w, master_h, master_y, stack_h, stack_y;
+    // n ： tile 客户端数量
+    unsigned int i, n;
+    // master_cw: master 区域 client 宽度、master_ch: master 区域 client 高度、stack_ch: stack 区域 client 高度、master_y: master的y坐标、stack_y: stack的y坐标
+    unsigned int master_cw, master_ch, stack_ch, master_y, stack_y;
     Client *c;
 
-    for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+    for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++) {}
     if (n == 0) return;
 
     if (n > m->nmaster) {
-        // 如果 client 数量大于定于的 master 区域的数量时，master_w = (屏幕宽度 + 屏幕和 client 的缝隙) * master占比
-        master_w = m->nmaster ? (int) ((float) (m->ww - gappi) * m->mfact) : 0;
+        // 当 client 数量大于的 master 区域的数量时，表示有 stack 区域，则 master 区域宽度(master_w) = 屏幕宽度(ww) * mfact(占比) - gappo(窗口与边缘 缝隙大小) - gappi(窗口与窗口 缝隙大小)/2
+        master_cw = m->nmaster ? (int)((float)m->ww * m->mfact) - gappo - gappi/ 2 : 0;
     } else {
-        master_w = m->ww - 2 * gappo + gappi;
+        master_cw = m->ww - 2 * gappo;
     }
 
-    // 单个master的高度
-    master_h = m->nmaster == 0 ? 0 : (m->wh - 2 * gappo - gappi * (m->nmaster - 1)) / m->nmaster;
-    // 单个stack的高度
-    stack_h = n == m->nmaster ? 0 : (m->wh - 2 * gappo - gappi * (n - m->nmaster - 1)) / (n - m->nmaster);
+    // 单个 master 区域的高度。
+    // 有两种情况： 1、当 n >= m->nmaster，高度为 (m->wh - 2 * gappo - gappi * (m->nmaster - 1)) / m->nmaster;
+    //            2、当 n < m->nmaster，高度为 (m->wh - 2 * gappo - gappi * (n - 1)) / n;
+    master_ch = m->nmaster == 0 ?
+        0 : n >= m->nmaster ?
+            (m->wh - 2 * gappo - gappi * (m->nmaster - 1)) / m->nmaster : (m->wh - 2 * gappo - gappi * (n - 1)) / n;
+    // 单个 stack 区域的高度
+    stack_ch = n > m->nmaster ? (m->wh - 2 * gappo - gappi * (n - m->nmaster - 1)) / (n - m->nmaster) : 0;
 
-    for (i = 0, master_y = stack_y = gappo, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+    for (i = 0, master_y = stack_y = gappo, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++) {
         if (i < m->nmaster) {
+            // 绘制 master 区域
             resize(c,
                    m->wx + gappo,
                    m->wy + (int) master_y,
-                   (int) master_w - 2 * c->bw - gappi,
-                   (int) master_h - 2 * c->bw,
+                   (int) master_cw - 2 * c->bw,
+                   (int) master_ch - 2 * c->bw,
                    0);
-            master_y += HEIGHT(c) + gappi;
+            master_y += master_ch  + gappi;
         } else {
-            resize(
-                    c,
-                    m->wx + (int) master_w + gappo,
+            // 绘制 stack 区域
+            resize(c,
+                    m->wx + gappo + (int)master_cw + gappi,
                     m->wy + (int) stack_y,
-                    m->ww - (int) master_w - 2 * c->bw - 2 * gappo,
-                    (int) stack_h - 2 * c->bw,
+                    m->ww - (int) master_cw - 2 * gappo - gappi - 2 * c->bw,
+                    (int) stack_ch - 2 * c->bw,
                     0
             );
-            stack_y += HEIGHT(c) + gappi;
+            stack_y += stack_ch + gappi;
         }
+    }
 }
 
 void
@@ -3813,12 +3825,12 @@ void
 grid(Monitor *m, unsigned int local_gappo, unsigned int local_gappi) {
     unsigned int i, n;
     unsigned int cx, cy, cw, ch;
-    unsigned int dx;
+    unsigned int dx = 0;
     unsigned int cols, rows, overcols;
     Client *c;
 
     // 获取多少个 client
-    for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+    for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++) {}
     if (n == 0) return;
     if (n == 1) {
         c = nexttiled(m->clients);
@@ -3875,6 +3887,11 @@ grid(Monitor *m, unsigned int local_gappo, unsigned int local_gappi) {
     }
 }
 
+void
+scroll(Monitor *m) {
+
+}
+
 Client *
 wintoclient(Window w) {
     Client *c;
@@ -3893,7 +3910,7 @@ wintosystrayicon(Window w) {
 
     if (!showsystray || !w)
         return i;
-    for (i = systray->icons; i && i->win != w; i = i->next);
+    for (i = systray->icons; i && i->win != w; i = i->next) {}
     return i;
 }
 
@@ -3955,8 +3972,8 @@ systraytomon(Monitor *m) {
             return selmon;
         return m == selmon ? m : NULL;
     }
-    for (n = 1, t = mons; t && t->next; n++, t = t->next);
-    for (i = 1, t = mons; t && t->next && i < systraypinning; i++, t = t->next);
+    for (n = 1, t = mons; t && t->next; n++, t = t->next) {}
+    for (i = 1, t = mons; t && t->next && i < systraypinning; i++, t = t->next) {}
     if (n < systraypinning)
         return mons;
     return t;
@@ -4007,7 +4024,7 @@ zoom(const Arg *arg) {
         return;
     if (c->isfloating || c->isfullscreen)
         return;
-    if (c == nexttiled(selmon->clients) && !(c = nexttiled(c->next)))
+    if (c == nexttiled(selmon->clients) && !((c = nexttiled(c->next))))
          return;
     pop(c);
 }
@@ -4020,7 +4037,7 @@ previewallwin()
 
     // 排布所有窗口的预览座标
     unsigned int n;
-    for (n = 0, c = m->clients; c; c = c->next, n++);
+    for (n = 0, c = m->clients; c; c = c->next, n++) {}
     if (n == 0) return;
     setpreviewwins(n, m, 60, 15);
 
@@ -4498,7 +4515,7 @@ main(int argc, char *argv[])
     if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
         fputs("warning: no locale support\n", stderr);
     // 获取屏幕连接
-    if (!(dpy = XOpenDisplay(NULL)))
+    if (!((dpy = XOpenDisplay(NULL))))
         die("dwm: cannot open display");
     checkotherwm();
     set_env();

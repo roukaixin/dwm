@@ -1,3 +1,4 @@
+#pragma once
 #include <X11/XF86keysym.h>
 
 static int showsystray                      = 1;         /* 是否显示托盘栏 */
@@ -21,8 +22,7 @@ static const unsigned int baralpha          = 0xc0;      /* 状态栏透明度 *
 static const unsigned int borderalpha       = 0xdd;      /* 边框透明度 */
 static const unsigned int null_alpha        = 0x00;
 static const char *fonts[]                  = {
-        "JetBrainsMono Nerd Font:style=Regular:size=13:antialias=true:autohint=true",
-        "monospace:size=13"
+        "JetBrainsMono Nerd Font:style=Regular:size=13:antialias=true:autohint=true"
 };
 static const char dmenufont[]               = "JetBrainsMono Nerd Font:size=13";
 static const char *colors[][3] = {
@@ -185,6 +185,7 @@ static const Env envs[] = {
 static const Layout layouts[] = {
         { "󰙀", tile },               /* 平铺布局 */
         { "󰕰", magicgrid },          /* 网格布局 */
+        { "", scroll },          /* 网格布局 */
 };
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
@@ -230,7 +231,7 @@ static const Key keys[] = {
     { MODKEY,              XK_c,            killclient,       {0} },                        /* super c            |  关闭窗口 */
     { MODKEY|ControlMask,  XK_c,            forcekillclient,  {0} },                        /* super ctrl c       |  强制关闭窗口(处理某些情况下无法销毁的窗口) */
     { MODKEY|ShiftMask,    XK_q,            quit,             {0} },                        /* super shift q      |  退出 */
-    { MODKEY|ShiftMask,    XK_space,        selectlayout,     {.v = &layouts[1]} },         /* super shift space  |  切换布局 */
+    { MODKEY|ShiftMask,    XK_space,        toggle_layout,    {0} },         /* super shift space  |  切换布局 */
     { MODKEY,              XK_o,            showonlyorall,    {0} },                        /* super o            |  切换 只显示一个窗口 / 全部显示 */
     { MODKEY|ControlMask,  XK_equal,        setgap,           {.i = -6} },                  /* super ctrl +       |  窗口增大 */
     { MODKEY|ControlMask,  XK_minus,        setgap,           {.i = +6} },                  /* super ctrl -       |  窗口减小 */
